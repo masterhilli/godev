@@ -5,6 +5,7 @@ import "testing"
 import "os/exec"
 
 
+var teststring = ".\n..\nexec_test.go\n"
 
 func TestSimpleExecutionOfLSCmdWithArgument(t *testing.T) {
 	out := executeCmd(t, "ls", "-la")
