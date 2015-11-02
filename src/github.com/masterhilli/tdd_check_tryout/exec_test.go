@@ -48,7 +48,7 @@ func (s *MyDockerTestEngine) TestCreateOwnDockerImage(c *C) {
 	check(err)
 	n, err := file.WriteString(primitiveDockerFile)
 	check(err)
-	fmt.Printf("%d\n", n)
+	fmt.Sprintf("%d\n", n)
 	err = file.Sync()
 	check(err)
 	err = file.Close()
@@ -65,6 +65,11 @@ func (s *MyDockerTestEngine) TestCreateOwnDockerImage(c *C) {
 	os.Chdir("..")
 	os.RemoveAll(dockCreateImage)
 	s.DockerImages(c,"docker-whale2")
+
+	out, err = exec.Command("docker", "rmi", "-f", "docker-whale2").Output()
+	if err != nil {
+		c.Fatal(err)
+	}
 }
 
 func (s *MyDockerTestEngine) DockerRunWithArgument(c *C, checkstring string, cmdArgumets ...string) {
