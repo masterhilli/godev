@@ -107,3 +107,16 @@ func TestTRTROwnHTMLStreamShouldReturn2matches(t *testing.T) {
 	expected := 2
 	AssertEqualsInt (t, len(actual), expected)	
 }
+
+func TestReturnIndexShouldReturn2(t *testing.T) {
+	index := returnIndexArray("<tr>...</tr>afkjajfladslkflkasd<tr>llll</tr>", "<tr>.*")
+
+	AssertEqualsInt(t, len(index), 2)
+}
+
+
+func TestJiraStreamShouldReturn2Index(t *testing.T) {
+	index := returnIndexArray(myJiraPageTestString, "<tr>.*")
+
+	AssertEqualsInt(t, len(index), 2)
+}
