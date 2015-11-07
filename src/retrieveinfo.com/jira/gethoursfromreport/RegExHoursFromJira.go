@@ -1,6 +1,6 @@
 package jiraRegEx
 import ( 
-	"fmt"
+//	"fmt"
 	"regexp"
 	)
 
@@ -13,7 +13,7 @@ func ReturnTRValues(stringToParse string) [] string {
 }
 
 func ReturnTDClassMainValues(stringToParse string) [] string {
-	fmt.Printf("Input for TD Search: %s", stringToParse)
+//	fmt.Printf("*****************Input for TD Search: %s\n", stringToParse)
 	return returnValuesOfTag(stringToParse, "td",  " class=\"main\"")
 }
 
@@ -25,52 +25,50 @@ func returnValuesOfTag(stringToParse string, tag string, attributes string) [] s
 func parseForTagStartEnd(stringToParse string, tag string, attributes string) []IntPair {
 	indexArray := returnIndexPairs(stringToParse, tag, attributes)
 	if (indexArray == nil) {
-		return []IntPair{{0,0}}
+		return []IntPair{{0,0}} // really return nil!
 	}
 	return indexArray
 }
 
-func returnIndexArray(stringToParse string, searchRegExp string) []int {
+func returnIndexArray(stringToParse string, searchRegExp string) [][]int {
 	regexpIndexFinder := regexp.MustCompile(searchRegExp)
-	indexArray := regexpIndexFinder.FindAllStringSubmatchIndex(stringToParse, 2000)
+	indexArray := regexpIndexFinder.FindAllStringSubmatchIndex(stringToParse, -1)
 	
 	if  indexArray == nil { 
 //		fmt.Printf("**********returnIndexArray nil**********\n")
 		return nil 
 	} else {
 //		fmt.Printf("**********returnIndexArray:%d %d**********\n", len(indexArray), len(indexArray[0]))
-		return indexArray[0]
+		return indexArray
 	}
 }
 
 func returnIndexPairs(stringToParse string, tag string, attributes string) []IntPair {
-	startIndexArray := returnIndexArray(stringToParse, "<"+tag+ attributes+">")
-	stopIndexArray  := returnIndexArray(stringToParse, "</" + tag + ">")
+	startIndexArray := returnIndexArray(stringToParse, "(?is)<"+tag+ attributes+">")
+	stopIndexArray  := returnIndexArray(stringToParse, "(?is)</" + tag + ">")
 	if len(startIndexArray) != len(stopIndexArray) {
 		return nil
 	}
 
-	//fmt.Printf("Length is not the same %s\n", stringToParse)
+//	fmt.Printf("******************* returnIndexPairs: %d %s  (Start: %d / End: %d)\n", len(startIndexArray), stringToParse, startIndexArray[0][1], stopIndexArray[0][0])
 
 	var indexPairs []IntPair = make([]IntPair, len(startIndexArray))
 	for i := 0; i < len(startIndexArray); i++ {
-		indexPairs[i].start = startIndexArray[i]
-		indexPairs[i].stop  = stopIndexArray[i]
+		indexPairs[i].start = startIndexArray[i][1]
+		indexPairs[i].stop  = stopIndexArray[i][0]
 	}
 	return indexPairs
 }
 
 func trimTagsFromArray(indexArray []IntPair, stringToTrim string, tagNameLen int) []string{
-	tagLen := tagNameLen+2
-
 	parsedSubMatchedTexts := make([]string, len(indexArray))
 	for i := 0; i < len(indexArray); i++ {
-		if (indexArray[i].stop - indexArray[i].start) >= tagLen {
-			parsedSubMatchedTexts[i] = stringToTrim[indexArray[i].start+tagLen:indexArray[i].stop]
+		if (indexArray[i].stop - indexArray[i].start) >= 0 {
+			parsedSubMatchedTexts[i] = stringToTrim[indexArray[i].start:indexArray[i].stop] //+tagLen
 		} else {
 			parsedSubMatchedTexts[i] = ""
 		}
-		fmt.Printf("*****************ParsedSubMatch: %s\n", parsedSubMatchedTexts[i])
+//		fmt.Printf("*****************ParsedSubMatch: %s\n", parsedSubMatchedTexts[i])
 	}	
 	return parsedSubMatchedTexts
 }
