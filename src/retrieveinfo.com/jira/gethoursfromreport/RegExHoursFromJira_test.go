@@ -64,7 +64,7 @@ var myJiraPageTestString string = "<div style=\"width: 100%; overflow-x: auto\">
 "        <tbody><tr>\n"+
 "            <td class=\"main\" colspan=\"2\">\n"+
 "                1/Sep - 2/Nov\n"+
-"            </td>\n"+
+"            </---Problemheretd>\n"+
 "                            <td class=\"main\">anton.jessner</td>\n"+
 "                            <td class=\"main\">david.hangl</td>\n"+
 "                            <td class=\"main\">leonardo.fisic</td>\n"+
@@ -99,6 +99,25 @@ func TestTRTROwnHTMLStreamShouldReturn2matches(t *testing.T) {
 	AssertEqualsInt (t, len(actual), expected)	
 }
 
+var tdtdTestString string = "<td class=\"main\"><b>34h</b></td>\n"+
+"                    		  <td class=\"main\"><b>13h40m</b></td>"
+
+func TestTagTDWithTwoMatchesShouldResult2(t *testing.T) {
+	//trTagValuesInArray := ReturnTRValues(myJiraPageTestString)
+	actual := ReturnTDClassMainValues(tdtdTestString)
+	expected := 2
+	AssertEqualsInt (t, len(actual), expected)	
+}
+
+
+func TTestTagTDJiraHtmlStreamMatches11(t *testing.T) {
+	trTagValuesInArray := ReturnTRValues(myJiraPageTestString)
+	actual := ReturnTDClassMainValues(trTagValuesInArray[0])
+	expected := 11
+	AssertEqualsInt (t, len(actual), expected)	
+}
+
+
 func TestReturnIndexShouldReturn2(t *testing.T) {
 	index := returnIndexArray("<tr>...</tr>afkjajfladslkflkasd<tr>llll</tr>", "<tr>.*")
 
@@ -108,6 +127,5 @@ func TestReturnIndexShouldReturn2(t *testing.T) {
 
 func TestJiraStreamShouldReturn2Index(t *testing.T) {
 	index := returnIndexArray(myJiraPageTestString, "<tr>.*")
-
 	AssertEqualsInt(t, len(index), 2)
 }
