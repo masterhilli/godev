@@ -4,11 +4,21 @@ import (
 	"regexp"
 	)
 
-var regexpForTRStart string = "<tr>"
-var regexpForTRStop string = "</tr>"
-
 type IntPair struct {
     start, stop int
+}
+
+func ReturnTRValues(stringToParse string) [] string {
+	indexArray := parseForTagStartEnd(stringToParse, "tr")
+	return trimTagsFromArray(indexArray, stringToParse, len("tr"))
+}
+
+func parseForTagStartEnd(stringToParse string, tag string) []IntPair {
+	indexArray := returnIndexPairs(stringToParse, tag)
+	if (indexArray == nil) {
+		return []IntPair{{0,0}}
+	}
+	return indexArray
 }
 
 func returnIndexArray(stringToParse string, searchRegExp string) []int {
@@ -22,9 +32,9 @@ func returnIndexArray(stringToParse string, searchRegExp string) []int {
 	}
 }
 
-func returnIndexPairs(stringToParse string) []IntPair {
-	startIndexArray := returnIndexArray(stringToParse, regexpForTRStart)
-	stopIndexArray  := returnIndexArray(stringToParse, regexpForTRStop)
+func returnIndexPairs(stringToParse string, tag string) []IntPair {
+	startIndexArray := returnIndexArray(stringToParse, "<"+tag+">")
+	stopIndexArray  := returnIndexArray(stringToParse, "</" + tag + ">")
 	if len(startIndexArray) != len(stopIndexArray) {
 //		fmt.Printf("Length is not the same %s\n", stringToParse)
 		return nil
@@ -38,25 +48,16 @@ func returnIndexPairs(stringToParse string) []IntPair {
 	return indexPairs
 }
 
-func ParseForTRTR(stringToParse string) []string {
-	indexArray := returnIndexPairs(stringToParse)
-	if (indexArray == nil) {
-		return []string{""}
-	}
+func trimTagsFromArray(indexArray []IntPair, stringToTrim string, tagNameLen int) []string{
+	tagLen := tagNameLen+2
 
 	parsedSubMatchedTexts := make([]string, len(indexArray))
 	for i := 0; i < len(indexArray); i++ {
-//		fmt.Printf("start: %d / stop: %d \"%s\"\n", indexArray[i].start, indexArray[i].stop, stringToParse)
-		if (indexArray[i].stop - indexArray[i].start) >= 4 {
-			parsedSubMatchedTexts[i] = stringToParse[indexArray[i].start+4:indexArray[i].stop]
+		if (indexArray[i].stop - indexArray[i].start) >= tagLen {
+			parsedSubMatchedTexts[i] = stringToTrim[indexArray[i].start+tagLen:indexArray[i].stop]
 		} else {
 			parsedSubMatchedTexts[i] = ""
 		}
 	}	
 	return parsedSubMatchedTexts
 }
-
-/*
-func HasTablesOnHtml(){
-	Mat
-}*/

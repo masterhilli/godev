@@ -21,40 +21,40 @@ var testString string = "<tr>---</tr>"
 var sepcialChars string = "^!&%()=?`'#+*_-:.;,><"
 // Test
 func TestTRTRRegExParser(t *testing.T) {
-	actual := ParseForTRTR(testString)
+	actual := ReturnTRValues(testString)
 	expected := "---"
 	AssertEqualsString (t, actual[0], expected)
 }
 
 func TestTRTRWithNumAndChars(t *testing.T) {
-	actual := ParseForTRTR("<tr>BLA123BLA</tr>")
+	actual := ReturnTRValues("<tr>BLA123BLA</tr>")
 	expected := "BLA123BLA"
 	AssertEqualsString (t, actual[0], expected)
 }
 
 
 func TestTRTRNovaluesIn(t *testing.T) {
-	actual := ParseForTRTR("<tr></tr>")
+	actual := ReturnTRValues("<tr></tr>")
 	expected := ""
 	AssertEqualsString (t, actual[0], expected)
 }
 
 func TestTRTRNoMatch(t *testing.T) {
-	actual := ParseForTRTR("<tr</tr>")
+	actual := ReturnTRValues("<tr</tr>")
 	expected := ""
 	AssertEqualsString (t, actual[0], expected)
 }
 
 
 func TestTRTRSpecialCharacters(t *testing.T) {
-	actual := ParseForTRTR("<tr>"+sepcialChars+"</tr>")
+	actual := ReturnTRValues("<tr>"+sepcialChars+"</tr>")
 	expected := sepcialChars
 	AssertEqualsString (t, actual[0], expected)
 }
 
 
 func TestTRTRSearchInLongerString(t *testing.T) {
-	actual := ParseForTRTR("scvjewoqfäiusaölkenskajflaöwkepori<tr>"+sepcialChars+"</tr>´dsfkjhjhsajkhfdahdskhaksdfkjas")
+	actual := ReturnTRValues("scvjewoqfäiusaölkenskajflaöwkepori<tr>"+sepcialChars+"</tr>´dsfkjhjhsajkhfdahdskhaksdfkjas")
 	expected := sepcialChars
 	AssertEqualsString (t, actual[0], expected)
 }
@@ -92,18 +92,9 @@ var myJiraPageTestString string = "<div style=\"width: 100%; overflow-x: auto\">
 "                    <td class=\"total\"><b>1h35m</b></td>\n"+
 "                <td class=\"total\"><b>172h5m</b></td>\n"+
 "</tr>"
-/*
-
-func TestTRTRCorrectJiraHTMLStreamReturns2Matches(t *testing.T) {
-	actual := ParseForTRTR(myJiraPageTestString)
-	expected := 2
-	AssertEqualsInt (t, len(actual), expected)	
-}*/
-
-
 
 func TestTRTROwnHTMLStreamShouldReturn2matches(t *testing.T) {
-	actual := ParseForTRTR("<tr>...</tr>afkjajfladslkflkasd<tr>llll</tr>")
+	actual := ReturnTRValues("<tr>...</tr>afkjajfladslkflkasd<tr>llll</tr>")
 	expected := 2
 	AssertEqualsInt (t, len(actual), expected)	
 }
