@@ -44,7 +44,7 @@ func (s *ReadInDataTestEngine) checkForError(c *C, e error) {
 func (s *ReadInDataTestEngine) TestReadingInWholeFile(c *C) {
 	data, err := ioutil.ReadFile("./testdata/Report-Jira.html")
     s.checkForError(c, err)
-    c.Assert(len(data), Equals, 172252)
+    c.Assert(len(data), Equals, 175551)
 }
 
 var regexpToFindNames string = "(?is)<tr>.*[<td [[:ascii:]]*>[[:alpha:]]*\\.[[:alpha:]]*</td>]*[[:space:]]*<td class=\"main\"><b>Total</b></td>[[:space:]]*</tr>"
