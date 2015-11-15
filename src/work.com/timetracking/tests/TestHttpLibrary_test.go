@@ -1,8 +1,7 @@
-package jiraRegEx
+package testinterfaces
 
 import (
 	"net/http"
-	"net/url"
 	"path/filepath"
 	"io/ioutil"
 	"testing"
@@ -13,6 +12,7 @@ import (
 
 // Hook up gocheck into the "go test" runner.
 type HttpTestEngine struct{}
+
 func TestHttpLibrary(t *testing.T) { 
 	Suite(&HttpTestEngine{})
 	TestingT(t) 
@@ -63,8 +63,6 @@ func (s *HttpTestEngine) TestHttpsGetJiraUrl(c *C) {
 	}
 }
 
-
-var urlToJiraReport string = "http://10.207.121.181/j/secure/ConfigureReport.jspa?startDateId=1%2FSep%2F15&endDateId=11%2FNov%2F15&projectId=10941&jqlQueryId=&selectedProjectId=10941&reportKey=com.synergyapps.plugins.jira.timepo-timesheet-plugin%3Aissues-report&Next=Next"
 func (s *HttpTestEngine) TestJiraCreateRequestAndLogin(c *C) {
 	filename, _ := filepath.Abs("..\\jira.yaml")
 	yamlInformation, err := ioutil.ReadFile(filename)
@@ -101,84 +99,3 @@ func (s *HttpTestEngine) WriteOutToFile(data []byte, fileName string)  {
         panic(err)
     }
 }
-
-func (s *HttpTestEngine) TestHttpPostFormParseForBodyNoError(c *C) {
-	resp, err := http.PostForm("http://www.google.com/", url.Values{"gfe_rd" : {"cr"}, "ei":{"lVhCVreWAsOH8Qe6lq2gDQ"}, "gws_rd" : {"ssl"}})
-	if (err == nil) {
-		_, errReader := ioutil.ReadAll(resp.Body)
-		c.Assert(errReader, IsNil)
-		resp.Body.Close()
-	} else {
-		c.Assert(err, NotNil)
-	}
-}
-
-func (s *HttpTestEngine) TestHttpsPostFormBodyOfJiraReport(c *C) {
-	//
-	var urlToJiraReport string = "http://10.207.121.181/j/secure/ConfigureReport.jspa"
-	urlValues := url.Values{
-							"startDateId": {"1/Sep/15"},
-							"endDateId": {"11/Nov/15"},
-							"projectId": {"10941"},
-							"jqlQueryId": {""},
-							"selectedProjectId": {"10941"},
-							"reportKey": {"com.synergyapps.plugins.jira.timepo-timesheet-plugin:issues-report"},
-							"Next": {"Next"}}
-	resp, err := http.PostForm(urlToJiraReport, urlValues)
-	if (err == nil) {
-		respBody, errReader := ioutil.ReadAll(resp.Body)
-		c.Assert(errReader, IsNil)
-		s.WriteOutToFile([]byte(respBody), "TestHttpsPostFormBodyOfJiraReport.html")
-		resp.Body.Close()
-	} else {
-		c.Assert(err, IsNil)
-	}
-}
-
-
-
-type Config struct {
-	JiraLogin LoginData
-    JiraUrl UrlInformation
-}
-
-type LoginData struct {
-    Username string
-    Password string
-}
-
-type UrlInformation struct {
-    Url string
-}
-
-
-func (s *HttpTestEngine) TestReadJiraConfig(c *C) {
-	filename, _ := filepath.Abs("./jira.yaml")
-	yamlInformation, err := ioutil.ReadFile(filename)
-	if err != nil {
-		panic(err)
-	}
-
-	var config Config
-    err = yaml.Unmarshal(yamlInformation, &config)
-    if err != nil {
-		panic(err)
-	}
-	c.Assert(config.JiraLogin.Username, Equals, "xyz")
-	c.Assert(config.JiraLogin.Password, Equals, "abcdefgh")
-	c.Assert(config.JiraUrl.Url, Equals, "http://10.207.121.181/j/secure/")
-}
-
-func (s *HttpTestEngine) TestYamlUnmarshaler(c *C) {
-	var config Config
-	var yamlInformation string = "jiralogin:\n    username: abc\n    password: xyz\njiraurl:\n    url: www.google.at"
-    err := yaml.Unmarshal([]byte(yamlInformation), &config)
-    if err != nil {
-		panic(err)
-	}
-	c.Assert(config.JiraLogin.Username, Equals, "abc")
-	c.Assert(config.JiraLogin.Password, Equals, "xyz")
-	c.Assert(config.JiraUrl.Url, Equals, "www.google.at")
-}
-
-

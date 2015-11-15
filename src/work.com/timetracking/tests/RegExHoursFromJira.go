@@ -1,6 +1,5 @@
-package jiraRegEx
+package testinterfaces
 import ( 
-//	"fmt"
 	"regexp"
 	)
 
@@ -13,7 +12,6 @@ func ReturnTRValues(stringToParse string) [] string {
 }
 
 func ReturnTDClassMainValues(stringToParse string) [] string {
-//	fmt.Printf("*****************Input for TD Search: %s\n", stringToParse)
 	return returnValuesOfTag(stringToParse, "td",  " class=\"main\"")
 }
 
@@ -35,10 +33,8 @@ func returnIndexArray(stringToParse string, searchRegExp string) [][]int {
 	indexArray := regexpIndexFinder.FindAllStringSubmatchIndex(stringToParse, -1)
 	
 	if  indexArray == nil { 
-//		fmt.Printf("**********returnIndexArray nil**********\n")
 		return nil 
 	} else {
-//		fmt.Printf("**********returnIndexArray:%d %d**********\n", len(indexArray), len(indexArray[0]))
 		return indexArray
 	}
 }
@@ -49,9 +45,6 @@ func returnIndexPairs(stringToParse string, tag string, attributes string) []Int
 	if len(startIndexArray) != len(stopIndexArray) {
 		return nil
 	}
-
-//	fmt.Printf("******************* returnIndexPairs: %d %s  (Start: %d / End: %d)\n", len(startIndexArray), stringToParse, startIndexArray[0][1], stopIndexArray[0][0])
-
 	var indexPairs []IntPair = make([]IntPair, len(startIndexArray))
 	for i := 0; i < len(startIndexArray); i++ {
 		indexPairs[i].start = startIndexArray[i][1]
@@ -68,7 +61,6 @@ func trimTagsFromArray(indexArray []IntPair, stringToTrim string, tagNameLen int
 		} else {
 			parsedSubMatchedTexts[i] = ""
 		}
-//		fmt.Printf("*****************ParsedSubMatch: %s\n", parsedSubMatchedTexts[i])
 	}	
 	return parsedSubMatchedTexts
 }
