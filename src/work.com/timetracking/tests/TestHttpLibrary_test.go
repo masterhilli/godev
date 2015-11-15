@@ -50,7 +50,7 @@ func (s *HttpTestEngine) TestHttpsGetParseForBodyNoError(c *C) {
 	}
 }
 
-func (s *HttpTestEngine) TestHttpsGetJiraUrl(c *C) {
+func (s *HttpTestEngine) TTestHttpsGetJiraUrl(c *C) {
 	var url string = "http://10.207.121.181/j/"
 	resp, err := http.Get(url)
 	if (err == nil) {
@@ -63,7 +63,7 @@ func (s *HttpTestEngine) TestHttpsGetJiraUrl(c *C) {
 	}
 }
 
-func (s *HttpTestEngine) TestJiraCreateRequestAndLogin(c *C) {
+func (s *HttpTestEngine) TTestJiraCreateRequestAndLogin(c *C) {
 	filename, _ := filepath.Abs("..\\jira.yaml")
 	yamlInformation, err := ioutil.ReadFile(filename)
 	if err != nil {
