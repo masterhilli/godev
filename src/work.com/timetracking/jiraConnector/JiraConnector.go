@@ -2,9 +2,8 @@ package jiraconnector
 
 import (
     "gopkg.in/yaml.v2"
-    "io/ioutil"
-    "path/filepath"
     . "work.com/timetracking/helper"
+    prj "work.com/timetracking/prjinfo"
 )
 
 type JiraConnector struct {
@@ -29,23 +28,13 @@ func (jc *JiraConnector) NewJiraConnector() {
 }
 
 func (jc *JiraConnector) Initialize(pathToConfig string) {
-    content := jc.readInFile(pathToConfig)
+    content := ReadInFile(pathToConfig)
     jc.config = jc.unmarshalToConfig(content)
 }
 
-// this is a test support function, should have nothing todo in here!
-func (jc *JiraConnector) RetrieveJIRAReportStream() string {
-    data, err := ioutil.ReadFile("./testdata/Report-Jira.html")
-    PanicOnError(err)
-    return string(data)
-}
+func (jc *JiraConnector) GetReportContentForProjectInTimeframe(projectInfo prj.Prjinfo) string {
 
-func (jc *JiraConnector) readInFile(path string) []byte {
-    filename, errAbs := filepath.Abs(path)
-    PanicOnError(errAbs)
-    content, errReadFile := ioutil.ReadFile(filename)
-    PanicOnError(errReadFile)
-    return content
+    return ""
 }
 
 func (jc *JiraConnector) unmarshalToConfig(content []byte) Config {

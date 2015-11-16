@@ -3,7 +3,7 @@ package main
 import (
     "fmt"
     . "work.com/timetracking/helper"
-    jiraConnect "work.com/timetracking/jiraConnector"
+    //    jiraConnect "work.com/timetracking/jiraConnector"
     parsehtml "work.com/timetracking/parsehtml"
     pt "work.com/timetracking/personaltime"
 )
@@ -17,8 +17,7 @@ import (
 
 func main() {
     var generateStatitics parsehtml.ParseHTML
-    var jc jiraConnect.JiraConnector
-    data := jc.RetrieveJIRAReportStream()
+    data := string(ReadInFile("./testdata/report-jira.html"))
     fmt.Printf("Data read in from file, len: %d\n", len(data))
 
     tableWithNames := generateStatitics.ParseInputForHTMLTableFittingRegexp(generateStatitics.GetRegExpForTableRowToFindEmployeeNames(), data)
