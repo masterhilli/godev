@@ -9,7 +9,7 @@ import (
 )
 
 type Projects struct {
-	ParseData []Prjinfo
+	Data      []Prjinfo
 	Seperator rune
 }
 
@@ -34,7 +34,7 @@ func (p *Projects) Initialize(path string, seperator rune) {
 func (p *Projects) parseProjectsFromByteStream(content []byte) {
 	records := p.readRecordsFromContent(string(content))
 
-	p.ParseData = make([]Prjinfo, len(records))
+	p.Data = make([]Prjinfo, len(records))
 	for i := 0; i < len(records); i++ {
 		p.setPrjInfoAtPosition(i, records[i])
 	}
@@ -52,14 +52,14 @@ func (p *Projects) readRecordsFromContent(content string) [][]string {
 
 func (p *Projects) setPrjInfoAtPosition(position int, record []string) {
 	if len(record) != 5 {
-		p.ParseData[position].Prj = "Length of items not enough, we need 5 items"
+		p.Data[position].Prj = "Length of items not enough, we need 5 items"
 		return
 	}
-	p.ParseData[position].Prj = setStringValue(record[0])
-	p.ParseData[position].Id = setIntValue(record[1])
-	p.ParseData[position].Query = setStringValue(record[2])
-	p.ParseData[position].Startdate = setJiraDateValue(record[3])
-	p.ParseData[position].Enddate = setJiraDateValue(record[4])
+	p.Data[position].Prj = setStringValue(record[0])
+	p.Data[position].Id = setIntValue(record[1])
+	p.Data[position].Query = setStringValue(record[2])
+	p.Data[position].Startdate = setJiraDateValue(record[3])
+	p.Data[position].Enddate = setJiraDateValue(record[4])
 }
 
 func setStringValue(value string) string {

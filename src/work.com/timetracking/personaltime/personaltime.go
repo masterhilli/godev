@@ -1,12 +1,12 @@
 package personaltime
 
 import (
-	"regexp"
-	"strconv"
+    "regexp"
+    "strconv"
 )
 
 type PersonalTime struct {
-    name string
+    name                           string
     weeks, days, hours, mins, secs int
 }
 
@@ -24,17 +24,17 @@ func (p *PersonalTime) InitializeTime(time string) {
 }
 
 func ParseForInteger(time string, timeIdentifier string) int {
-    regexpForValue := regexp.MustCompile("(?is)[0-9]+"+ timeIdentifier)
+    regexpForValue := regexp.MustCompile("(?is)[0-9]+" + timeIdentifier)
     valueFromRegExp := regexpForValue.FindStringSubmatch(time)
     if valueFromRegExp == nil {
         //fmt.Printf("*** DEBUG: valueFromRegExp returned to nil(%s/%s)\n", time, timeIdentifier)
         return 0
     }
-    
+
     match := valueFromRegExp[0]
-    match = match[0:len(match)-1]
+    match = match[0 : len(match)-1]
     value, err := strconv.Atoi(match)
-    
+
     if err != nil {
         return 0
     } else {
@@ -42,19 +42,26 @@ func ParseForInteger(time string, timeIdentifier string) int {
     }
 }
 
-func (p *PersonalTime) ToString() string {  
+func (p *PersonalTime) ToString() string {
     //fmt.Printf("%s: %dw/%dd/%dh/%dm/%ds\n", p.name, p.weeks, p.days, p.hours, p.mins, p.secs)
-    return "***" + p.name   + " : "+p.toStringTimes(p.weeks, "week(s)") +
-                              " : "+p.toStringTimes(p.days, "day(s)") +
-                              " : "+p.toStringTimes(p.hours, "hour(s)")+ 
-                              " : "+p.toStringTimes(p.mins, "min(s)")+
-                              " : "+p.toStringTimes(p.secs, "sec(s)")
+    return "***" + p.name + " : " + p.toStringTimes(p.weeks, "week(s)") +
+        " : " + p.toStringTimes(p.days, "day(s)") +
+        " : " + p.toStringTimes(p.hours, "hour(s)") +
+        " : " + p.toStringTimes(p.mins, "min(s)") +
+        " : " + p.toStringTimes(p.secs, "sec(s)")
 }
 
 func (p *PersonalTime) toStringTimes(time int, name string) string {
     var timeStringBuffer string = ""
-    if (time > 0) {
+    if time > 0 {
         timeStringBuffer = timeStringBuffer + strconv.Itoa(time) + " " + name
     }
     return timeStringBuffer
+}
+
+func (p *PersonalTime) ToCsvFormat() string {
+    dmins := float64(p.mins)
+    mins := dmins / 60.0
+    time := strconv.FormatFloat(float64(p.hours)+mins, 'f', 2, 64)
+    return p.name + "," + time
 }
