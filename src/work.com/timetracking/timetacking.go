@@ -21,10 +21,11 @@ import (
 * Create a struct that creates a csv file with the necessary information (in future this might be possible to create in confluence itself)
  */
 
+var testing bool = false
+
 func main() {
     var jc jiraConnection.JiraConnector
     var pi prjinfo.Projects
-    var testing bool = false
 
     if len(os.Args) >= 2 && os.Args[1] == "-t" {
         testing = true
@@ -44,8 +45,10 @@ func main() {
         tm = ReadTeammembers("./teammembers.txt")
     }
 
-    for k := range tm {
-        fmt.Printf("Read in:\t%s\n", k)
+    if testing {
+        for k := range tm {
+            fmt.Printf("Read in:\t%s\n", k)
+        }
     }
 
     var content string
@@ -103,10 +106,12 @@ func PrintValuesForProject(prjName string, nameValues, timeValues []string, team
     }
 
     for key := range nameValues {
-        if teammembers[personsTimes[key].GetName()] == true {
+        if teammembers[strings.ToLower(personsTimes[key].GetName())] == true {
             sumOfTimes = sumOfTimes + personsTimes[key].ToFloat64InHours()
-            fmt.Printf("Team Member: %s : %f\n", personsTimes[key].ToCsvFormat(), personsTimes[key].ToFloat64InHours())
-        } else {
+            if testing {
+                fmt.Printf("Team Member: %s : %f\n", personsTimes[key].ToCsvFormat(), personsTimes[key].ToFloat64InHours())
+            }
+        } else if testing {
             fmt.Printf("Non-Team Member: %s : %f\n", personsTimes[key].ToCsvFormat(), personsTimes[key].ToFloat64InHours())
         }
     }
@@ -134,7 +139,7 @@ func ReadTeammembers(file string) map[string]bool {
     for errLine == nil {
         line = strings.TrimSpace(line)
         if len(line) > 0 {
-            teammembers[line] = true
+            teammembers[strings.ToLower(line)] = true
         }
         line, errLine = reader.ReadString('\n')
     }
