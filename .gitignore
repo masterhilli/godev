@@ -34,4 +34,5 @@ trace.out
 *.html
 *.csv
 teammembers.txt
+teammembers_all.txt
 teammembers_test.txt
