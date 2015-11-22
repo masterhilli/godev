@@ -5,9 +5,7 @@ import (
     "fmt"
     "os"
     "path/filepath"
-    //    "strconv"
     "strings"
-    "time"
     . "work.com/timetracking/helper"
     jiraConnection "work.com/timetracking/jiraConnector"
     parsehtml "work.com/timetracking/parsehtml"
@@ -59,9 +57,8 @@ func main() {
 
     var nameTimePairs map[string]NameTimePair = make(map[string]NameTimePair)
     var content string
-    start := time.Now()
     for i := range pi.Data {
-        fmt.Printf("Retieving %d of %d in %s\n", i, len(pi.Data), time.Since(start))
+        fmt.Printf(".")
         if testing {
             content = string(ReadInFile("./testdata/Report-Jira.html"))
         } else {
@@ -74,6 +71,7 @@ func main() {
         retValues.TimeValues = timeValues
         nameTimePairs[pi.Data[i].Prj] = retValues
     }
+    fmt.Printf(".\n")
 
     PrintValuesForProject(nameTimePairs, tm)
 
@@ -103,9 +101,12 @@ func PrintValuesForProject(nameTimePairs map[string]NameTimePair, teammembers ma
     for i := range totalPrjs {
         var prjTime pt.PersonalTime = totalPrjs[i]
         prjTime.SetOverallTime(sumOfAllPrj)
-        fmt.Printf("%s \n", prjTime.ToCsvFormat())
+        if prjTime.ToFloat64InHours() > 0.0 {
+            fmt.Printf("%s \n", prjTime.ToCsvFormat())
+        }
         totalPrjs[i] = prjTime
     }
+    fmt.Printf("Sum of TIMES: %fh\n", sumOfAllPrj)
 
 }
 
