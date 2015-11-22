@@ -33,3 +33,5 @@ trace.out
 *.yaml
 *.html
 *.csv
+teammembers.txt
+teammembers_test.txt
