@@ -10,6 +10,10 @@ type PersonalTime struct {
     weeks, days, hours, mins, secs int
 }
 
+func (p *PersonalTime) GetName() string {
+    return p.name
+}
+
 func (p *PersonalTime) Initialize(name string, time string) {
     p.name = name
     p.InitializeTime(time)
@@ -59,9 +63,13 @@ func (p *PersonalTime) toStringTimes(time int, name string) string {
     return timeStringBuffer
 }
 
-func (p *PersonalTime) ToCsvFormat() string {
+func (p *PersonalTime) ToFloat64InHours() float64 {
     dmins := float64(p.mins)
     mins := dmins / 60.0
-    time := strconv.FormatFloat(float64(p.hours)+mins, 'f', 2, 64)
+    return float64(p.hours) + mins
+}
+
+func (p *PersonalTime) ToCsvFormat() string {
+    time := strconv.FormatFloat(p.ToFloat64InHours(), 'f', 2, 64)
     return p.name + "," + time
 }
