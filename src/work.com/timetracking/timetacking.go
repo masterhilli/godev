@@ -5,8 +5,9 @@ import (
     "fmt"
     "os"
     "path/filepath"
-    "strconv"
+    //    "strconv"
     "strings"
+    "time"
     . "work.com/timetracking/helper"
     jiraConnection "work.com/timetracking/jiraConnector"
     parsehtml "work.com/timetracking/parsehtml"
@@ -22,6 +23,11 @@ import (
  */
 
 var testing bool = false
+
+type NameTimePair struct {
+    // PrjName                string
+    NameValues, TimeValues []string
+}
 
 func main() {
     var jc jiraConnection.JiraConnector
@@ -51,16 +57,25 @@ func main() {
         }
     }
 
+    var nameTimePairs map[string]NameTimePair = make(map[string]NameTimePair)
     var content string
+    start := time.Now()
     for i := range pi.Data {
+        fmt.Printf("Retieving %d of %d in %s\n", i, len(pi.Data), time.Since(start))
         if testing {
             content = string(ReadInFile("./testdata/Report-Jira.html"))
         } else {
             content = jc.GetReportContentForProjectInTimeframe(pi.Data[i]) // fix point to retrieve
         }
-        nameValues, timeValues := ParseHTMLContent(content)
-        PrintValuesForProject(pi.Data[i].Prj, nameValues, timeValues, tm)
+        var retValues NameTimePair
+        var nameValues, timeValues []string
+        nameValues, timeValues = ParseHTMLContent(content)
+        retValues.NameValues = nameValues
+        retValues.TimeValues = timeValues
+        nameTimePairs[pi.Data[i].Prj] = retValues
     }
+
+    PrintValuesForProject(nameTimePairs, tm)
 
 }
 
@@ -74,38 +89,40 @@ func ParseHTMLContent(data string) ([]string, []string) {
     return nameValues, timeValues
 }
 
-func PrintValuesPerItem(nameValues, timeValues []string) {
-    if len(nameValues)+1 == len(timeValues) {
-        var i int = 0
-        var personsTimes []pt.PersonalTime = make([]pt.PersonalTime, len(nameValues)+1)
-        for i = 0; i < len(nameValues); i++ {
-            var person pt.PersonalTime
-            person.Initialize(nameValues[i], timeValues[i])
-            personsTimes[i] = person
-        }
-        var total pt.PersonalTime
-        total.Initialize("TOTAL", timeValues[i])
-        personsTimes[i] = total
-        for i := range personsTimes {
-            fmt.Printf("PERSON: %s\n", personsTimes[i].ToCsvFormat())
-        }
+func PrintValuesForProject(nameTimePairs map[string]NameTimePair, teammembers map[string]bool) {
+    var totalPrjs map[string]pt.PersonalTime = make(map[string]pt.PersonalTime)
+    var sumOfAllPrj float64 = 0
+
+    for i := range nameTimePairs {
+        var retTotalTime pt.PersonalTime
+        retTotalTime = CreateTotalOfPrj(i, nameTimePairs[i], teammembers)
+        sumOfAllPrj = sumOfAllPrj + retTotalTime.ToFloat64InHours()
+        totalPrjs[i] = retTotalTime
     }
+
+    for i := range totalPrjs {
+        var prjTime pt.PersonalTime = totalPrjs[i]
+        prjTime.SetOverallTime(sumOfAllPrj)
+        fmt.Printf("%s \n", prjTime.ToCsvFormat())
+        totalPrjs[i] = prjTime
+    }
+
 }
 
-func PrintValuesForProject(prjName string, nameValues, timeValues []string, teammembers map[string]bool) {
+func CreateTotalOfPrj(prjName string, nameTimePair NameTimePair, teammembers map[string]bool) pt.PersonalTime {
     var total pt.PersonalTime
     var sumOfTimes float64 = 0.0
 
     var i int = 0
-    var personsTimes []pt.PersonalTime = make([]pt.PersonalTime, len(nameValues)+1)
+    var personsTimes []pt.PersonalTime = make([]pt.PersonalTime, len(nameTimePair.NameValues)+1)
 
-    for i = 0; i < len(nameValues); i++ {
+    for i = 0; i < len(nameTimePair.NameValues); i++ {
         var person pt.PersonalTime
-        person.Initialize(nameValues[i], timeValues[i])
+        person.InitializeFromString(nameTimePair.NameValues[i], nameTimePair.TimeValues[i])
         personsTimes[i] = person
     }
 
-    for key := range nameValues {
+    for key := range nameTimePair.NameValues {
         if teammembers[strings.ToLower(personsTimes[key].GetName())] == true {
             sumOfTimes = sumOfTimes + personsTimes[key].ToFloat64InHours()
             if testing {
@@ -116,13 +133,8 @@ func PrintValuesForProject(prjName string, nameValues, timeValues []string, team
         }
     }
 
-    if len(timeValues) > 0 {
-        total.Initialize(prjName, timeValues[len(timeValues)-1])
-    } else {
-        total.Initialize(prjName, "0h")
-    }
-
-    fmt.Printf("%s : %s\n", total.ToCsvFormat(), strconv.FormatFloat(sumOfTimes, 'f', 2, 64))
+    total.InitializeFromFloat(prjName, sumOfTimes)
+    return total
 }
 
 func ReadTeammembers(file string) map[string]bool {

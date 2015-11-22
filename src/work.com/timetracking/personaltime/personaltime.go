@@ -8,15 +8,26 @@ import (
 type PersonalTime struct {
     name                           string
     weeks, days, hours, mins, secs int
+    overallTimeOfAllProjects       float64
 }
 
 func (p *PersonalTime) GetName() string {
     return p.name
 }
 
-func (p *PersonalTime) Initialize(name string, time string) {
+func (p *PersonalTime) SetOverallTime(overallTime float64) {
+    p.overallTimeOfAllProjects = overallTime
+}
+
+func (p *PersonalTime) InitializeFromString(name string, time string) {
     p.name = name
     p.InitializeTime(time)
+}
+
+func (p *PersonalTime) InitializeFromFloat(name string, timeInHours float64) {
+    p.name = name
+    p.hours = int(timeInHours)
+    p.mins = int((timeInHours - float64(p.hours)) * 60)
 }
 
 func (p *PersonalTime) InitializeTime(time string) {
@@ -71,5 +82,10 @@ func (p *PersonalTime) ToFloat64InHours() float64 {
 
 func (p *PersonalTime) ToCsvFormat() string {
     time := strconv.FormatFloat(p.ToFloat64InHours(), 'f', 2, 64)
-    return p.name + "," + time
+    var retVal string = p.name + "," + time
+    if p.overallTimeOfAllProjects > 0.0 {
+        percentOfOverallPrj := strconv.FormatFloat((100.0/p.overallTimeOfAllProjects)*p.ToFloat64InHours(), 'f', 1, 64)
+        retVal = retVal + "," + percentOfOverallPrj + "%"
+    }
+    return retVal
 }
