@@ -33,6 +33,7 @@ trace.out
 *.yaml
 *.html
 *.csv
+*.zip
 teammembers.txt
 teammembers_all.txt
 teammembers_test.txt
