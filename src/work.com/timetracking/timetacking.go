@@ -13,13 +13,6 @@ import (
     prjinfo "work.com/timetracking/prjinfo"
 )
 
-/* TODO:
-* Create a struct holding all jira log in information & connection strings
-* Create a struct that holds the projects to retrieve (time and so on)
-* Create a struct that parses the data and creates the time overview
-* Create a struct that creates a csv file with the necessary information (in future this might be possible to create in confluence itself)
- */
-
 var testing bool = false
 
 type NameTimePair struct {
