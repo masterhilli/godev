@@ -31,8 +31,17 @@ func main() {
     var jc jiraConnection.JiraConnector
     var pi prjinfo.Projects
 
-    if len(os.Args) >= 2 && os.Args[1] == "-t" {
-        testing = true
+    if len(os.Args) >= 2 {
+        if os.Args[1] == "-t" {
+            testing = true
+        } else if os.Args[1] == "--help" {
+            content := ReadInFile("./timetracking_help.txt")
+            fmt.Printf("%s\n", string(content))
+            return
+        } else {
+            fmt.Printf("If you do not know how to use this program please call with \"--help\"\n")
+            return
+        }
     }
 
     if testing {
