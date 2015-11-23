@@ -34,6 +34,8 @@ func main() {
     if len(os.Args) >= 2 {
         if os.Args[1] == "-t" {
             testing = true
+        } else if os.Args[1] == "-r" {
+            testing = false
         } else if os.Args[1] == "--help" {
             content := ReadInFile("./timetracking_help.txt")
             fmt.Printf("%s\n", string(content))
@@ -42,6 +44,9 @@ func main() {
             fmt.Printf("If you do not know how to use this program please call with \"--help\"\n")
             return
         }
+    } else {
+        fmt.Printf("If you do not know how to use this program please call with \"--help\"\n")
+        return
     }
 
     if testing {

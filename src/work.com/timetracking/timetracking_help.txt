@@ -1,5 +1,7 @@
 Possible Arguments:
 --help calls this help
+ -r    runs the program
+  
 <no other arguments till now>
 
 
