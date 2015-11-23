@@ -6,6 +6,7 @@ import (
     "os"
     "path/filepath"
     "strings"
+    //    "sync"
     . "work.com/timetracking/helper"
     jiraConnection "work.com/timetracking/jiraConnector"
     parsehtml "work.com/timetracking/parsehtml"
@@ -63,25 +64,34 @@ func main() {
     }
 
     var nameTimePairs map[string]NameTimePair = make(map[string]NameTimePair)
-    var content string
+    fmt.Printf("ReadIn Projects: %d\n", len(pi.Data))
     for i := range pi.Data {
-        fmt.Printf(".")
-        if testing {
-            content = string(ReadInFile("./testdata/Report-Jira.html"))
-        } else {
-            content = jc.GetReportContentForProjectInTimeframe(pi.Data[i]) // fix point to retrieve
-        }
-        var retValues NameTimePair
-        var nameValues, timeValues []string
-        nameValues, timeValues = ParseHTMLContent(content)
-        retValues.NameValues = nameValues
-        retValues.TimeValues = timeValues
-        nameTimePairs[pi.Data[i].Prj] = retValues
+        RunRetrieveContent(nameTimePairs, pi.Data[i], jc)
     }
-    fmt.Printf(".\n")
+    //fmt.Printf(".\n")
 
     PrintValuesForProject(nameTimePairs, tm)
 
+}
+
+func RunRetrieveContent(nameTimePairs map[string]NameTimePair, prjInfo prjinfo.Prjinfo, jc jiraConnection.JiraConnector) {
+    var content string
+    //var wg sync.WaitGroup
+
+    if testing {
+        content = string(ReadInFile("./testdata/Report-Jira.html"))
+    } else {
+        content = jc.GetReportContentForProjectInTimeframe(prjInfo) // fix point to retrieve
+    }
+    var retValues NameTimePair
+    var nameValues, timeValues []string
+    nameValues, timeValues = ParseHTMLContent(content)
+    retValues.NameValues = nameValues
+    retValues.TimeValues = timeValues
+    //wg.Wait()
+    nameTimePairs[prjInfo.Prj] = retValues
+    //wg.Done()
+    fmt.Printf(".%s DONE\n", prjInfo.Prj)
 }
 
 func ParseHTMLContent(data string) ([]string, []string) {
