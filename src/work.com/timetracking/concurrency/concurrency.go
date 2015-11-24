@@ -6,12 +6,24 @@ import (
 	"time"
 )
 
-var wg sync.WaitGroup // 1
+var wgM sync.WaitGroup // 1
 
 func main() {
-	/*CallingSQFor10Times()
-	wg.Wait()*/
-	playPingerPonger()
+	myChannel := make(chan int)
+	wgM.Add(10)
+	for i := 0; i < 10; i++ {
+		go genSQ(myChannel, i)
+	}
+
+	//time.Sleep(30 * time.Millisecond)
+	wgM.Wait()
+	close(myChannel)
+	/*for k := 0; k < 10; k++ {
+		fmt.Println(<-myChannel)
+	}*/
+	//CallingSQFor10Times()
+
+	//playPingerPonger()
 }
 
 func playPingerPonger() {
@@ -62,10 +74,9 @@ func CallingSQFor10Times() {
 
 func genSQ(out <-chan int, nums int) {
 	fmt.Println("Going to sleep")
-	wg.Add(nums)
-	defer wg.Done()
-	time.Sleep(20 * time.Millisecond)
+	time.Sleep(1 * time.Millisecond)
 	out = sq(gen(nums))
+	wgM.Done()
 }
 
 /*

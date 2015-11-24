@@ -6,7 +6,7 @@ import (
     "os"
     "path/filepath"
     "strings"
-    //    "sync"
+    "time"
     . "work.com/timetracking/helper"
     jiraConnection "work.com/timetracking/jiraConnector"
     parsehtml "work.com/timetracking/parsehtml"
@@ -68,9 +68,9 @@ func main() {
         }
     }
 
+    timeStart := time.Now()
     var myRetValueChannel chan ChanelReturnValue = make(chan ChanelReturnValue)
     var nameTimePairs map[string]NameTimePair = make(map[string]NameTimePair)
-    fmt.Printf("ReadIn Projects: %d\n", len(pi.Data))
     for i := range pi.Data {
         go RunRetrieveContent(myRetValueChannel, pi.Data[i], jc)
     }
@@ -78,14 +78,17 @@ func main() {
     for j := 0; j < len(pi.Data); j++ {
         retValue := <-myRetValueChannel
         nameTimePairs[retValue.Prj] = retValue.Content
-        fmt.Printf(".%s DONE\n", retValue.Prj)
     }
+    close(myRetValueChannel)
 
+    timeStop := time.Now()
+    fmt.Printf("-->All projects retrieved in %v\n", timeStop.Sub(timeStart))
     PrintValuesForProject(nameTimePairs, tm)
 
 }
 
 func RunRetrieveContent(returnChannel chan ChanelReturnValue, prjInfo prjinfo.Prjinfo, jc jiraConnection.JiraConnector) {
+    timeStart := time.Now()
     var content string
     var retVal ChanelReturnValue
 
@@ -101,6 +104,8 @@ func RunRetrieveContent(returnChannel chan ChanelReturnValue, prjInfo prjinfo.Pr
     retValues.TimeValues = timeValues
     retVal.Prj = prjInfo.Prj
     retVal.Content = retValues
+    timeStop := time.Now()
+    fmt.Printf("-->%s DONE in %v\n", retVal.Prj, timeStop.Sub(timeStart))
     returnChannel <- retVal
 }
 
