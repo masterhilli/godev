@@ -21,6 +21,11 @@ type NameTimePair struct {
     NameValues, TimeValues []string
 }
 
+type ChanelReturnValue struct {
+    Prj     string
+    Content NameTimePair
+}
+
 func main() {
     var jc jiraConnection.JiraConnector
     var pi prjinfo.Projects
@@ -63,20 +68,26 @@ func main() {
         }
     }
 
+    var myRetValueChannel chan ChanelReturnValue = make(chan ChanelReturnValue)
     var nameTimePairs map[string]NameTimePair = make(map[string]NameTimePair)
     fmt.Printf("ReadIn Projects: %d\n", len(pi.Data))
     for i := range pi.Data {
-        RunRetrieveContent(nameTimePairs, pi.Data[i], jc)
+        go RunRetrieveContent(myRetValueChannel, pi.Data[i], jc)
     }
-    //fmt.Printf(".\n")
+
+    for j := 0; j < len(pi.Data); j++ {
+        retValue := <-myRetValueChannel
+        nameTimePairs[retValue.Prj] = retValue.Content
+        fmt.Printf(".%s DONE\n", retValue.Prj)
+    }
 
     PrintValuesForProject(nameTimePairs, tm)
 
 }
 
-func RunRetrieveContent(nameTimePairs map[string]NameTimePair, prjInfo prjinfo.Prjinfo, jc jiraConnection.JiraConnector) {
+func RunRetrieveContent(returnChannel chan ChanelReturnValue, prjInfo prjinfo.Prjinfo, jc jiraConnection.JiraConnector) {
     var content string
-    //var wg sync.WaitGroup
+    var retVal ChanelReturnValue
 
     if testing {
         content = string(ReadInFile("./testdata/Report-Jira.html"))
@@ -88,10 +99,9 @@ func RunRetrieveContent(nameTimePairs map[string]NameTimePair, prjInfo prjinfo.P
     nameValues, timeValues = ParseHTMLContent(content)
     retValues.NameValues = nameValues
     retValues.TimeValues = timeValues
-    //wg.Wait()
-    nameTimePairs[prjInfo.Prj] = retValues
-    //wg.Done()
-    fmt.Printf(".%s DONE\n", prjInfo.Prj)
+    retVal.Prj = prjInfo.Prj
+    retVal.Content = retValues
+    returnChannel <- retVal
 }
 
 func ParseHTMLContent(data string) ([]string, []string) {
