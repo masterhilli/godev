@@ -5,6 +5,7 @@ import (
     "fmt"
     "os"
     "path/filepath"
+    "strconv"
     "strings"
     "time"
     . "work.com/timetracking/helper"
@@ -130,16 +131,30 @@ func PrintValuesForProject(nameTimePairs map[string]NameTimePair, teammembers ma
         totalPrjs[i] = retTotalTime
     }
 
+    PrintValuesInCSVFormatSSS("Projectname", "Hours", "Percent")
     for i := range totalPrjs {
         var prjTime pt.PersonalTime = totalPrjs[i]
         prjTime.SetOverallTime(sumOfAllPrj)
         if prjTime.ToFloat64InHours() > 0.0 {
-            fmt.Printf("%s \n", prjTime.ToCsvFormat())
+            PrintValuesInCSVFormatPersTime(prjTime)
         }
         totalPrjs[i] = prjTime
     }
-    fmt.Printf("Sum of TIMES: %fh\n", sumOfAllPrj)
 
+    PrintValuesInCSVFormatSFF("OVERALLTIME", sumOfAllPrj, 100.0)
+}
+
+var seperator rune = ';'
+
+func PrintValuesInCSVFormatSFF(projectname string, hours float64, percent float64) {
+    PrintValuesInCSVFormatSSS(projectname, strconv.FormatFloat(hours, 'f', 2, 64), strconv.FormatFloat(percent, 'f', 1, 64)+"%")
+}
+func PrintValuesInCSVFormatSSS(projectname string, hours string, percent string) {
+    fmt.Printf("%s%c%s%c%s%c\n", projectname, seperator, hours, seperator, percent, seperator)
+}
+
+func PrintValuesInCSVFormatPersTime(prjTime pt.PersonalTime) {
+    fmt.Printf("%s\n", prjTime.ToCsvFormat(seperator))
 }
 
 func CreateTotalOfPrj(prjName string, nameTimePair NameTimePair, teammembers map[string]bool) pt.PersonalTime {
@@ -159,10 +174,10 @@ func CreateTotalOfPrj(prjName string, nameTimePair NameTimePair, teammembers map
         if teammembers[strings.ToLower(personsTimes[key].GetName())] == true {
             sumOfTimes = sumOfTimes + personsTimes[key].ToFloat64InHours()
             if testing {
-                fmt.Printf("Team Member: %s : %f\n", personsTimes[key].ToCsvFormat(), personsTimes[key].ToFloat64InHours())
+                fmt.Printf("Team Member: %s : %f\n", personsTimes[key].ToCsvFormat(seperator), personsTimes[key].ToFloat64InHours())
             }
         } else if testing {
-            fmt.Printf("Non-Team Member: %s : %f\n", personsTimes[key].ToCsvFormat(), personsTimes[key].ToFloat64InHours())
+            fmt.Printf("Non-Team Member: %s : %f\n", personsTimes[key].ToCsvFormat(seperator), personsTimes[key].ToFloat64InHours())
         }
     }
 

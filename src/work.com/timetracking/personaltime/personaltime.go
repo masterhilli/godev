@@ -80,12 +80,13 @@ func (p *PersonalTime) ToFloat64InHours() float64 {
     return float64(p.hours) + mins
 }
 
-func (p *PersonalTime) ToCsvFormat() string {
+func (p *PersonalTime) ToCsvFormat(seperator rune) string {
     time := strconv.FormatFloat(p.ToFloat64InHours(), 'f', 2, 64)
-    var retVal string = p.name + "," + time
+    var retVal string = p.name + string(seperator) + time
     if p.overallTimeOfAllProjects > 0.0 {
         percentOfOverallPrj := strconv.FormatFloat((100.0/p.overallTimeOfAllProjects)*p.ToFloat64InHours(), 'f', 1, 64)
-        retVal = retVal + "," + percentOfOverallPrj + "%"
+        retVal = retVal + string(seperator) + percentOfOverallPrj + "%"
     }
+    retVal = retVal + string(seperator)
     return retVal
 }
