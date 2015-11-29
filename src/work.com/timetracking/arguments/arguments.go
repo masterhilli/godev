@@ -43,7 +43,7 @@ func (t *TimetrackingArgs) GetEndDate() time.Time {
 		endDate := t.startDate.Add(duration)
 		return endDate
 	}
-	return t.startDate
+	return time.Now()
 
 }
 
