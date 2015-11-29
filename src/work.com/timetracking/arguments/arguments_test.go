@@ -63,3 +63,13 @@ func (ate *ArgumentTestEngine) TestNotSetFlagForSprintStatistic(c *C) {
 	ate.ta.ParseArguments([]string{"test.exe", "tm=TestFilename", "PRJ=myProjectFile.csv"})
 	c.Assert(ate.ta.sprintStatistic, Equals, false)
 }
+
+func (ate *ArgumentTestEngine) TestSetStartDate(c *C) {
+	ate.ta.ParseArguments([]string{"test.exe", "tm=TestFilename", "PRJ=myProjectFile.csv", "start?5.1.2015", "-sprint"})
+	c.Assert(ate.ta.startDate, Equals, "5.1.2015")
+}
+
+func (ate *ArgumentTestEngine) TestNotSetAStartDate(c *C) {
+	ate.ta.ParseArguments([]string{"test.exe", "tm=TestFilename", "PRJ=myProjectFile.csv"})
+	c.Assert(ate.ta.startDate, Equals, "")
+}
