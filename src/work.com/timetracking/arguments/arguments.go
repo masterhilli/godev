@@ -3,6 +3,7 @@ package arguments
 import (
 	"fmt"
 	"strings"
+	"time"
 )
 
 const defaultTeammemberFilepath string = "./teammembers.txt"
@@ -12,7 +13,7 @@ type TimetrackingArgs struct {
 	countParsedArgs       int
 	filePathToTeammembers string
 	filePathToProjects    string
-	startDate             string
+	startDate             time.Time
 	sprintStatistic       bool
 }
 
@@ -36,11 +37,21 @@ func (t *TimetrackingArgs) GetFilePathToProjects() string {
 	return retVal
 }
 
+func (t *TimetrackingArgs) GetEndDate() time.Time {
+	if t.sprintStatistic {
+		duration := time.Hour * 24 * 7
+		endDate := t.startDate.Add(duration)
+		return endDate
+	}
+	return t.startDate
+
+}
+
 func (t *TimetrackingArgs) clearArguments() {
 	t.countParsedArgs = 0
 	t.filePathToProjects = ""
 	t.filePathToTeammembers = ""
-	t.startDate = ""
+	t.startDate = time.Date(0, time.January, 0, 0, 0, 0, 0, time.UTC)
 	t.sprintStatistic = false
 }
 
@@ -126,8 +137,39 @@ func (t *TimetrackingArgs) parseDateArg(dateArg string) {
 func (t *TimetrackingArgs) setDateVariable(prefix, dateArg string) {
 	switch prefix {
 	case "start":
-		t.startDate = dateArg
+		t.startDate = t.parseIntoTimeObj(dateArg)
 	default:
 		fmt.Printf("Unknown Date argument: %s\n", prefix)
 	}
+}
+
+func (t *TimetrackingArgs) parseIntoTimeObj(date string) time.Time {
+	layout := t.createTimeLayout(date)
+	var myTime time.Time
+	myTime, err := time.Parse(layout, date)
+	if err != nil {
+		panic(err)
+	}
+	return myTime
+}
+
+func (t *TimetrackingArgs) createTimeLayout(date string) string {
+	index := strings.IndexRune(date, '.')
+	var layout string = ""
+	if index == 1 {
+		layout = layout + "2."
+	} else {
+		layout = layout + "02."
+	}
+
+	index = strings.IndexRune(date[index+1:], '.')
+	if index == 1 {
+		layout = layout + "1."
+	} else {
+		layout = layout + "01."
+	}
+
+	layout = layout + "2006"
+	return layout
+
 }

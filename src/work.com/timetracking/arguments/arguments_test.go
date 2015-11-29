@@ -3,6 +3,7 @@ package arguments
 import (
 	. "gopkg.in/check.v1"
 	"testing"
+	"time"
 )
 
 type ArgumentTestEngine struct {
@@ -66,10 +67,62 @@ func (ate *ArgumentTestEngine) TestNotSetFlagForSprintStatistic(c *C) {
 
 func (ate *ArgumentTestEngine) TestSetStartDate(c *C) {
 	ate.ta.ParseArguments([]string{"test.exe", "tm=TestFilename", "PRJ=myProjectFile.csv", "start?5.1.2015", "-sprint"})
-	c.Assert(ate.ta.startDate, Equals, "5.1.2015")
+	t := time.Date(2015, time.January, 5, 0, 0, 0, 0, time.UTC)
+	c.Assert(ate.ta.startDate, Equals, t)
+}
+
+func (ate *ArgumentTestEngine) TestGetEndDate(c *C) {
+	ate.ta.ParseArguments([]string{"test.exe", "tm=TestFilename", "PRJ=myProjectFile.csv", "start?25.12.2015", "-sprint"})
+	t := time.Date(2016, time.January, 1, 0, 0, 0, 0, time.UTC)
+	c.Assert(ate.ta.GetEndDate(), Equals, t)
 }
 
 func (ate *ArgumentTestEngine) TestNotSetAStartDate(c *C) {
 	ate.ta.ParseArguments([]string{"test.exe", "tm=TestFilename", "PRJ=myProjectFile.csv"})
-	c.Assert(ate.ta.startDate, Equals, "")
+	t := time.Date(0, time.January, 0, 0, 0, 0, 0, time.UTC)
+	c.Assert(ate.ta.startDate, Equals, t)
+}
+
+func (ate *ArgumentTestEngine) TestCreateTimeLayoutAll2digits(c *C) {
+	layout := ate.ta.createTimeLayout("15.01.2015")
+	c.Assert(layout, Equals, "02.01.2006")
+}
+
+func (ate *ArgumentTestEngine) TestCreateTimeLayoutDay1digit(c *C) {
+	layout := ate.ta.createTimeLayout("1.01.2015")
+	c.Assert(layout, Equals, "2.01.2006")
+}
+
+func (ate *ArgumentTestEngine) TestCreateTimeLayoutMonth1digit(c *C) {
+	layout := ate.ta.createTimeLayout("15.1.2015")
+	c.Assert(layout, Equals, "02.1.2006")
+}
+
+func (ate *ArgumentTestEngine) TestCreateTimeLayoutAll1digit(c *C) {
+	layout := ate.ta.createTimeLayout("1.1.2015")
+	c.Assert(layout, Equals, "2.1.2006")
+}
+
+func (ate *ArgumentTestEngine) TestParseIntoTimeObjAll2digits(c *C) {
+	parsedTime := ate.ta.parseIntoTimeObj("15.01.2015")
+	t := time.Date(2015, time.January, 15, 0, 0, 0, 0, time.UTC)
+	c.Assert(parsedTime, Equals, t)
+}
+
+func (ate *ArgumentTestEngine) TestParseIntoTimeObjDay1digit(c *C) {
+	parsedTime := ate.ta.parseIntoTimeObj("1.11.2015")
+	t := time.Date(2015, time.November, 1, 0, 0, 0, 0, time.UTC)
+	c.Assert(parsedTime, Equals, t)
+}
+
+func (ate *ArgumentTestEngine) TestParseIntoTimeObjMonth1digit(c *C) {
+	parsedTime := ate.ta.parseIntoTimeObj("15.1.2015")
+	t := time.Date(2015, time.January, 15, 0, 0, 0, 0, time.UTC)
+	c.Assert(parsedTime, Equals, t)
+}
+
+func (ate *ArgumentTestEngine) TestParseIntoTimeObjAll1digit(c *C) {
+	parsedTime := ate.ta.parseIntoTimeObj("1.1.2015")
+	t := time.Date(2015, time.January, 1, 0, 0, 0, 0, time.UTC)
+	c.Assert(parsedTime, Equals, t)
 }
