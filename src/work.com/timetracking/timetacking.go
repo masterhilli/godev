@@ -16,7 +16,7 @@ import (
     prjinfo "work.com/timetracking/prjinfo"
 )
 
-var testing bool = false
+var args arguments.TimetrackingArgs
 
 type NameTimePair struct {
     // PrjName                string
@@ -31,40 +31,50 @@ type ChanelReturnValue struct {
 func main() {
     var jc jiraConnection.JiraConnector
     var pi prjinfo.Projects
+    args = arguments.ParseArguments(os.Args)
 
-    if len(os.Args) >= 2 {
-        if os.Args[1] == "-t" {
-            testing = true
-        } else if os.Args[1] == "-r" {
-            testing = false
-        } else if os.Args[1] == "--help" {
-            content := ReadInFile("./timetracking_help.txt")
-            fmt.Printf("%s\n", string(content))
-            return
-        } else {
-            fmt.Printf("If you do not know how to use this program please call with \"--help\"\n")
-            return
-        }
-    } else {
-        fmt.Printf("If you do not know how to use this program please call with \"--help\"\n")
+    if args.IsHelpCall() {
         return
     }
 
-    if testing {
+    if !args.IsTesting() && !args.IsRunning() {
+        fmt.Println("If you do not know how to use this program please call with \"--help\"")
+        return
+    }
+    /*
+       if len(os.Args) >= 2 {
+           if os.Args[1] == "-t" {
+               testing = true
+           } else if os.Args[1] == "-r" {
+               testing = false
+           } else if os.Args[1] == "--help" {
+               content := ReadInFile("./timetracking_help.txt")
+               fmt.Printf("%s\n", string(content))
+               return
+           } else {
+               fmt.Printf("If you do not know how to use this program please call with \"--help\"\n")
+               return
+           }
+       } else {
+           fmt.Printf("If you do not know how to use this program please call with \"--help\"\n")
+           return
+       }*/
+
+    if args.IsTesting() {
         pi.Initialize("./projects_test.csv", ',')
     } else {
-        pi.Initialize("./projects.csv", ',')
+        pi.Initialize(args.GetFilePathToProjects(), ',')
     }
-    jc.Initialize("./jira.yaml")
+    jc.Initialize(args.GetFilePathConfig())
 
     var tm map[string]bool
-    if testing {
+    if args.IsTesting() {
         tm = ReadTeammembers("./teammembers_test.txt")
     } else {
-        tm = ReadTeammembers("./teammembers.txt")
+        tm = ReadTeammembers(args.GetFilePathToTeammembers())
     }
 
-    if testing {
+    if args.IsTesting() {
         for k := range tm {
             fmt.Printf("Read in:\t%s\n", k)
         }
@@ -94,7 +104,7 @@ func RunRetrieveContent(returnChannel chan ChanelReturnValue, prjInfo prjinfo.Pr
     var content string
     var retVal ChanelReturnValue
 
-    if testing {
+    if args.IsTesting() {
         content = string(ReadInFile("./testdata/Report-Jira.html"))
     } else {
         content = jc.GetReportContentForProjectInTimeframe(prjInfo) // fix point to retrieve
@@ -174,10 +184,10 @@ func CreateTotalOfPrj(prjName string, nameTimePair NameTimePair, teammembers map
     for key := range nameTimePair.NameValues {
         if teammembers[strings.ToLower(personsTimes[key].GetName())] == true {
             sumOfTimes = sumOfTimes + personsTimes[key].ToFloat64InHours()
-            if testing {
+            if args.IsTesting() {
                 fmt.Printf("Team Member: %s : %f\n", personsTimes[key].ToCsvFormat(seperator), personsTimes[key].ToFloat64InHours())
             }
-        } else if testing {
+        } else if args.IsTesting() {
             fmt.Printf("Non-Team Member: %s : %f\n", personsTimes[key].ToCsvFormat(seperator), personsTimes[key].ToFloat64InHours())
         }
     }
