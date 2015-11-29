@@ -55,9 +55,11 @@ func (t *TimetrackingArgs) clearArguments() {
 	t.sprintStatistic = false
 }
 
-func (t *TimetrackingArgs) ParseArguments(args []string) {
-	t.clearArguments()
-	t.parseAllArguments(args)
+func ParseArguments(args []string) TimetrackingArgs {
+	var timeTrackingArgs TimetrackingArgs
+	timeTrackingArgs.clearArguments()
+	timeTrackingArgs.parseAllArguments(args)
+	return timeTrackingArgs
 }
 
 func (t *TimetrackingArgs) parseAllArguments(args []string) {
