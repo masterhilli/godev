@@ -4,6 +4,9 @@ import (
 	"strings"
 )
 
+const defaultTeammemberFilepath string = "./teammembers.txt"
+const defaultProjectsFilepath string = "./projects.csv"
+
 type TimetrackingArgs struct {
 	countParsedArgs       int
 	filePathToTeammembers string
@@ -15,11 +18,19 @@ func (t *TimetrackingArgs) GetCountParsedArgs() int {
 }
 
 func (t *TimetrackingArgs) GetFilePathToTeammembers() string {
-	return t.filePathToTeammembers
+	retVal := t.filePathToTeammembers
+	if len(retVal) == 0 {
+		retVal = defaultTeammemberFilepath
+	}
+	return retVal
 }
 
 func (t *TimetrackingArgs) GetFilePathToProjects() string {
-	return t.filePathToProjects
+	retVal := t.filePathToProjects
+	if len(retVal) == 0 {
+		retVal = defaultProjectsFilepath
+	}
+	return retVal
 }
 
 func (t *TimetrackingArgs) ParseArguments(args []string) {
