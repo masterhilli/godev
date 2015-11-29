@@ -23,3 +23,33 @@ func (ate *ArgumentTestEngine) TestSetTeammemberFile(c *C) {
 	ate.ta.ParseArguments([]string{"test.exe", "tm=TestFilename"})
 	c.Assert(ate.ta.GetFilePathToTeammembers(), Equals, "TestFilename")
 }
+
+func (ate *ArgumentTestEngine) TestSetProjectsFile(c *C) {
+	ate.ta.ParseArguments([]string{"test.exe", "tm=TestFilename", "prj=myProjectFile.csv"})
+	c.Assert(ate.ta.GetFilePathToProjects(), Equals, "myProjectFile.csv")
+}
+
+func (ate *ArgumentTestEngine) TestSetProjectsFileNotLowerCase(c *C) {
+	ate.ta.ParseArguments([]string{"test.exe", "tm=TestFilename", "PRJ=myProjectFile.csv"})
+	c.Assert(ate.ta.GetFilePathToProjects(), Equals, "myProjectFile.csv")
+}
+
+func (ate *ArgumentTestEngine) TestIsStringArgument(c *C) {
+	retVal := ate.ta.isStringArg("bla=SomthingElse")
+	c.Assert(retVal, Equals, true)
+}
+
+func (ate *ArgumentTestEngine) TestIsNotStringArgument(c *C) {
+	retVal := ate.ta.isStringArg("-blaSomthingElse")
+	c.Assert(retVal, Equals, false)
+}
+
+func (ate *ArgumentTestEngine) TestIsBooleanArgument(c *C) {
+	retVal := ate.ta.isBooleanArg("-bla")
+	c.Assert(retVal, Equals, true)
+}
+
+func (ate *ArgumentTestEngine) TestIsNotBooleanArgument(c *C) {
+	retVal := ate.ta.isBooleanArg("b-laSomthingElse")
+	c.Assert(retVal, Equals, false)
+}

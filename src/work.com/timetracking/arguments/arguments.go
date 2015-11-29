@@ -7,6 +7,7 @@ import (
 type TimetrackingArgs struct {
 	countParsedArgs       int
 	filePathToTeammembers string
+	filePathToProjects    string
 }
 
 func (t *TimetrackingArgs) GetCountParsedArgs() int {
@@ -17,6 +18,10 @@ func (t *TimetrackingArgs) GetFilePathToTeammembers() string {
 	return t.filePathToTeammembers
 }
 
+func (t *TimetrackingArgs) GetFilePathToProjects() string {
+	return t.filePathToProjects
+}
+
 func (t *TimetrackingArgs) ParseArguments(args []string) {
 	t.parseAllArguments(args)
 }
@@ -25,8 +30,19 @@ func (t *TimetrackingArgs) parseAllArguments(args []string) {
 	t.countParsedArgs = 0
 	for i := 1; i < len(args); i++ {
 		t.countParsedArgs++
-		t.parseStringArg(args[i])
+		if t.isStringArg(args[i]) {
+			t.parseStringArg(args[i])
+		}
+
 	}
+}
+
+func (t *TimetrackingArgs) isStringArg(arg string) bool {
+	return (strings.IndexRune(arg, '=') >= 0)
+}
+
+func (t *TimetrackingArgs) isBooleanArg(arg string) bool {
+	return (strings.IndexRune(arg, '-') == 0)
 }
 
 func (t *TimetrackingArgs) parseStringArg(stringArg string) {
@@ -34,5 +50,16 @@ func (t *TimetrackingArgs) parseStringArg(stringArg string) {
 	if index < 0 {
 		return // this is not a string arg
 	}
-	t.filePathToTeammembers = stringArg[index+1:]
+	t.setStringVariable(stringArg[0:index], stringArg[index+1:])
+}
+
+func (t *TimetrackingArgs) setStringVariable(prefix string, value string) {
+	switch prefix {
+	case "tm":
+		t.filePathToTeammembers = value
+	case "prj":
+		t.filePathToProjects = value
+	default:
+		// nothing really todo
+	}
 }
