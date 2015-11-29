@@ -25,3 +25,12 @@ func (d *TestDateEngine) TestFormatToUrlFormat(c *C) {
 	jd.Initialize("31.12.2015")
 	c.Assert(jd.GetTimeForUrl(), Equals, "31%2FDec%2F15")
 }
+
+func (d *TestDateEngine) TestDurationParser(c *C) {
+	duration, err := time.ParseDuration("5h30m")
+	if err != nil {
+		panic(err)
+	}
+
+	c.Assert(duration.Hours(), Equals, 5.5)
+}
