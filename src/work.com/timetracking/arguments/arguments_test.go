@@ -53,3 +53,13 @@ func (ate *ArgumentTestEngine) TestIsNotBooleanArgument(c *C) {
 	retVal := ate.ta.isBooleanArg("b-laSomthingElse")
 	c.Assert(retVal, Equals, false)
 }
+
+func (ate *ArgumentTestEngine) TestSetFlagForSprintStatistic(c *C) {
+	ate.ta.ParseArguments([]string{"test.exe", "tm=TestFilename", "PRJ=myProjectFile.csv", "-sprint"})
+	c.Assert(ate.ta.sprintStatistic, Equals, true)
+}
+
+func (ate *ArgumentTestEngine) TestNotSetFlagForSprintStatistic(c *C) {
+	ate.ta.ParseArguments([]string{"test.exe", "tm=TestFilename", "PRJ=myProjectFile.csv"})
+	c.Assert(ate.ta.sprintStatistic, Equals, false)
+}

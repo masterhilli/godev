@@ -11,6 +11,7 @@ type TimetrackingArgs struct {
 	countParsedArgs       int
 	filePathToTeammembers string
 	filePathToProjects    string
+	sprintStatistic       bool
 }
 
 func (t *TimetrackingArgs) GetCountParsedArgs() int {
@@ -43,6 +44,8 @@ func (t *TimetrackingArgs) parseAllArguments(args []string) {
 		t.countParsedArgs++
 		if t.isStringArg(args[i]) {
 			t.parseStringArg(args[i])
+		} else if t.isBooleanArg(args[i]) {
+			t.parseBooleanArg(args[i])
 		}
 
 	}
@@ -70,6 +73,23 @@ func (t *TimetrackingArgs) setStringVariable(prefix string, value string) {
 		t.filePathToTeammembers = value
 	case "prj":
 		t.filePathToProjects = value
+	default:
+		// nothing really todo
+	}
+}
+
+func (t *TimetrackingArgs) parseBooleanArg(boolArg string) {
+	index := strings.IndexRune(boolArg, '-')
+	if index != 0 {
+		return // this is not a string arg
+	}
+	t.setBooleanVariable(boolArg)
+}
+
+func (t *TimetrackingArgs) setBooleanVariable(boolArg string) {
+	switch boolArg {
+	case "-sprint":
+		t.sprintStatistic = true
 	default:
 		// nothing really todo
 	}
