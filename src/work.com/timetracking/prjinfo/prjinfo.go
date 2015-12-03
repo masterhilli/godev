@@ -14,11 +14,12 @@ type Projects struct {
 }
 
 type Prjinfo struct {
-	Prj       string
-	Id        int
-	Query     string
-	Startdate JiraDate
-	Enddate   JiraDate
+	Prj          string
+	Id           int
+	Query        string
+	Startdate    JiraDate
+	Enddate      JiraDate
+	ProductOwner string
 }
 
 type JiraDate struct {
@@ -51,8 +52,8 @@ func (p *Projects) readRecordsFromContent(content string) [][]string {
 }
 
 func (p *Projects) setPrjInfoAtPosition(position int, record []string) {
-	if len(record) != 5 {
-		p.Data[position].Prj = "Length of items not enough, we need 5 items"
+	if len(record) != 6 {
+		p.Data[position].Prj = "Length of items not enough, we need 6 items"
 		return
 	}
 	p.Data[position].Prj = setStringValue(record[0])
@@ -60,6 +61,7 @@ func (p *Projects) setPrjInfoAtPosition(position int, record []string) {
 	p.Data[position].Query = setStringValue(record[2])
 	p.Data[position].Startdate = setJiraDateValue(record[3])
 	p.Data[position].Enddate = setJiraDateValue(record[4])
+	p.Data[position].ProductOwner = setStringValue(record[5])
 }
 
 func setStringValue(value string) string {

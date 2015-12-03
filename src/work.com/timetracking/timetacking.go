@@ -41,24 +41,6 @@ func main() {
         fmt.Println("If you do not know how to use this program please call with \"--help\"")
         return
     }
-    /*
-       if len(os.Args) >= 2 {
-           if os.Args[1] == "-t" {
-               testing = true
-           } else if os.Args[1] == "-r" {
-               testing = false
-           } else if os.Args[1] == "--help" {
-               content := ReadInFile("./timetracking_help.txt")
-               fmt.Printf("%s\n", string(content))
-               return
-           } else {
-               fmt.Printf("If you do not know how to use this program please call with \"--help\"\n")
-               return
-           }
-       } else {
-           fmt.Printf("If you do not know how to use this program please call with \"--help\"\n")
-           return
-       }*/
 
     if args.IsTesting() {
         pi.Initialize("./projects_test.csv", ',')
@@ -174,6 +156,7 @@ func CreateTotalOfPrj(prjName string, nameTimePair NameTimePair, teammembers map
 
     var i int = 0
     var personsTimes []pt.PersonalTime = make([]pt.PersonalTime, len(nameTimePair.NameValues)+1)
+    var personsWithTime []string = make([]string, 0, len(nameTimePair.NameValues)+1)
 
     for i = 0; i < len(nameTimePair.NameValues); i++ {
         var person pt.PersonalTime
@@ -184,6 +167,11 @@ func CreateTotalOfPrj(prjName string, nameTimePair NameTimePair, teammembers map
     for key := range nameTimePair.NameValues {
         if teammembers[strings.ToLower(personsTimes[key].GetName())] == true {
             sumOfTimes = sumOfTimes + personsTimes[key].ToFloat64InHours()
+            if personsTimes[key].ToFloat64InHours() > 0.0 {
+                lastname := personsTimes[key].GetName()
+                lastname = lastname[strings.IndexRune(lastname, '.')+1:]
+                personsWithTime = append(personsWithTime, lastname)
+            }
             if args.IsTesting() {
                 fmt.Printf("Team Member: %s : %f\n", personsTimes[key].ToCsvFormat(seperator), personsTimes[key].ToFloat64InHours())
             }
@@ -192,7 +180,7 @@ func CreateTotalOfPrj(prjName string, nameTimePair NameTimePair, teammembers map
         }
     }
 
-    total.InitializeFromFloat(prjName, sumOfTimes)
+    total.InitializeFromFloat(prjName, sumOfTimes, personsWithTime)
     return total
 }
 

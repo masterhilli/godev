@@ -9,6 +9,7 @@ type PersonalTime struct {
     name                           string
     weeks, days, hours, mins, secs int
     overallTimeOfAllProjects       float64
+    participants                   []string
 }
 
 func (p *PersonalTime) GetName() string {
@@ -24,10 +25,11 @@ func (p *PersonalTime) InitializeFromString(name string, time string) {
     p.InitializeTime(time)
 }
 
-func (p *PersonalTime) InitializeFromFloat(name string, timeInHours float64) {
+func (p *PersonalTime) InitializeFromFloat(name string, timeInHours float64, participants []string) {
     p.name = name
     p.hours = int(timeInHours)
     p.mins = int((timeInHours - float64(p.hours)) * 60)
+    p.participants = participants
 }
 
 func (p *PersonalTime) InitializeTime(time string) {
@@ -82,11 +84,19 @@ func (p *PersonalTime) ToFloat64InHours() float64 {
 
 func (p *PersonalTime) ToCsvFormat(seperator rune) string {
     time := strconv.FormatFloat(p.ToFloat64InHours(), 'f', 2, 64)
-    var retVal string = p.name + string(seperator) + time
+    var sumParticipants string
+    for k := range p.participants {
+        sumParticipants = sumParticipants + p.participants[k]
+        if k < (len(p.participants) - 1) {
+            sumParticipants = sumParticipants + ","
+        }
+
+    }
+    var retVal string = "LCC eServices Region South-East" + string(seperator) + sumParticipants + string(seperator) + p.name
     if p.overallTimeOfAllProjects > 0.0 {
         percentOfOverallPrj := strconv.FormatFloat((100.0/p.overallTimeOfAllProjects)*p.ToFloat64InHours(), 'f', 1, 64)
         retVal = retVal + string(seperator) + percentOfOverallPrj + "%"
     }
-    retVal = retVal + string(seperator)
+    retVal = retVal + string(seperator) + time
     return retVal
 }
