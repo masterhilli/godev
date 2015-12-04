@@ -1,4 +1,4 @@
-package jiraconnector
+package jira
 
 import (
 	. "gopkg.in/check.v1"
@@ -8,7 +8,7 @@ import (
 
 type YamlTestEngine struct {
 	ProjectInfo prj.Prjinfo
-	jc          JiraConnector
+	jc          HtmlConnector
 }
 
 func TestYamlEngine(t *testing.T) {

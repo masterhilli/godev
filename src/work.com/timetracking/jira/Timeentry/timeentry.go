@@ -1,38 +1,38 @@
-package personaltime
+package TimeEntry
 
 import (
     "regexp"
     "strconv"
 )
 
-type PersonalTime struct {
+type TimeEntry struct {
     name                           string
     weeks, days, hours, mins, secs int
     overallTimeOfAllProjects       float64
     participants                   []string
 }
 
-func (p *PersonalTime) GetName() string {
+func (p *TimeEntry) GetName() string {
     return p.name
 }
 
-func (p *PersonalTime) SetOverallTime(overallTime float64) {
+func (p *TimeEntry) SetOverallTime(overallTime float64) {
     p.overallTimeOfAllProjects = overallTime
 }
 
-func (p *PersonalTime) InitializeFromString(name string, time string) {
+func (p *TimeEntry) InitializeFromString(name string, time string) {
     p.name = name
     p.InitializeTime(time)
 }
 
-func (p *PersonalTime) InitializeFromFloat(name string, timeInHours float64, participants []string) {
+func (p *TimeEntry) InitializeFromFloat(name string, timeInHours float64, participants []string) {
     p.name = name
     p.hours = int(timeInHours)
     p.mins = int((timeInHours - float64(p.hours)) * 60)
     p.participants = participants
 }
 
-func (p *PersonalTime) InitializeTime(time string) {
+func (p *TimeEntry) InitializeTime(time string) {
     p.weeks = ParseForInteger(time, "w")
     p.days = ParseForInteger(time, "d")
     p.hours = ParseForInteger(time, "h")
@@ -59,7 +59,7 @@ func ParseForInteger(time string, timeIdentifier string) int {
     }
 }
 
-func (p *PersonalTime) ToString() string {
+func (p *TimeEntry) ToString() string {
     //fmt.Printf("%s: %dw/%dd/%dh/%dm/%ds\n", p.name, p.weeks, p.days, p.hours, p.mins, p.secs)
     return "***" + p.name + " : " + p.toStringTimes(p.weeks, "week(s)") +
         " : " + p.toStringTimes(p.days, "day(s)") +
@@ -68,7 +68,7 @@ func (p *PersonalTime) ToString() string {
         " : " + p.toStringTimes(p.secs, "sec(s)")
 }
 
-func (p *PersonalTime) toStringTimes(time int, name string) string {
+func (p *TimeEntry) toStringTimes(time int, name string) string {
     var timeStringBuffer string = ""
     if time > 0 {
         timeStringBuffer = timeStringBuffer + strconv.Itoa(time) + " " + name
@@ -76,13 +76,13 @@ func (p *PersonalTime) toStringTimes(time int, name string) string {
     return timeStringBuffer
 }
 
-func (p *PersonalTime) ToFloat64InHours() float64 {
+func (p *TimeEntry) ToFloat64InHours() float64 {
     dmins := float64(p.mins)
     mins := dmins / 60.0
     return float64(p.hours) + mins
 }
 
-func (p *PersonalTime) ToCsvFormat(seperator rune) string {
+func (p *TimeEntry) ToCsvFormat(seperator rune) string {
     time := strconv.FormatFloat(p.ToFloat64InHours(), 'f', 2, 64)
     var sumParticipants string
     for k := range p.participants {

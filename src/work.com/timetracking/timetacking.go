@@ -10,9 +10,10 @@ import (
     "time"
     arguments "work.com/timetracking/arguments"
     . "work.com/timetracking/helper"
-    jiraConnection "work.com/timetracking/jiraConnector"
+    jiraConfig "work.com/timetracking/jira/Config"
+    jiraConnection "work.com/timetracking/jira/HtmlConnection"
+    jiraTime "work.com/timetracking/jira/Timeentry"
     parsehtml "work.com/timetracking/parsehtml"
-    pt "work.com/timetracking/personaltime"
     prjinfo "work.com/timetracking/prjinfo"
 )
 
@@ -29,10 +30,11 @@ type ChanelReturnValue struct {
 }
 
 func main() {
-    var jc jiraConnection.JiraConnector
+
     var pi prjinfo.Projects
     args = arguments.ParseArguments(os.Args)
-
+    var config jiraConfig.Config = jiraConfig.Reader.Read(args.GetFilePathConfig())
+    var jc jiraConnection.HtmlConnector = jiraConnection.NewHtmlConnector(config)
     if args.IsHelpCall() {
         return
     }
@@ -47,7 +49,6 @@ func main() {
     } else {
         pi.Initialize(args.GetFilePathToProjects(), ',')
     }
-    jc.Initialize(args.GetFilePathConfig())
 
     var tm map[string]bool
     if args.IsTesting() {
@@ -81,7 +82,7 @@ func main() {
 
 }
 
-func RunRetrieveContent(returnChannel chan ChanelReturnValue, prjInfo prjinfo.Prjinfo, jc jiraConnection.JiraConnector) {
+func RunRetrieveContent(returnChannel chan ChanelReturnValue, prjInfo prjinfo.Prjinfo, jc jiraConnection.HtmlConnector) {
     timeStart := time.Now()
     var content string
     var retVal ChanelReturnValue
@@ -114,11 +115,11 @@ func ParseHTMLContent(data string) ([]string, []string) {
 }
 
 func PrintValuesForProject(nameTimePairs map[string]NameTimePair, teammembers map[string]bool) {
-    var totalPrjs map[string]pt.PersonalTime = make(map[string]pt.PersonalTime)
+    var totalPrjs map[string]jiraTime.TimeEntry = make(map[string]jiraTime.TimeEntry)
     var sumOfAllPrj float64 = 0
 
     for i := range nameTimePairs {
-        var retTotalTime pt.PersonalTime
+        var retTotalTime jiraTime.TimeEntry
         retTotalTime = CreateTotalOfPrj(i, nameTimePairs[i], teammembers)
         sumOfAllPrj = sumOfAllPrj + retTotalTime.ToFloat64InHours()
         totalPrjs[i] = retTotalTime
@@ -126,7 +127,7 @@ func PrintValuesForProject(nameTimePairs map[string]NameTimePair, teammembers ma
 
     PrintValuesInCSVFormatSSS("Projectname", "Hours", "Percent")
     for i := range totalPrjs {
-        var prjTime pt.PersonalTime = totalPrjs[i]
+        var prjTime jiraTime.TimeEntry = totalPrjs[i]
         prjTime.SetOverallTime(sumOfAllPrj)
         if prjTime.ToFloat64InHours() > 0.0 {
             PrintValuesInCSVFormatPersTime(prjTime)
@@ -146,20 +147,20 @@ func PrintValuesInCSVFormatSSS(projectname string, hours string, percent string)
     fmt.Printf("%s%c%s%c%s%c\n", projectname, seperator, hours, seperator, percent, seperator)
 }
 
-func PrintValuesInCSVFormatPersTime(prjTime pt.PersonalTime) {
+func PrintValuesInCSVFormatPersTime(prjTime jiraTime.TimeEntry) {
     fmt.Printf("%s\n", prjTime.ToCsvFormat(seperator))
 }
 
-func CreateTotalOfPrj(prjName string, nameTimePair NameTimePair, teammembers map[string]bool) pt.PersonalTime {
-    var total pt.PersonalTime
+func CreateTotalOfPrj(prjName string, nameTimePair NameTimePair, teammembers map[string]bool) jiraTime.TimeEntry {
+    var total jiraTime.TimeEntry
     var sumOfTimes float64 = 0.0
 
     var i int = 0
-    var personsTimes []pt.PersonalTime = make([]pt.PersonalTime, len(nameTimePair.NameValues)+1)
+    var personsTimes []jiraTime.TimeEntry = make([]jiraTime.TimeEntry, len(nameTimePair.NameValues)+1)
     var personsWithTime []string = make([]string, 0, len(nameTimePair.NameValues)+1)
 
     for i = 0; i < len(nameTimePair.NameValues); i++ {
-        var person pt.PersonalTime
+        var person jiraTime.TimeEntry
         person.InitializeFromString(nameTimePair.NameValues[i], nameTimePair.TimeValues[i])
         personsTimes[i] = person
     }
