@@ -3,6 +3,7 @@ package jira
 import (
 	. "gopkg.in/check.v1"
 	"testing"
+	. "work.com/timetracking/jira/Config"
 	prj "work.com/timetracking/prjinfo"
 )
 
@@ -23,26 +24,9 @@ func TestYamlEngine(t *testing.T) {
 	myEndDate.Initialize("11.11.2015")
 	yte.ProjectInfo.Startdate = myStartDate
 	yte.ProjectInfo.Enddate = myEndDate
-	yte.jc.Initialize("./jira.yaml")
+	yte.jc = NewHtmlConnector(Reader.Read("./jira.yaml"))
 	Suite(&yte)
 	TestingT(t)
-}
-
-func (y *YamlTestEngine) TestReadJiraConfig(c *C) {
-
-	config := y.jc.config
-	c.Assert(config.JiraLogin.Username, Equals, "xyz")
-	c.Assert(config.JiraLogin.Password, Equals, "abcdefgh")
-	c.Assert(config.JiraUrl.Url, Equals, "http://10.207.121.181/j/secure/")
-	c.Assert(config.JiraUrl.Query, Equals, "&jqlQueryId=")
-}
-
-func (y *YamlTestEngine) TestYamlUnmarshaler(c *C) {
-	var content string = "jiralogin:\n    username: abc\n    password: xyz\njiraurl:\n    url: www.google.at"
-	config := y.jc.unmarshalToConfig([]byte(content))
-	c.Assert(config.JiraLogin.Username, Equals, "abc")
-	c.Assert(config.JiraLogin.Password, Equals, "xyz")
-	c.Assert(config.JiraUrl.Url, Equals, "www.google.at")
 }
 
 var jiraUrl string = "http://10.207.121.181/j/secure/ConfigureReport.jspa?startDateId=1%2FSep%2F15&endDateId=11%2FNov%2F15&projectId=10941&jqlQueryId=&selectedProjectId=10941&reportKey=com.synergyapps.plugins.jira.timepo-timesheet-plugin%3Aissues-report&Next=Next"
