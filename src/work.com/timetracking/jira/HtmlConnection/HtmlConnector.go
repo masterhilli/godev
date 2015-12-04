@@ -51,8 +51,8 @@ func (jc *HtmlConnector) getHTMLBodyFromRequest(requ *http.Request) string {
     client := &http.Client{}
 
     resp, err := client.Do(requ)
-    defer resp.Body.Close()
     PanicOnError(err)
+    defer resp.Body.Close()
     content, errReader := ioutil.ReadAll(resp.Body)
     PanicOnError(errReader)
     return string(content)
