@@ -27,10 +27,16 @@ func (t *TimetrackingArgs) GetCountParsedArgs() int {
 }
 
 func (t *TimetrackingArgs) GetFilePathToTeammembers() string {
+	if t.testing {
+		return "./teammembers_test.txt"
+	}
 	return t.filePathToTeammembers
 }
 
 func (t *TimetrackingArgs) GetFilePathToProjects() string {
+	if t.testing {
+		return "./projects_test.csv"
+	}
 	return t.filePathToProjects
 }
 
@@ -45,7 +51,6 @@ func (t *TimetrackingArgs) GetEndDate() time.Time {
 		return endDate
 	}
 	return time.Now()
-
 }
 
 func (t *TimetrackingArgs) IsTesting() bool {
@@ -58,6 +63,10 @@ func (t *TimetrackingArgs) IsRunning() bool {
 
 func (t *TimetrackingArgs) IsHelpCall() bool {
 	return t.help
+}
+
+func (t *TimetrackingArgs) HasNoRunArgs() bool {
+	return !t.IsHelpCall() && !t.IsRunning() && !t.IsTesting()
 }
 
 func (t *TimetrackingArgs) resetArguments() {
@@ -76,6 +85,9 @@ func ParseArguments(args []string) TimetrackingArgs {
 	var timeTrackingArgs TimetrackingArgs
 	timeTrackingArgs.resetArguments()
 	timeTrackingArgs.parseAllArguments(args)
+	if timeTrackingArgs.HasNoRunArgs() {
+		fmt.Println("If you do not know how to use this program please call with \"--help\"")
+	}
 	return timeTrackingArgs
 }
 

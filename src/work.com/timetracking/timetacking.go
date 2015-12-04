@@ -30,32 +30,17 @@ type ChanelReturnValue struct {
 }
 
 func main() {
-
-    var pi prjinfo.Projects
     args = arguments.ParseArguments(os.Args)
+    if args.IsHelpCall() || args.HasNoRunArgs() {
+        return
+    }
+
     var config jiraConfig.Config = jiraConfig.Reader.Read(args.GetFilePathConfig())
     var jc jiraConnection.HtmlConnector = jiraConnection.NewHtmlConnector(config)
-    if args.IsHelpCall() {
-        return
-    }
+    var tm map[string]bool = ReadTeammembers(args.GetFilePathToTeammembers())
+    var pi prjinfo.Projects
 
-    if !args.IsTesting() && !args.IsRunning() {
-        fmt.Println("If you do not know how to use this program please call with \"--help\"")
-        return
-    }
-
-    if args.IsTesting() {
-        pi.Initialize("./projects_test.csv", ',')
-    } else {
-        pi.Initialize(args.GetFilePathToProjects(), ',')
-    }
-
-    var tm map[string]bool
-    if args.IsTesting() {
-        tm = ReadTeammembers("./teammembers_test.txt")
-    } else {
-        tm = ReadTeammembers(args.GetFilePathToTeammembers())
-    }
+    pi.Initialize(args.GetFilePathToProjects(), ',')
 
     if args.IsTesting() {
         for k := range tm {
