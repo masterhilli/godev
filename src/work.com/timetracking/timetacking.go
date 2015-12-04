@@ -30,7 +30,7 @@ type ChanelReturnValue struct {
 }
 
 func main() {
-    args = arguments.ParseArguments(os.Args)
+    args = arguments.NewArguments()
     if args.IsHelpCall() || args.HasNoRunArgs() {
         return
     }

@@ -2,6 +2,7 @@ package arguments
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"time"
 )
@@ -81,10 +82,10 @@ func (t *TimetrackingArgs) resetArguments() {
 	t.help = false
 }
 
-func ParseArguments(args []string) TimetrackingArgs {
+func NewArguments() TimetrackingArgs {
 	var timeTrackingArgs TimetrackingArgs
 	timeTrackingArgs.resetArguments()
-	timeTrackingArgs.parseAllArguments(args)
+	timeTrackingArgs.parseAllArguments(os.Args)
 	if timeTrackingArgs.HasNoRunArgs() {
 		fmt.Println("If you do not know how to use this program please call with \"--help\"")
 	}
