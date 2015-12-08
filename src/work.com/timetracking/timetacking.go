@@ -8,11 +8,11 @@ import (
     "strconv"
     "strings"
     "time"
-    . "work.com/timetracking/HTMLParser"
     arguments "work.com/timetracking/arguments"
     . "work.com/timetracking/data"
     . "work.com/timetracking/helper"
     jiraConfig "work.com/timetracking/jira/Config"
+    . "work.com/timetracking/jira/HTMLParser"
     jiraConnection "work.com/timetracking/jira/HtmlConnection"
     jiraTime "work.com/timetracking/jira/Timeentry"
 )

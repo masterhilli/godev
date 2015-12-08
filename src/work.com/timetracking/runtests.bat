@@ -7,6 +7,10 @@ go test
 cd ..
 cd Timeentry
 go test
+cd ..\UrlDate
+go test
+cd ..\HTMLParser
+go test
 cd ..\..
 cd data
 go test

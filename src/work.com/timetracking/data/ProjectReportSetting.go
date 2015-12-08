@@ -3,24 +3,19 @@ package data
 import (
 	"strconv"
 	"strings"
-	"time"
-	. "work.com/timetracking/helper"
+	. "work.com/timetracking/jira/UrlDate"
 )
 
 type ProjectReportSetting struct {
 	Prj          string
 	Id           int
 	Query        string
-	Startdate    JiraDate
-	Enddate      JiraDate
+	Startdate    UrlDate
+	Enddate      UrlDate
 	ProductOwner string
 
 	names []string
 	times []string
-}
-
-type JiraDate struct {
-	t time.Time
 }
 
 func (pi *ProjectReportSetting) GetNames() []string {
@@ -52,24 +47,9 @@ func setIntValue(value string) int {
 	}
 }
 
-func setJiraDateValue(value string) JiraDate {
-	var jiraDate JiraDate
+func setJiraDateValue(value string) UrlDate {
+	var jiraDate UrlDate
 	jiraDate.Initialize(strings.TrimSpace(value))
 
 	return jiraDate
-}
-
-func (jd *JiraDate) Initialize(date string) {
-	if len(date) == 0 {
-		jd.t = time.Now()
-		return
-	}
-	tmp, err := time.Parse("02.01.2006", date)
-	PanicOnError(err)
-	jd.t = tmp
-}
-
-func (jd *JiraDate) GetTimeForUrl() string {
-	urldate := jd.t.Format("2") + "%2F" + jd.t.Format("Jan") + "%2F" + jd.t.Format("06")
-	return urldate
 }
