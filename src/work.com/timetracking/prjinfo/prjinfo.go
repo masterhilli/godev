@@ -20,6 +20,9 @@ type Prjinfo struct {
 	Startdate    JiraDate
 	Enddate      JiraDate
 	ProductOwner string
+
+	names []string
+	times []string
 }
 
 type JiraDate struct {
@@ -62,6 +65,22 @@ func (p *Projects) setPrjInfoAtPosition(position int, record []string) {
 	p.Data[position].Startdate = setJiraDateValue(record[3])
 	p.Data[position].Enddate = setJiraDateValue(record[4])
 	p.Data[position].ProductOwner = setStringValue(record[5])
+}
+
+func (pi *Prjinfo) GetNames() []string {
+	return pi.names
+}
+
+func (pi *Prjinfo) SetNames(names []string) {
+	pi.names = names
+}
+
+func (pi *Prjinfo) GetTimes() []string {
+	return pi.times
+}
+
+func (pi *Prjinfo) SetTimes(times []string) {
+	pi.times = times
 }
 
 func setStringValue(value string) string {

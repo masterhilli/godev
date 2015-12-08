@@ -48,18 +48,28 @@ func main() {
     for j := 0; j < len(pi.Data); j++ {
         retValue := <-retChannel
         nameTimePairs[retValue.GetPrjInfo().Prj] = retValue
+        // we just wait for the threads to end
     }
     close(retChannel)
 
     timeStop := time.Now()
     fmt.Printf("-->All projects retrieved in %v\n", timeStop.Sub(timeStart))
     PrintValuesForProject(nameTimePairs, tm)
+    //PrintValuesForProject(pi, tm)
 
 }
 
 func PrintValuesForProject(nameTimePairs map[string]HTMLParser, teammembers map[string]bool) {
+    //func PrintValuesForProject(pi prjinfo.Projects, teammembers map[string]bool) {
     var totalPrjs map[string]jiraTime.TimeEntry = make(map[string]jiraTime.TimeEntry)
     var sumOfAllPrj float64 = 0
+
+    /*for i := range pi.Data {
+        var retTotalTime jiraTime.TimeEntry
+        retTotalTime = CreateTotalOfPrj(pi.Data[i].Prj, pi.Data[i], teammembers)
+        sumOfAllPrj = sumOfAllPrj + retTotalTime.ToFloat64InHours()
+        totalPrjs[pi.Data[i].Prj] = retTotalTime
+    }*/
 
     for i := range nameTimePairs {
         var retTotalTime jiraTime.TimeEntry
@@ -94,6 +104,7 @@ func PrintValuesInCSVFormatPersTime(prjTime jiraTime.TimeEntry) {
     fmt.Printf("%s\n", prjTime.ToCsvFormat(seperator))
 }
 
+//func CreateTotalOfPrj(prjName string, nameTimePair prjinfo.Prjinfo, teammembers map[string]bool) jiraTime.TimeEntry {
 func CreateTotalOfPrj(prjName string, nameTimePair HTMLParser, teammembers map[string]bool) jiraTime.TimeEntry {
     var total jiraTime.TimeEntry
     var sumOfTimes float64 = 0.0
