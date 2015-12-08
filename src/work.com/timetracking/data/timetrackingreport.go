@@ -2,8 +2,10 @@ package data
 
 import (
 	"encoding/csv"
+	"strconv"
 	"strings"
 	. "work.com/timetracking/helper"
+	. "work.com/timetracking/jira/UrlDate"
 )
 
 type TimeTrackingReport struct {
@@ -11,24 +13,24 @@ type TimeTrackingReport struct {
 	Seperator rune
 }
 
-func (p *TimeTrackingReport) Initialize(path string, seperator rune) {
-	p.Seperator = seperator
+func (this *TimeTrackingReport) Initialize(path string, seperator rune) {
+	this.Seperator = seperator
 	content := ReadInFile(path)
-	p.parseProjectsFromByteStream(content)
+	this.parseProjectsFromByteStream(content)
 }
 
-func (p *TimeTrackingReport) parseProjectsFromByteStream(content []byte) {
-	records := p.readRecordsFromContent(string(content))
+func (this *TimeTrackingReport) parseProjectsFromByteStream(content []byte) {
+	records := this.readRecordsFromContent(string(content))
 
-	p.Settings = make([]ProjectReportSetting, len(records))
+	this.Settings = make([]ProjectReportSetting, len(records))
 	for i := 0; i < len(records); i++ {
-		p.setPrjInfoAtPosition(i, records[i])
+		this.setPrjInfoAtPosition(i, records[i])
 	}
 }
 
-func (p *TimeTrackingReport) readRecordsFromContent(content string) [][]string {
+func (this *TimeTrackingReport) readRecordsFromContent(content string) [][]string {
 	r := csv.NewReader(strings.NewReader(content))
-	r.Comma = p.Seperator
+	r.Comma = this.Seperator
 	r.Comment = '#'
 
 	records, err := r.ReadAll()
@@ -36,16 +38,36 @@ func (p *TimeTrackingReport) readRecordsFromContent(content string) [][]string {
 	return records
 }
 
-func (p *TimeTrackingReport) setPrjInfoAtPosition(position int, record []string) {
+func (this *TimeTrackingReport) setPrjInfoAtPosition(position int, record []string) {
 	if len(record) != 6 {
-		p.Settings[position].Prj = "Length of items not enough, we need 6 items"
+		this.Settings[position].Prj = "Length of items not enough, we need 6 items"
 		return
 	}
-	lastPos := &p.Settings[position]
-	lastPos.Prj = setStringValue(record[0])
-	lastPos.Id = setIntValue(record[1])
-	lastPos.Query = setStringValue(record[2])
-	lastPos.Startdate = setJiraDateValue(record[3])
-	lastPos.Enddate = setJiraDateValue(record[4])
-	lastPos.ProductOwner = setStringValue(record[5])
+	lastPos := &this.Settings[position]
+	lastPos.Prj = this.setStringValue(record[0])
+	lastPos.Id = this.setIntValue(record[1])
+	lastPos.Query = this.setStringValue(record[2])
+	lastPos.Startdate = this.setJiraDateValue(record[3])
+	lastPos.Enddate = this.setJiraDateValue(record[4])
+	lastPos.ProductOwner = this.setStringValue(record[5])
+}
+
+func (this TimeTrackingReport) setStringValue(value string) string {
+	return strings.TrimSpace(value)
+}
+
+func (this TimeTrackingReport) setIntValue(value string) int {
+	k, parseErr := strconv.Atoi(strings.TrimSpace(value))
+	if parseErr != nil {
+		return -1
+	} else {
+		return k
+	}
+}
+
+func (this TimeTrackingReport) setJiraDateValue(value string) UrlDate {
+	var jiraDate UrlDate
+	jiraDate.Initialize(strings.TrimSpace(value))
+
+	return jiraDate
 }

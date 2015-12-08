@@ -1,8 +1,6 @@
 package data
 
 import (
-	"strconv"
-	"strings"
 	. "work.com/timetracking/jira/UrlDate"
 )
 
@@ -32,24 +30,4 @@ func (pi *ProjectReportSetting) GetTimes() []string {
 
 func (pi *ProjectReportSetting) SetTimes(times []string) {
 	pi.times = times
-}
-
-func setStringValue(value string) string {
-	return strings.TrimSpace(value)
-}
-
-func setIntValue(value string) int {
-	k, parseErr := strconv.Atoi(strings.TrimSpace(value))
-	if parseErr != nil {
-		return -1
-	} else {
-		return k
-	}
-}
-
-func setJiraDateValue(value string) UrlDate {
-	var jiraDate UrlDate
-	jiraDate.Initialize(strings.TrimSpace(value))
-
-	return jiraDate
 }
