@@ -47,8 +47,8 @@ func (this *TimeTrackingReport) setPrjInfoAtPosition(position int, record []stri
 	lastPos.Prj = this.setStringValue(record[0])
 	lastPos.Id = this.setIntValue(record[1])
 	lastPos.Query = this.setStringValue(record[2])
-	lastPos.Startdate = this.setJiraDateValue(record[3])
-	lastPos.Enddate = this.setJiraDateValue(record[4])
+	lastPos.Startdate = this.setUrlDateValue(record[3])
+	lastPos.Enddate = this.setUrlDateValue(record[4])
 	lastPos.ProductOwner = this.setStringValue(record[5])
 }
 
@@ -65,7 +65,7 @@ func (this TimeTrackingReport) setIntValue(value string) int {
 	}
 }
 
-func (this TimeTrackingReport) setJiraDateValue(value string) UrlDate {
+func (this TimeTrackingReport) setUrlDateValue(value string) UrlDate {
 	var jiraDate UrlDate
 	jiraDate.Initialize(strings.TrimSpace(value))
 
