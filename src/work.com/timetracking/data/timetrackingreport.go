@@ -28,7 +28,7 @@ func (this *TimeTrackingReport) parseProjectsFromByteStream(content []byte) {
 	}
 }
 
-func (this *TimeTrackingReport) readRecordsFromContent(content string) [][]string {
+func (this TimeTrackingReport) readRecordsFromContent(content string) [][]string {
 	r := csv.NewReader(strings.NewReader(content))
 	r.Comma = this.Seperator
 	r.Comment = '#'
@@ -40,7 +40,7 @@ func (this *TimeTrackingReport) readRecordsFromContent(content string) [][]strin
 
 func (this *TimeTrackingReport) setPrjInfoAtPosition(position int, record []string) {
 	if len(record) != 6 {
-		this.Settings[position].Prj = "Length of items not enough, we need 6 items"
+		panic("Length of items not enough, we need 6 items")
 		return
 	}
 	lastPos := &this.Settings[position]
