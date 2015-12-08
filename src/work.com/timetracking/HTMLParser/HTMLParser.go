@@ -4,12 +4,12 @@ import (
     "fmt"
     "regexp"
     "time"
+    . "work.com/timetracking/data"
     . "work.com/timetracking/helper"
     jiraConnection "work.com/timetracking/jira/HtmlConnection"
-    prjinfo "work.com/timetracking/prjinfo"
 )
 
-func RetrieveNameTimePairPerProject(retChan chan HTMLParser, prjInfo *prjinfo.Prjinfo, jc jiraConnection.HtmlConnector) {
+func RetrieveNameTimePairPerProject(retChan chan HTMLParser, prjInfo *Prjinfo, jc jiraConnection.HtmlConnector) {
     timeStart := time.Now()
     var htmlParser HTMLParser
 
@@ -32,7 +32,7 @@ func RetrieveNameTimePairPerProject(retChan chan HTMLParser, prjInfo *prjinfo.Pr
 
 type HTMLParser struct {
     names, times []string
-    prjInfo      prjinfo.Prjinfo
+    prjInfo      Prjinfo
 }
 
 func (ghpp *HTMLParser) GetNames() []string {
@@ -43,7 +43,7 @@ func (ghpp *HTMLParser) GetTimes() []string {
     return ghpp.times
 }
 
-func (ghpp *HTMLParser) GetPrjInfo() prjinfo.Prjinfo {
+func (ghpp *HTMLParser) GetPrjInfo() Prjinfo {
     return ghpp.prjInfo
 }
 

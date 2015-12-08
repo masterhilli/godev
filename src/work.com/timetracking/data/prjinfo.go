@@ -1,4 +1,4 @@
-package prjinfo
+package data
 
 import (
 	"encoding/csv"

@@ -4,9 +4,9 @@ import (
     "io/ioutil"
     "net/http"
     "strconv"
+    . "work.com/timetracking/data"
     . "work.com/timetracking/helper"
     . "work.com/timetracking/jira/Config"
-    prj "work.com/timetracking/prjinfo"
 )
 
 type HtmlConnector struct {
@@ -19,19 +19,19 @@ func NewHtmlConnector(config Config) HtmlConnector {
     return htmlConnector
 }
 
-func (jc *HtmlConnector) GetReportContentForProjectInTimeframe(projectInfo prj.Prjinfo) string {
+func (jc *HtmlConnector) GetReportContentForProjectInTimeframe(projectInfo Prjinfo) string {
     requ := jc.generateRequest(projectInfo)
     return jc.getHTMLBodyFromRequest(requ)
 }
 
-func (jc *HtmlConnector) generateRequest(projectInfo prj.Prjinfo) *http.Request {
+func (jc *HtmlConnector) generateRequest(projectInfo Prjinfo) *http.Request {
     requ, err := http.NewRequest("GET", jc.generateUrlToConnect(projectInfo), nil)
     PanicOnError(err)
     requ.SetBasicAuth(jc.config.JiraLogin.Username, jc.config.JiraLogin.Password)
     return requ
 }
 
-func (jc *HtmlConnector) generateUrlToConnect(projectInfo prj.Prjinfo) string {
+func (jc *HtmlConnector) generateUrlToConnect(projectInfo Prjinfo) string {
     return jc.config.JiraUrl.Url +
         jc.config.JiraUrl.Reportname +
         jc.config.JiraUrl.Startdate +

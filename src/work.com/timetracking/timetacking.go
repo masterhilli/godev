@@ -10,11 +10,11 @@ import (
     "time"
     . "work.com/timetracking/HTMLParser"
     arguments "work.com/timetracking/arguments"
+    . "work.com/timetracking/data"
     . "work.com/timetracking/helper"
     jiraConfig "work.com/timetracking/jira/Config"
     jiraConnection "work.com/timetracking/jira/HtmlConnection"
     jiraTime "work.com/timetracking/jira/Timeentry"
-    prjinfo "work.com/timetracking/prjinfo"
 )
 
 type NamesTimes interface {
@@ -33,7 +33,7 @@ func main() {
     var config jiraConfig.Config = jiraConfig.Reader.Read(args.GetFilePathConfig())
     var jc jiraConnection.HtmlConnector = jiraConnection.NewHtmlConnector(config)
     var tm map[string]bool = ReadTeammembers(args.GetFilePathToTeammembers())
-    var pi prjinfo.Projects
+    var pi TimeTrackingReport
 
     pi.Initialize(args.GetFilePathToProjects(), ',')
 
@@ -46,11 +46,11 @@ func main() {
     timeStart := time.Now()
     var retChannel chan HTMLParser = make(chan HTMLParser)
     //var nameTimePairs map[string]HTMLParser = make(map[string]HTMLParser)
-    for i := range pi.Data {
-        go RetrieveNameTimePairPerProject(retChannel, &(pi.Data[i]), jc)
+    for i := range pi.Settings {
+        go RetrieveNameTimePairPerProject(retChannel, &(pi.Settings[i]), jc)
     }
 
-    for j := 0; j < len(pi.Data); j++ {
+    for j := 0; j < len(pi.Settings); j++ {
         _ = <-retChannel
         //retValue := <-retChannel
         //nameTimePairs[retValue.GetPrjInfo().Prj] = retValue
@@ -66,15 +66,15 @@ func main() {
 }
 
 //func PrintValuesForProject(nameTimePairs map[string]HTMLParser, teammembers map[string]bool) {
-func PrintValuesForProject(pi prjinfo.Projects, teammembers map[string]bool) {
+func PrintValuesForProject(pi TimeTrackingReport, teammembers map[string]bool) {
     var totalPrjs map[string]jiraTime.TimeEntry = make(map[string]jiraTime.TimeEntry)
     var sumOfAllPrj float64 = 0
 
-    for i := range pi.Data {
+    for i := range pi.Settings {
         var retTotalTime jiraTime.TimeEntry
-        retTotalTime = CreateTotalOfPrj(pi.Data[i].Prj, &(pi.Data[i]), teammembers)
+        retTotalTime = CreateTotalOfPrj(pi.Settings[i].Prj, &(pi.Settings[i]), teammembers)
         sumOfAllPrj = sumOfAllPrj + retTotalTime.ToFloat64InHours()
-        totalPrjs[pi.Data[i].Prj] = retTotalTime
+        totalPrjs[pi.Settings[i].Prj] = retTotalTime
     }
 
     /*

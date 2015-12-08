@@ -8,3 +8,6 @@ cd ..
 cd Timeentry
 go test
 cd ..\..
+cd data
+go test
+cd ..
