@@ -1,19 +1,13 @@
 package data
 
 import (
-	"encoding/csv"
 	"strconv"
 	"strings"
 	"time"
 	. "work.com/timetracking/helper"
 )
 
-type Projects struct {
-	Data      []Prjinfo
-	Seperator rune
-}
-
-type Prjinfo struct {
+type ProjectReportSetting struct {
 	Prj          string
 	Id           int
 	Query        string
@@ -29,57 +23,19 @@ type JiraDate struct {
 	t time.Time
 }
 
-func (p *Projects) Initialize(path string, seperator rune) {
-	p.Seperator = seperator
-	content := ReadInFile(path)
-	p.parseProjectsFromByteStream(content)
-}
-
-func (p *Projects) parseProjectsFromByteStream(content []byte) {
-	records := p.readRecordsFromContent(string(content))
-
-	p.Data = make([]Prjinfo, len(records))
-	for i := 0; i < len(records); i++ {
-		p.setPrjInfoAtPosition(i, records[i])
-	}
-}
-
-func (p *Projects) readRecordsFromContent(content string) [][]string {
-	r := csv.NewReader(strings.NewReader(content))
-	r.Comma = p.Seperator
-	r.Comment = '#'
-
-	records, err := r.ReadAll()
-	PanicOnError(err)
-	return records
-}
-
-func (p *Projects) setPrjInfoAtPosition(position int, record []string) {
-	if len(record) != 6 {
-		p.Data[position].Prj = "Length of items not enough, we need 6 items"
-		return
-	}
-	p.Data[position].Prj = setStringValue(record[0])
-	p.Data[position].Id = setIntValue(record[1])
-	p.Data[position].Query = setStringValue(record[2])
-	p.Data[position].Startdate = setJiraDateValue(record[3])
-	p.Data[position].Enddate = setJiraDateValue(record[4])
-	p.Data[position].ProductOwner = setStringValue(record[5])
-}
-
-func (pi *Prjinfo) GetNames() []string {
+func (pi *ProjectReportSetting) GetNames() []string {
 	return pi.names
 }
 
-func (pi *Prjinfo) SetNames(names []string) {
+func (pi *ProjectReportSetting) SetNames(names []string) {
 	pi.names = names
 }
 
-func (pi *Prjinfo) GetTimes() []string {
+func (pi *ProjectReportSetting) GetTimes() []string {
 	return pi.times
 }
 
-func (pi *Prjinfo) SetTimes(times []string) {
+func (pi *ProjectReportSetting) SetTimes(times []string) {
 	pi.times = times
 }
 

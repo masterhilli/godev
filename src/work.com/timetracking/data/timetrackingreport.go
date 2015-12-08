@@ -7,7 +7,7 @@ import (
 )
 
 type TimeTrackingReport struct {
-	Settings  []Prjinfo //ProjectReportSettings
+	Settings  []ProjectReportSetting
 	Seperator rune
 }
 
@@ -20,7 +20,7 @@ func (p *TimeTrackingReport) Initialize(path string, seperator rune) {
 func (p *TimeTrackingReport) parseProjectsFromByteStream(content []byte) {
 	records := p.readRecordsFromContent(string(content))
 
-	p.Settings = make([]Prjinfo, len(records))
+	p.Settings = make([]ProjectReportSetting, len(records))
 	for i := 0; i < len(records); i++ {
 		p.setPrjInfoAtPosition(i, records[i])
 	}

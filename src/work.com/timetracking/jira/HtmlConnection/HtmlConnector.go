@@ -19,19 +19,19 @@ func NewHtmlConnector(config Config) HtmlConnector {
     return htmlConnector
 }
 
-func (jc *HtmlConnector) GetReportContentForProjectInTimeframe(projectInfo Prjinfo) string {
+func (jc *HtmlConnector) GetReportContentForProjectInTimeframe(projectInfo ProjectReportSetting) string {
     requ := jc.generateRequest(projectInfo)
     return jc.getHTMLBodyFromRequest(requ)
 }
 
-func (jc *HtmlConnector) generateRequest(projectInfo Prjinfo) *http.Request {
+func (jc *HtmlConnector) generateRequest(projectInfo ProjectReportSetting) *http.Request {
     requ, err := http.NewRequest("GET", jc.generateUrlToConnect(projectInfo), nil)
     PanicOnError(err)
     requ.SetBasicAuth(jc.config.JiraLogin.Username, jc.config.JiraLogin.Password)
     return requ
 }
 
-func (jc *HtmlConnector) generateUrlToConnect(projectInfo Prjinfo) string {
+func (jc *HtmlConnector) generateUrlToConnect(projectInfo ProjectReportSetting) string {
     return jc.config.JiraUrl.Url +
         jc.config.JiraUrl.Reportname +
         jc.config.JiraUrl.Startdate +
