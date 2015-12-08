@@ -8,26 +8,16 @@ import (
     "strconv"
     "strings"
     "time"
+    . "work.com/timetracking/HTMLParser"
     arguments "work.com/timetracking/arguments"
     . "work.com/timetracking/helper"
     jiraConfig "work.com/timetracking/jira/Config"
     jiraConnection "work.com/timetracking/jira/HtmlConnection"
     jiraTime "work.com/timetracking/jira/Timeentry"
-    parsehtml "work.com/timetracking/parsehtml"
     prjinfo "work.com/timetracking/prjinfo"
 )
 
 var args arguments.TimetrackingArgs
-
-type NameTimePair struct {
-    // PrjName                string
-    NameValues, TimeValues []string
-}
-
-type ChanelReturnValue struct {
-    Prj     string
-    Content NameTimePair
-}
 
 func main() {
     args = arguments.NewArguments()
@@ -49,17 +39,17 @@ func main() {
     }
 
     timeStart := time.Now()
-    var myRetValueChannel chan ChanelReturnValue = make(chan ChanelReturnValue)
-    var nameTimePairs map[string]NameTimePair = make(map[string]NameTimePair)
+    var retChannel chan HTMLParser = make(chan HTMLParser)
+    var nameTimePairs map[string]HTMLParser = make(map[string]HTMLParser)
     for i := range pi.Data {
-        go RunRetrieveContent(myRetValueChannel, pi.Data[i], jc)
+        go RetrieveNameTimePairPerProject(retChannel, pi.Data[i], jc)
     }
 
     for j := 0; j < len(pi.Data); j++ {
-        retValue := <-myRetValueChannel
-        nameTimePairs[retValue.Prj] = retValue.Content
+        retValue := <-retChannel
+        nameTimePairs[retValue.GetPrjInfo().Prj] = retValue
     }
-    close(myRetValueChannel)
+    close(retChannel)
 
     timeStop := time.Now()
     fmt.Printf("-->All projects retrieved in %v\n", timeStop.Sub(timeStart))
@@ -67,39 +57,7 @@ func main() {
 
 }
 
-func RunRetrieveContent(returnChannel chan ChanelReturnValue, prjInfo prjinfo.Prjinfo, jc jiraConnection.HtmlConnector) {
-    timeStart := time.Now()
-    var content string
-    var retVal ChanelReturnValue
-
-    if args.IsTesting() {
-        content = string(ReadInFile("./testdata/Report-Jira.html"))
-    } else {
-        content = jc.GetReportContentForProjectInTimeframe(prjInfo) // fix point to retrieve
-    }
-    var retValues NameTimePair
-    var nameValues, timeValues []string
-    nameValues, timeValues = ParseHTMLContent(content)
-    retValues.NameValues = nameValues
-    retValues.TimeValues = timeValues
-    retVal.Prj = prjInfo.Prj
-    retVal.Content = retValues
-    timeStop := time.Now()
-    fmt.Printf("-->%s DONE in %v\n", retVal.Prj, timeStop.Sub(timeStart))
-    returnChannel <- retVal
-}
-
-func ParseHTMLContent(data string) ([]string, []string) {
-    var generateStatitics parsehtml.ParseHTML
-    tableWithNames := generateStatitics.ParseInputForHTMLTableFittingRegexp(generateStatitics.GetRegExpForTableRowToFindEmployeeNames(), data)
-    nameValues := generateStatitics.ParseForTableRowsInHTMLTable("[A-Za-z]*\\.[A-Za-z]*", "td", " class=\"main\"", tableWithNames)
-
-    tableWithTimes := generateStatitics.ParseInputForHTMLTableFittingRegexp(generateStatitics.GetRegExpForTableRowToFindTotalTimes(), data)
-    timeValues := generateStatitics.ParseForTableRowsInHTMLTable("([0-9]*[wdhms]{1})+", "b", "", tableWithTimes)
-    return nameValues, timeValues
-}
-
-func PrintValuesForProject(nameTimePairs map[string]NameTimePair, teammembers map[string]bool) {
+func PrintValuesForProject(nameTimePairs map[string]HTMLParser, teammembers map[string]bool) {
     var totalPrjs map[string]jiraTime.TimeEntry = make(map[string]jiraTime.TimeEntry)
     var sumOfAllPrj float64 = 0
 
@@ -136,21 +94,21 @@ func PrintValuesInCSVFormatPersTime(prjTime jiraTime.TimeEntry) {
     fmt.Printf("%s\n", prjTime.ToCsvFormat(seperator))
 }
 
-func CreateTotalOfPrj(prjName string, nameTimePair NameTimePair, teammembers map[string]bool) jiraTime.TimeEntry {
+func CreateTotalOfPrj(prjName string, nameTimePair HTMLParser, teammembers map[string]bool) jiraTime.TimeEntry {
     var total jiraTime.TimeEntry
     var sumOfTimes float64 = 0.0
 
     var i int = 0
-    var personsTimes []jiraTime.TimeEntry = make([]jiraTime.TimeEntry, len(nameTimePair.NameValues)+1)
-    var personsWithTime []string = make([]string, 0, len(nameTimePair.NameValues)+1)
+    var personsTimes []jiraTime.TimeEntry = make([]jiraTime.TimeEntry, len(nameTimePair.GetNames())+1)
+    var personsWithTime []string = make([]string, 0, len(nameTimePair.GetNames())+1)
 
-    for i = 0; i < len(nameTimePair.NameValues); i++ {
+    for i = 0; i < len(nameTimePair.GetNames()); i++ {
         var person jiraTime.TimeEntry
-        person.InitializeFromString(nameTimePair.NameValues[i], nameTimePair.TimeValues[i])
+        person.InitializeFromString(nameTimePair.GetNames()[i], nameTimePair.GetTimes()[i])
         personsTimes[i] = person
     }
 
-    for key := range nameTimePair.NameValues {
+    for key := range nameTimePair.GetNames() {
         if teammembers[strings.ToLower(personsTimes[key].GetName())] == true {
             sumOfTimes = sumOfTimes + personsTimes[key].ToFloat64InHours()
             if personsTimes[key].ToFloat64InHours() > 0.0 {
