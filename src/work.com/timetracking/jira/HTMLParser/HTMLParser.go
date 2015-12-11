@@ -9,7 +9,7 @@ import (
     jiraConnection "work.com/timetracking/jira/HtmlConnection"
 )
 
-func RetrieveNameTimePairPerProject(retChan chan HTMLParser, prjInfo *ProjectReportSetting, jc jiraConnection.HtmlConnector) {
+func RetrieveNameTimePairPerProject(retChan chan ProjectReportSetting, prjInfo ProjectReportSetting, jc jiraConnection.HtmlConnector) {
     timeStart := time.Now()
     var htmlParser HTMLParser
 
@@ -22,12 +22,12 @@ func RetrieveNameTimePairPerProject(retChan chan HTMLParser, prjInfo *ProjectRep
       }*/
 
     htmlParser.ParseHTMLContent(content)
-    htmlParser.prjInfo = *prjInfo
+    htmlParser.prjInfo = prjInfo
     prjInfo.SetNames(htmlParser.GetNames())
     prjInfo.SetTimes(htmlParser.GetTimes())
     timeStop := time.Now()
     fmt.Printf("-->%s DONE in %v\n", prjInfo.Prj, timeStop.Sub(timeStart))
-    retChan <- htmlParser
+    retChan <- prjInfo
 }
 
 type HTMLParser struct {

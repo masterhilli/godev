@@ -9,6 +9,10 @@ type UrlDate struct {
 	t time.Time
 }
 
+func (this UrlDate) GetTime() time.Time {
+	return this.t
+}
+
 func (this *UrlDate) Initialize(date string) {
 	if len(date) == 0 {
 		this.t = time.Now()

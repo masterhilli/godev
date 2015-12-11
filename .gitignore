@@ -22,6 +22,8 @@ golang.org
 _cgo_defun.c
 _cgo_gotypes.go
 _cgo_export.*
+.idea
+godev.iml
 
 _testmain.go
 trace.out

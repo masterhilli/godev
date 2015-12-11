@@ -44,14 +44,15 @@ func main() {
     }
 
     timeStart := time.Now()
-    var retChannel chan HTMLParser = make(chan HTMLParser)
+    var retChannel chan ProjectReportSetting = make(chan ProjectReportSetting)
     //var nameTimePairs map[string]HTMLParser = make(map[string]HTMLParser)
     for i := range pi.Settings {
-        go RetrieveNameTimePairPerProject(retChannel, &(pi.Settings[i]), jc)
+        go RetrieveNameTimePairPerProject(retChannel, pi.Settings[i], jc) // I really do not like this one! you can not add the pointer of an element of the map as param to a method :(
     }
 
     for j := 0; j < len(pi.Settings); j++ {
-        _ = <-retChannel
+        prjSetting := <-retChannel
+        pi.Settings[strings.ToLower(prjSetting.Prj)] = prjSetting
         //retValue := <-retChannel
         //nameTimePairs[retValue.GetPrjInfo().Prj] = retValue
         // we just wait for the threads to end
@@ -72,7 +73,8 @@ func PrintValuesForProject(pi TimeTrackingReport, teammembers map[string]bool) {
 
     for i := range pi.Settings {
         var retTotalTime jiraTime.TimeEntry
-        retTotalTime = CreateTotalOfPrj(pi.Settings[i].Prj, &(pi.Settings[i]), teammembers)
+        setting := pi.Settings[i]
+        retTotalTime = CreateTotalOfPrj(pi.Settings[i].Prj, &setting, teammembers)
         sumOfAllPrj = sumOfAllPrj + retTotalTime.ToFloat64InHours()
         totalPrjs[pi.Settings[i].Prj] = retTotalTime
     }

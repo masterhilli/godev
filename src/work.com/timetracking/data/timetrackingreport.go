@@ -9,7 +9,7 @@ import (
 )
 
 type TimeTrackingReport struct {
-	Settings  []ProjectReportSetting
+	Settings  map[string]ProjectReportSetting
 	Seperator rune
 }
 
@@ -22,7 +22,7 @@ func (this *TimeTrackingReport) Initialize(path string, seperator rune) {
 func (this *TimeTrackingReport) parseProjectsFromByteStream(content []byte) {
 	records := this.readRecordsFromContent(string(content))
 
-	this.Settings = make([]ProjectReportSetting, len(records))
+	this.Settings = make(map[string]ProjectReportSetting, len(records))
 	for i := 0; i < len(records); i++ {
 		this.setPrjInfoAtPosition(i, records[i])
 	}
@@ -43,13 +43,14 @@ func (this *TimeTrackingReport) setPrjInfoAtPosition(position int, record []stri
 		panic("Length of items not enough, we need 6 items")
 		return
 	}
-	lastPos := &this.Settings[position]
-	lastPos.Prj = this.setStringValue(record[0])
-	lastPos.Id = this.setIntValue(record[1])
-	lastPos.Query = this.setStringValue(record[2])
-	lastPos.Startdate = this.setUrlDateValue(record[3])
-	lastPos.Enddate = this.setUrlDateValue(record[4])
-	lastPos.ProductOwner = this.setStringValue(record[5])
+	var newElement ProjectReportSetting
+	newElement.Prj = this.setStringValue(record[0])
+	newElement.Id = this.setIntValue(record[1])
+	newElement.Query = this.setStringValue(record[2])
+	newElement.Startdate = this.setUrlDateValue(record[3])
+	newElement.Enddate = this.setUrlDateValue(record[4])
+	newElement.ProductOwner = this.setStringValue(record[5])
+	this.Settings[strings.ToLower(newElement.Prj)] = newElement
 }
 
 func (this TimeTrackingReport) setStringValue(value string) string {

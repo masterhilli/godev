@@ -4,11 +4,12 @@ import (
 	. "gopkg.in/check.v1"
 	"testing"
 	. "work.com/timetracking/jira/Config"
-	prj "work.com/timetracking/prjinfo"
+	. "work.com/timetracking/jira/UrlDate"
+	. "work.com/timetracking/data"
 )
 
 type YamlTestEngine struct {
-	ProjectInfo prj.Prjinfo
+	ProjectInfo ProjectReportSetting
 	jc          HtmlConnector
 }
 
@@ -17,8 +18,8 @@ func TestYamlEngine(t *testing.T) {
 	yte.ProjectInfo.Prj = "SOLUT"
 	yte.ProjectInfo.Id = 10941
 	yte.ProjectInfo.Query = ""
-	var myStartDate prj.JiraDate
-	var myEndDate prj.JiraDate
+	var myStartDate UrlDate
+	var myEndDate UrlDate
 
 	myStartDate.Initialize("01.09.2015")
 	myEndDate.Initialize("11.11.2015")
