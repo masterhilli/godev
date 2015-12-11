@@ -7,13 +7,15 @@ import (
 	"time"
 )
 
-const defaultTeammemberFilepath string = "./teammembers.txt"
-const defaultProjectsFilepath string = "./projects.csv"
-const defaultConfigFilepath string = "./jira.yaml"
+const defaultTeamMemberFilepath string = "./configFiles/teammembers.txt"
+const defaultProjectsFilepath string = "./configFiles/projects.csv"
+const defaultConfigFilepath string = "./configFiles/jira.yaml"
+const testTeamMemberFilepath string = "./configFiles/teammembers_test.txt"
+const testProjectsFilepath string = "./configFiles/projects_test.csv"
 
-type TimetrackingArgs struct {
+type TimeTrackingArgs struct {
 	countParsedArgs       int
-	filePathToTeammembers string
+	filePathToTeamMembers string
 	filePathToProjects    string
 	filePathToConfig      string
 	startDate             time.Time
@@ -23,29 +25,29 @@ type TimetrackingArgs struct {
 	help                  bool
 }
 
-func (t *TimetrackingArgs) GetCountParsedArgs() int {
+func (t *TimeTrackingArgs) GetCountParsedArgs() int {
 	return t.countParsedArgs
 }
 
-func (t *TimetrackingArgs) GetFilePathToTeammembers() string {
+func (t *TimeTrackingArgs) GetFilePathToTeammembers() string {
 	if t.testing {
-		return "./teammembers_test.txt"
+		return testTeamMemberFilepath
 	}
-	return t.filePathToTeammembers
+	return t.filePathToTeamMembers
 }
 
-func (t *TimetrackingArgs) GetFilePathToProjects() string {
+func (t *TimeTrackingArgs) GetFilePathToProjects() string {
 	if t.testing {
-		return "./projects_test.csv"
+		return testProjectsFilepath
 	}
 	return t.filePathToProjects
 }
 
-func (t *TimetrackingArgs) GetFilePathConfig() string {
+func (t *TimeTrackingArgs) GetFilePathConfig() string {
 	return t.filePathToConfig
 }
 
-func (t *TimetrackingArgs) GetEndDate() time.Time {
+func (t *TimeTrackingArgs) GetEndDate() time.Time {
 	if t.sprintStatistic {
 		duration := time.Hour * 24 * 7
 		endDate := t.startDate.Add(duration)
@@ -54,27 +56,27 @@ func (t *TimetrackingArgs) GetEndDate() time.Time {
 	return time.Now()
 }
 
-func (t *TimetrackingArgs) IsTesting() bool {
+func (t *TimeTrackingArgs) IsTesting() bool {
 	return t.testing
 }
 
-func (t *TimetrackingArgs) IsRunning() bool {
+func (t *TimeTrackingArgs) IsRunning() bool {
 	return t.run
 }
 
-func (t *TimetrackingArgs) IsHelpCall() bool {
+func (t *TimeTrackingArgs) IsHelpCall() bool {
 	return t.help
 }
 
-func (t *TimetrackingArgs) HasNoRunArgs() bool {
+func (t *TimeTrackingArgs) HasNoRunArgs() bool {
 	return !t.IsHelpCall() && !t.IsRunning() && !t.IsTesting()
 }
 
-func (t *TimetrackingArgs) resetArguments() {
+func (t *TimeTrackingArgs) resetArguments() {
 	t.countParsedArgs = 0
 	t.filePathToConfig = defaultConfigFilepath
 	t.filePathToProjects = defaultProjectsFilepath
-	t.filePathToTeammembers = defaultTeammemberFilepath
+	t.filePathToTeamMembers = defaultTeamMemberFilepath
 	t.startDate = time.Date(0, time.January, 0, 0, 0, 0, 0, time.UTC)
 	t.sprintStatistic = false
 	t.testing = false
@@ -82,8 +84,8 @@ func (t *TimetrackingArgs) resetArguments() {
 	t.help = false
 }
 
-func NewArguments() TimetrackingArgs {
-	var timeTrackingArgs TimetrackingArgs
+func NewArguments() TimeTrackingArgs {
+	var timeTrackingArgs TimeTrackingArgs
 	timeTrackingArgs.resetArguments()
 	timeTrackingArgs.parseAllArguments(os.Args)
 	if timeTrackingArgs.HasNoRunArgs() {
@@ -92,7 +94,7 @@ func NewArguments() TimetrackingArgs {
 	return timeTrackingArgs
 }
 
-func (t *TimetrackingArgs) parseAllArguments(args []string) {
+func (t *TimeTrackingArgs) parseAllArguments(args []string) {
 	t.countParsedArgs = 0
 	for i := 1; i < len(args); i++ {
 		arg := args[i]
@@ -110,19 +112,19 @@ func (t *TimetrackingArgs) parseAllArguments(args []string) {
 	}
 }
 
-func (t *TimetrackingArgs) isStringArg(arg string) bool {
+func (t *TimeTrackingArgs) isStringArg(arg string) bool {
 	return (strings.IndexRune(arg, '=') >= 0)
 }
 
-func (t *TimetrackingArgs) isBooleanArg(arg string) bool {
+func (t *TimeTrackingArgs) isBooleanArg(arg string) bool {
 	return (strings.IndexRune(arg, '-') == 0)
 }
 
-func (t *TimetrackingArgs) isDateArg(arg string) bool {
+func (t *TimeTrackingArgs) isDateArg(arg string) bool {
 	return (strings.IndexRune(arg, '?') >= 0)
 }
 
-func (t *TimetrackingArgs) parseStringArg(stringArg string) {
+func (t *TimeTrackingArgs) parseStringArg(stringArg string) {
 	index := strings.IndexRune(stringArg, '=')
 	if index < 0 {
 		return // this is not a string arg
@@ -130,10 +132,10 @@ func (t *TimetrackingArgs) parseStringArg(stringArg string) {
 	t.setStringVariable(strings.ToLower(stringArg[0:index]), stringArg[index+1:])
 }
 
-func (t *TimetrackingArgs) setStringVariable(prefix string, value string) {
+func (t *TimeTrackingArgs) setStringVariable(prefix string, value string) {
 	switch prefix {
 	case "tm":
-		t.filePathToTeammembers = value
+		t.filePathToTeamMembers = value
 	case "prj":
 		t.filePathToProjects = value
 	default:
@@ -141,7 +143,7 @@ func (t *TimetrackingArgs) setStringVariable(prefix string, value string) {
 	}
 }
 
-func (t *TimetrackingArgs) parseBooleanArg(boolArg string) {
+func (t *TimeTrackingArgs) parseBooleanArg(boolArg string) {
 	index := strings.IndexRune(boolArg, '-')
 	if index != 0 {
 		return // this is not a string arg
@@ -149,7 +151,7 @@ func (t *TimetrackingArgs) parseBooleanArg(boolArg string) {
 	t.setBooleanVariable(strings.ToLower(boolArg))
 }
 
-func (t *TimetrackingArgs) setBooleanVariable(boolArg string) {
+func (t *TimeTrackingArgs) setBooleanVariable(boolArg string) {
 	switch boolArg {
 	case "-sprint":
 		t.sprintStatistic = true
@@ -165,7 +167,7 @@ func (t *TimetrackingArgs) setBooleanVariable(boolArg string) {
 	}
 }
 
-func (t *TimetrackingArgs) parseDateArg(dateArg string) {
+func (t *TimeTrackingArgs) parseDateArg(dateArg string) {
 	index := strings.IndexRune(dateArg, '?')
 	if index <= 0 {
 		return // this is not a string arg
@@ -173,7 +175,7 @@ func (t *TimetrackingArgs) parseDateArg(dateArg string) {
 	t.setDateVariable(strings.ToLower(dateArg[0:index]), dateArg[index+1:])
 }
 
-func (t *TimetrackingArgs) setDateVariable(prefix, dateArg string) {
+func (t *TimeTrackingArgs) setDateVariable(prefix, dateArg string) {
 	switch prefix {
 	case "start":
 		t.startDate = t.parseIntoTimeObj(dateArg)
@@ -182,7 +184,7 @@ func (t *TimetrackingArgs) setDateVariable(prefix, dateArg string) {
 	}
 }
 
-func (t *TimetrackingArgs) parseIntoTimeObj(date string) time.Time {
+func (t *TimeTrackingArgs) parseIntoTimeObj(date string) time.Time {
 	layout := t.createTimeLayout(date)
 	var myTime time.Time
 	myTime, err := time.Parse(layout, date)
@@ -192,7 +194,7 @@ func (t *TimetrackingArgs) parseIntoTimeObj(date string) time.Time {
 	return myTime
 }
 
-func (t *TimetrackingArgs) createTimeLayout(date string) string {
+func (t *TimeTrackingArgs) createTimeLayout(date string) string {
 	index := strings.IndexRune(date, '.')
 	var layout string = ""
 	if index == 1 {

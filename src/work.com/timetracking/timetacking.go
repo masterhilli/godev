@@ -22,7 +22,7 @@ type NamesTimes interface {
     GetTimes() []string
 }
 
-var args arguments.TimetrackingArgs
+var args arguments.TimeTrackingArgs
 
 func main() {
     args = arguments.NewArguments()

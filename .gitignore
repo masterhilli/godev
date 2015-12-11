@@ -12,6 +12,7 @@ gopkg.in
 nsf
 rogpeppe
 golang.org
+configFiles
 
 # Architecture specific extensions/prefixes
 *.[568vq]
