@@ -3,26 +3,112 @@ package data
 import (
 	"encoding/csv"
 	"strconv"
+	"fmt"
 	"strings"
+	. "work.com/timetracking/jira/Timeentry"
 	. "work.com/timetracking/helper"
 	. "work.com/timetracking/jira/UrlDate"
+	. "work.com/timetracking/arguments"
 )
 
 type TimeTrackingReport struct {
-	Settings  map[string]ProjectReportSetting
-	Seperator rune
+	settings  map[string]ProjectReportSetting
+	SumOfAllProjectTimes float64
+	teammembers map[string]bool
 }
 
-func (this *TimeTrackingReport) Initialize(path string, seperator rune) {
-	this.Seperator = seperator
+func (this *TimeTrackingReport) GetAllSettings() map[string]ProjectReportSetting {
+	return this.settings
+}
+
+func (this *TimeTrackingReport) GetSettingsLen() int {
+	return len(this.settings)
+}
+
+func (this *TimeTrackingReport) GetEntry(index string) ProjectReportSetting {
+	retVal := this.settings[strings.ToLower(index)]
+	return retVal
+}
+
+func (this *TimeTrackingReport) SetEntry(prjRepSettings ProjectReportSetting) {
+	this.settings[strings.ToLower(prjRepSettings.Prj)] = prjRepSettings
+}
+
+func (this *TimeTrackingReport) SetTeamMembers(tm map[string]bool) {
+	this.teammembers = make(map[string]bool)
+	for i := range tm {
+		this.teammembers[strings.ToLower(i)] = true
+	}
+}
+
+func (this *TimeTrackingReport) Initialize(path string) {
 	content := ReadInFile(path)
 	this.parseProjectsFromByteStream(content)
+}
+
+func (this *TimeTrackingReport) Finish() {
+	this.calculateSumOfAllTimes()
+	this.finishPrjSettings()
+}
+
+func (this *TimeTrackingReport) calculateSumOfAllTimes() {
+	for i := range this.settings {
+		entry := this.settings[i]
+		var retTotalTime TimeEntry
+		setting := this.settings[i]
+		retTotalTime = this.createTotalOfPrj(this.settings[i].Prj, &setting)
+		this.SumOfAllProjectTimes = this.SumOfAllProjectTimes + retTotalTime.ToFloat64InHours()
+		entry.SetTimeEntry(retTotalTime)
+		this.settings[i] = entry
+	}
+}
+
+func (this *TimeTrackingReport) finishPrjSettings() {
+	for i := range this.settings {
+		entry := this.settings[i]
+		entry.timeEntry.SetOverallTime(this.SumOfAllProjectTimes)
+		this.settings[i] = entry
+	}
+}
+
+func (this TimeTrackingReport) createTotalOfPrj(prjName string, nameTimePair NamesTimes) TimeEntry {
+	var total TimeEntry
+	var sumOfTimes float64 = 0.0
+
+	var i int = 0
+	var personsTimes []TimeEntry = make([]TimeEntry, len(nameTimePair.GetNames())+1)
+	var personsWithTime []string = make([]string, 0, len(nameTimePair.GetNames())+1)
+
+	for i = 0; i < len(nameTimePair.GetNames()); i++ {
+		var person TimeEntry
+		person.InitializeFromString(nameTimePair.GetNames()[i], nameTimePair.GetTimes()[i])
+		personsTimes[i] = person
+	}
+
+	for key := range nameTimePair.GetNames() {
+		if this.teammembers[strings.ToLower(personsTimes[key].GetName())] == true {
+			sumOfTimes = sumOfTimes + personsTimes[key].ToFloat64InHours()
+			if personsTimes[key].ToFloat64InHours() > 0.0 {
+				lastname := personsTimes[key].GetName()
+				lastname = lastname[strings.IndexRune(lastname, '.')+1:]
+				personsWithTime = append(personsWithTime, lastname)
+			}
+			if GetArguments().IsTesting() {
+				fmt.Printf("Team Member: %s : %f\n", personsTimes[key].ToCsvFormat(';'), personsTimes[key].ToFloat64InHours())
+			}
+		} else if GetArguments().IsTesting() {
+			fmt.Printf("Non-Team Member: %s : %f\n", personsTimes[key].ToCsvFormat(';'), personsTimes[key].ToFloat64InHours())
+		}
+	}
+
+	total.InitializeFromFloat(prjName, sumOfTimes, personsWithTime)
+	return total
 }
 
 func (this *TimeTrackingReport) parseProjectsFromByteStream(content []byte) {
 	records := this.readRecordsFromContent(string(content))
 
-	this.Settings = make(map[string]ProjectReportSetting, len(records))
+	this.settings = make(map[string]ProjectReportSetting, len(records))
 	for i := 0; i < len(records); i++ {
 		this.setPrjInfoAtPosition(i, records[i])
 	}
@@ -30,7 +116,7 @@ func (this *TimeTrackingReport) parseProjectsFromByteStream(content []byte) {
 
 func (this TimeTrackingReport) readRecordsFromContent(content string) [][]string {
 	r := csv.NewReader(strings.NewReader(content))
-	r.Comma = this.Seperator
+	r.Comma = ','
 	r.Comment = '#'
 
 	records, err := r.ReadAll()
@@ -50,7 +136,7 @@ func (this *TimeTrackingReport) setPrjInfoAtPosition(position int, record []stri
 	newElement.Startdate = this.setUrlDateValue(record[3])
 	newElement.Enddate = this.setUrlDateValue(record[4])
 	newElement.ProductOwner = this.setStringValue(record[5])
-	this.Settings[strings.ToLower(newElement.Prj)] = newElement
+	this.settings[strings.ToLower(newElement.Prj)] = newElement
 }
 
 func (this TimeTrackingReport) setStringValue(value string) string {
