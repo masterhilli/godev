@@ -11,7 +11,7 @@ type ProjectReportSetting struct {
 	Query        string
 	Startdate    UrlDate
 	Enddate      UrlDate
-	ProductOwner string
+	productOwner string
 
 	names []string
 	times []string
@@ -41,4 +41,12 @@ func (pi *ProjectReportSetting) GetTimes() []string {
 
 func (pi *ProjectReportSetting) SetTimes(times []string) {
 	pi.times = times
+}
+
+func (this *ProjectReportSetting) GetProductOwner() string {
+	return this.productOwner
+}
+
+func (this *ProjectReportSetting) SetProductOwner(po string) {
+	this.productOwner = po
 }

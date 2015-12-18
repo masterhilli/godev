@@ -3,6 +3,7 @@ package TimeEntry
 import (
     "regexp"
     "strconv"
+    "strings"
 )
 
 type TimeEntry struct {
@@ -18,6 +19,10 @@ func (p *TimeEntry) GetName() string {
 
 func (p *TimeEntry) SetOverallTime(overallTime float64) {
     p.overallTimeOfAllProjects = overallTime
+}
+
+func (p *TimeEntry) GetInPercent() float64 {
+    return (100.0/p.overallTimeOfAllProjects)*p.ToFloat64InHours()
 }
 
 func (p *TimeEntry) InitializeFromString(name string, time string) {
@@ -38,6 +43,21 @@ func (p *TimeEntry) InitializeTime(time string) {
     p.hours = ParseForInteger(time, "h")
     p.mins = ParseForInteger(time, "m")
     p.secs = ParseForInteger(time, "s")
+}
+
+func (this *TimeEntry) GetTeamMembersCommaSeperated(poToSkip string) string {
+    var teamMembers string
+    participantCount := len(this.participants)
+    for i := range this.participants {
+        nextTeamMember := this.participants[i]
+        if strings.ToLower(nextTeamMember) != strings.ToLower(poToSkip) {
+            teamMembers = teamMembers + nextTeamMember
+            if i < (participantCount - 1) {
+                teamMembers = teamMembers + ","
+            }
+        }
+    }
+    return teamMembers
 }
 
 func ParseForInteger(time string, timeIdentifier string) int {
@@ -94,7 +114,7 @@ func (p *TimeEntry) ToCsvFormat(seperator rune) string {
     }
     var retVal string = "LCC eServices Region South-East" + string(seperator) + sumParticipants + string(seperator) + p.name
     if p.overallTimeOfAllProjects > 0.0 {
-        percentOfOverallPrj := strconv.FormatFloat((100.0/p.overallTimeOfAllProjects)*p.ToFloat64InHours(), 'f', 1, 64)
+        percentOfOverallPrj := strconv.FormatFloat(p.GetInPercent(), 'f', 1, 64)
         retVal = retVal + string(seperator) + percentOfOverallPrj + "%"
     }
     retVal = retVal + string(seperator) + time

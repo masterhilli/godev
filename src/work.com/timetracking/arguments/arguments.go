@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"strconv"
 )
 
 const defaultTeamMemberFilepath string = "./configFiles/teammembers.txt"
@@ -13,10 +14,12 @@ const defaultConfigFilepath string = "./configFiles/jira.yaml"
 const testTeamMemberFilepath string = "./configFiles/teammembers_test.txt"
 const testProjectsFilepath string = "./configFiles/projects_test.csv"
 
-var args *TimeTrackingArgs = nil
+var args TimeTrackingArgs
+var isInitialized bool
 
 type TimeTrackingArgs struct {
 	countParsedArgs       int
+	reportId			  int
 	filePathToTeamMembers string
 	filePathToProjects    string
 	filePathToConfig      string
@@ -27,18 +30,22 @@ type TimeTrackingArgs struct {
 	help                  bool
 }
 
-func (t TimeTrackingArgs) GetCountParsedArgs() int {
+func (this *TimeTrackingArgs) GetReporterId() int {
+	return this.reportId
+}
+
+func (t *TimeTrackingArgs) GetCountParsedArgs() int {
 	return t.countParsedArgs
 }
 
-func (t TimeTrackingArgs) GetFilePathToTeammembers() string {
+func (t *TimeTrackingArgs) GetFilePathToTeammembers() string {
 	if t.testing {
 		return testTeamMemberFilepath
 	}
 	return t.filePathToTeamMembers
 }
 
-func (t TimeTrackingArgs) GetFilePathToProjects() string {
+func (t *TimeTrackingArgs) GetFilePathToProjects() string {
 	if t.testing {
 		return testProjectsFilepath
 	}
@@ -49,7 +56,7 @@ func (t *TimeTrackingArgs) GetFilePathConfig() string {
 	return t.filePathToConfig
 }
 
-func (t TimeTrackingArgs) GetEndDate() time.Time {
+func (t *TimeTrackingArgs) GetEndDate() time.Time {
 	if t.sprintStatistic {
 		duration := time.Hour * 24 * 7
 		endDate := t.startDate.Add(duration)
@@ -58,24 +65,25 @@ func (t TimeTrackingArgs) GetEndDate() time.Time {
 	return time.Now()
 }
 
-func (t TimeTrackingArgs) IsTesting() bool {
+func (t *TimeTrackingArgs) IsTesting() bool {
 	return t.testing
 }
 
-func (t TimeTrackingArgs) IsRunning() bool {
+func (t *TimeTrackingArgs) IsRunning() bool {
 	return t.run
 }
 
-func (t TimeTrackingArgs) IsHelpCall() bool {
+func (t *TimeTrackingArgs) IsHelpCall() bool {
 	return t.help
 }
 
-func (t TimeTrackingArgs) HasNoRunArgs() bool {
+func (t *TimeTrackingArgs) HasNoRunArgs() bool {
 	return !t.IsHelpCall() && !t.IsRunning() && !t.IsTesting()
 }
 
 func (t *TimeTrackingArgs) resetArguments() {
 	t.countParsedArgs = 0
+	t.reportId = 0
 	t.filePathToConfig = defaultConfigFilepath
 	t.filePathToProjects = defaultProjectsFilepath
 	t.filePathToTeamMembers = defaultTeamMemberFilepath
@@ -87,16 +95,17 @@ func (t *TimeTrackingArgs) resetArguments() {
 }
 
 func GetArguments() TimeTrackingArgs {
-	if args == nil {
+	if isInitialized == false {
 		var timeTrackingArgs TimeTrackingArgs
 		timeTrackingArgs.resetArguments()
 		timeTrackingArgs.parseAllArguments(os.Args)
 		if timeTrackingArgs.HasNoRunArgs() {
 			fmt.Println("If you do not know how to use this program please call with \"--help\"")
 		}
-		args = &timeTrackingArgs
+		args = timeTrackingArgs
+		isInitialized = true
 	}
-	return *args
+	return args
 }
 
 func (t *TimeTrackingArgs) parseAllArguments(args []string) {
@@ -104,7 +113,9 @@ func (t *TimeTrackingArgs) parseAllArguments(args []string) {
 	for i := 1; i < len(args); i++ {
 		arg := args[i]
 		t.countParsedArgs++
-		if t.isStringArg(arg) {
+		if t.isIntArg(arg) {
+			t.parseIntArg(arg)
+		} else if t.isStringArg(arg) {
 			t.parseStringArg(arg)
 		} else if t.isBooleanArg(arg) {
 			t.parseBooleanArg(arg)
@@ -127,6 +138,10 @@ func (t *TimeTrackingArgs) isBooleanArg(arg string) bool {
 
 func (t *TimeTrackingArgs) isDateArg(arg string) bool {
 	return (strings.IndexRune(arg, '?') >= 0)
+}
+
+func (this *TimeTrackingArgs) isIntArg(arg string) bool {
+	return (strings.IndexRune(arg, '#') == 0)
 }
 
 func (t *TimeTrackingArgs) parseStringArg(stringArg string) {
@@ -189,6 +204,30 @@ func (t *TimeTrackingArgs) setDateVariable(prefix, dateArg string) {
 	}
 }
 
+func (t *TimeTrackingArgs) parseIntArg(intArg string) {
+	index := strings.IndexRune(intArg, '#')
+	indexOfEqual := strings.IndexRune(intArg, '=')
+	if index != 0 {
+		return // this is not a int arg
+	}
+	fmt.Println(strings.ToLower(intArg[1:indexOfEqual]))
+	fmt.Println(intArg[indexOfEqual+1:])
+	t.setIntVariable(strings.ToLower(intArg[1:indexOfEqual]), intArg[indexOfEqual+1:])
+}
+
+func (this *TimeTrackingArgs) setIntVariable(prefix, intArg string) {
+	switch prefix {
+	case "report":
+		var err error
+		this.reportId, err = strconv.Atoi(intArg)
+		if (err != nil) {
+			panic(err)
+		}
+	default:
+		fmt.Printf("Unknown Int argument: %s\n", prefix)
+	}
+}
+
 func (t *TimeTrackingArgs) parseIntoTimeObj(date string) time.Time {
 	layout := t.createTimeLayout(date)
 	var myTime time.Time
@@ -222,7 +261,9 @@ func (t *TimeTrackingArgs) createTimeLayout(date string) string {
 
 const helpContent string = `Possible Arguments: 
 --help calls this help
- -r    runs the program
+-r    runs the program
+options:
+#report=0
   
 <no other arguments till now>
 

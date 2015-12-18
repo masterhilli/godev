@@ -7,19 +7,19 @@ import (
     . "work.com/timetracking/data"
     . "work.com/timetracking/helper"
     jiraConnection "work.com/timetracking/jira/HtmlConnection"
+    . "work.com/timetracking/arguments"
 )
 
 func RetrieveNameTimePairPerProject(retChan chan ProjectReportSetting, prjInfo ProjectReportSetting, jc jiraConnection.HtmlConnector) {
     timeStart := time.Now()
     var htmlParser HTMLParser
-
-    content := string(ReadInFile("./testdata/Report-Jira.html"))
-    /*content := jc.GetReportContentForProjectInTimeframe(prjInfo)
-      if args.IsTesting() {
-
-      } else {
-          // fix point to retrieve
-      }*/
+    var content string
+    args := GetArguments()
+    if args.IsTesting() {
+      content = string(ReadInFile("./testdata/Report-Jira.html"))
+    } else {
+      content = jc.GetReportContentForProjectInTimeframe(prjInfo)
+    }
 
     htmlParser.ParseHTMLContent(content)
     htmlParser.prjInfo = prjInfo

@@ -15,7 +15,9 @@ func TestRegisterArgumentTestEngine(t *testing.T) {
 	TestingT(t)
 }
 
-func (ate *ArgumentTestEngine) TestSettingArgumentsWithOnly1Argument(c *C) {
+
+// we ignore that one because depending on the IDE we use, the args are different
+func (ate *ArgumentTestEngine) IgnoreSettingArgumentsWithOnly1Argument(c *C) {
 	var ta TimeTrackingArgs = GetArguments()
 	c.Assert(ta.GetCountParsedArgs(), Equals, 1)
 }
@@ -133,4 +135,39 @@ func (ate *ArgumentTestEngine) TestParseIntoTimeObjAll1digit(c *C) {
 	parsedTime := ate.ta.parseIntoTimeObj("1.1.2015")
 	t := time.Date(2015, time.January, 1, 0, 0, 0, 0, time.UTC)
 	c.Assert(parsedTime, Equals, t)
+}
+
+
+func (ate *ArgumentTestEngine) TestParseAllArgumentsIntIntoReportId(c *C) {
+	var arg TimeTrackingArgs
+	arg.parseAllArguments([]string{"bla.ignore", "#report=7", "-t"})
+	c.Assert(arg.reportId, Equals, 7)
+}
+
+func (ate *ArgumentTestEngine) TestIsIntArgReturnsTrue(c *C) {
+	var arg TimeTrackingArgs
+	isInt := arg.isIntArg("#report=2")
+	c.Assert(isInt, Equals, true)
+}
+
+func (ate *ArgumentTestEngine) TestSetIntVariableReturnsReportIdIs5(c *C) {
+	var arg TimeTrackingArgs
+	arg.setIntVariable("report", "3")
+	c.Assert(arg.reportId, Equals, 3)
+}
+
+func (ate *ArgumentTestEngine) TestParseIntArgReturns5asReportId(c *C) {
+	var arg TimeTrackingArgs
+	arg.parseIntArg("#report=4")
+	c.Assert(arg.reportId, Equals, 4)
+}
+
+
+func (ate *ArgumentTestEngine) TestParseAllArgsReturnsManyAsserts(c *C) {
+	var arg TimeTrackingArgs = GetArguments()
+
+	arg.parseAllArguments([]string{"go", "run", "timetracking.go", "-t", "#report=4"})
+
+	c.Assert(GetArguments().testing, Equals, true)
+	c.Assert(GetArguments().reportId, Equals, 4)
 }

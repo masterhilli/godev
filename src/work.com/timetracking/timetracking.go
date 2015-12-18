@@ -52,8 +52,9 @@ func main() {
 
     timeStop := time.Now()
     fmt.Printf("-->All projects retrieved in %v\n", timeStop.Sub(timeStart))
-    var reporter CCSReporter
-    reporter.SetSeparator(';')
+    var reporter ReporterInterface
+    pi.Finish()
+    reporter = GetReporter(';')
     reporter.ExportReport(pi)
 
 }
