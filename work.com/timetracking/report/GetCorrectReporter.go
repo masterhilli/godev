@@ -14,7 +14,6 @@ type ReporterInterface interface {
 func GetReporter(separator rune) ReporterInterface {
 	args := GetArguments()
 	if args.GetReporterId() == 0 {
-		fmt.Println("Simple Report created!")
 		return GetSimpleProjectReporter()
 	}
 	ccsRep :=  GetCCSReporter()
