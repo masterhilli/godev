@@ -1,11 +1,11 @@
 package arguments
 
 import (
-	"fmt"
-	"os"
-	"strings"
-	"time"
-	"strconv"
+"fmt"
+"os"
+"strings"
+"time"
+"strconv"
 )
 
 const defaultTeamMemberFilepath string = "./configFiles/teammembers.txt"
@@ -18,80 +18,16 @@ var args TimeTrackingArgs
 var isInitialized bool
 
 type TimeTrackingArgs struct {
-	countParsedArgs       int
-	reportId			  int
-	filePathToTeamMembers string
-	filePathToProjects    string
-	filePathToConfig      string
-	startDate             time.Time
-	sprintStatistic       bool
-	testing               bool
-	run                   bool
-	help                  bool
-}
-
-func (this *TimeTrackingArgs) GetReporterId() int {
-	return this.reportId
-}
-
-func (t *TimeTrackingArgs) GetCountParsedArgs() int {
-	return t.countParsedArgs
-}
-
-func (t *TimeTrackingArgs) GetFilePathToTeammembers() string {
-	if t.testing {
-		return testTeamMemberFilepath
-	}
-	return t.filePathToTeamMembers
-}
-
-func (t *TimeTrackingArgs) GetFilePathToProjects() string {
-	if t.testing {
-		return testProjectsFilepath
-	}
-	return t.filePathToProjects
-}
-
-func (t *TimeTrackingArgs) GetFilePathConfig() string {
-	return t.filePathToConfig
-}
-
-func (t *TimeTrackingArgs) GetEndDate() time.Time {
-	if t.sprintStatistic {
-		duration := time.Hour * 24 * 7
-		endDate := t.startDate.Add(duration)
-		return endDate
-	}
-	return time.Now()
-}
-
-func (t *TimeTrackingArgs) IsTesting() bool {
-	return t.testing
-}
-
-func (t *TimeTrackingArgs) IsRunning() bool {
-	return t.run
-}
-
-func (t *TimeTrackingArgs) IsHelpCall() bool {
-	return t.help
-}
-
-func (t *TimeTrackingArgs) HasNoRunArgs() bool {
-	return !t.IsHelpCall() && !t.IsRunning() && !t.IsTesting()
-}
-
-func (t *TimeTrackingArgs) resetArguments() {
-	t.countParsedArgs = 0
-	t.reportId = 0
-	t.filePathToConfig = defaultConfigFilepath
-	t.filePathToProjects = defaultProjectsFilepath
-	t.filePathToTeamMembers = defaultTeamMemberFilepath
-	t.startDate = time.Date(0, time.January, 0, 0, 0, 0, 0, time.UTC)
-	t.sprintStatistic = false
-	t.testing = false
-	t.run = false
-	t.help = false
+countParsedArgs       int
+reportId			  int
+filePathToTeamMembers string
+filePathToProjects    string
+filePathToConfig      string
+startDate             time.Time
+sprintStatistic       bool
+testing               bool
+run                   bool
+help                  bool
 }
 
 func GetArguments() TimeTrackingArgs {
@@ -108,8 +44,78 @@ func GetArguments() TimeTrackingArgs {
 	return args
 }
 
+func (this *TimeTrackingArgs) GetReporterId() int {
+return this.reportId
+}
+
+func (this *TimeTrackingArgs) SetReporterId(reportid int) {
+this.reportId = reportid
+}
+
+func (t *TimeTrackingArgs) GetCountParsedArgs() int {
+return t.countParsedArgs
+}
+
+func (t *TimeTrackingArgs) GetFilePathToTeammembers() string {
+if t.testing {
+	return testTeamMemberFilepath
+}
+return t.filePathToTeamMembers
+}
+
+func (t *TimeTrackingArgs) GetFilePathToProjects() string {
+if t.testing {
+	return testProjectsFilepath
+}
+return t.filePathToProjects
+}
+
+func (t *TimeTrackingArgs) GetFilePathConfig() string {
+return t.filePathToConfig
+}
+
+func (t *TimeTrackingArgs) GetEndDate() time.Time {
+if t.sprintStatistic {
+	duration := time.Hour * 24 * 7
+	endDate := t.startDate.Add(duration)
+	return endDate
+}
+return time.Now()
+}
+
+func (t *TimeTrackingArgs) IsTesting() bool {
+return t.testing
+}
+
+func (t *TimeTrackingArgs) IsRunning() bool {
+return t.run
+}
+
+func (t *TimeTrackingArgs) IsHelpCall() bool {
+return t.help
+}
+
+func (t *TimeTrackingArgs) HasNoRunArgs() bool {
+return !t.IsHelpCall() && !t.IsRunning() && !t.IsTesting()
+}
+
+func (t *TimeTrackingArgs) resetArguments() {
+t.countParsedArgs = 0
+t.SetReporterId(0)
+t.filePathToConfig = defaultConfigFilepath
+t.filePathToProjects = defaultProjectsFilepath
+t.filePathToTeamMembers = defaultTeamMemberFilepath
+t.startDate = time.Date(0, time.January, 0, 0, 0, 0, 0, time.UTC)
+t.sprintStatistic = false
+t.testing = false
+t.run = false
+t.help = false
+}
+
+
 func (t *TimeTrackingArgs) parseAllArguments(args []string) {
 	t.countParsedArgs = 0
+
 	for i := 1; i < len(args); i++ {
 		arg := args[i]
 		t.countParsedArgs++
@@ -141,7 +147,7 @@ func (t *TimeTrackingArgs) isDateArg(arg string) bool {
 }
 
 func (this *TimeTrackingArgs) isIntArg(arg string) bool {
-	return (strings.IndexRune(arg, '#') == 0)
+	return (strings.IndexRune(arg, '#') >= 0)
 }
 
 func (t *TimeTrackingArgs) parseStringArg(stringArg string) {
@@ -206,23 +212,20 @@ func (t *TimeTrackingArgs) setDateVariable(prefix, dateArg string) {
 
 func (t *TimeTrackingArgs) parseIntArg(intArg string) {
 	index := strings.IndexRune(intArg, '#')
-	indexOfEqual := strings.IndexRune(intArg, '=')
-	if index != 0 {
+	if index <= 0 {
 		return // this is not a int arg
 	}
-	fmt.Println(strings.ToLower(intArg[1:indexOfEqual]))
-	fmt.Println(intArg[indexOfEqual+1:])
-	t.setIntVariable(strings.ToLower(intArg[1:indexOfEqual]), intArg[indexOfEqual+1:])
+	t.setIntVariable(strings.ToLower(intArg[0:index]), intArg[index+1:])
 }
 
 func (this *TimeTrackingArgs) setIntVariable(prefix, intArg string) {
 	switch prefix {
 	case "report":
-		var err error
-		this.reportId, err = strconv.Atoi(intArg)
+		report, err := strconv.Atoi(intArg)
 		if (err != nil) {
 			panic(err)
 		}
+		this.SetReporterId(report)
 	default:
 		fmt.Printf("Unknown Int argument: %s\n", prefix)
 	}

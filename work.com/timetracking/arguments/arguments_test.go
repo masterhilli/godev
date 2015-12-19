@@ -140,13 +140,13 @@ func (ate *ArgumentTestEngine) TestParseIntoTimeObjAll1digit(c *C) {
 
 func (ate *ArgumentTestEngine) TestParseAllArgumentsIntIntoReportId(c *C) {
 	var arg TimeTrackingArgs
-	arg.parseAllArguments([]string{"bla.ignore", "#report=7", "-t"})
+	arg.parseAllArguments([]string{"bla.ignore", "report#7", "-t"})
 	c.Assert(arg.reportId, Equals, 7)
 }
 
 func (ate *ArgumentTestEngine) TestIsIntArgReturnsTrue(c *C) {
 	var arg TimeTrackingArgs
-	isInt := arg.isIntArg("#report=2")
+	isInt := arg.isIntArg("report#2")
 	c.Assert(isInt, Equals, true)
 }
 
@@ -158,15 +158,15 @@ func (ate *ArgumentTestEngine) TestSetIntVariableReturnsReportIdIs5(c *C) {
 
 func (ate *ArgumentTestEngine) TestParseIntArgReturns5asReportId(c *C) {
 	var arg TimeTrackingArgs
-	arg.parseIntArg("#report=4")
-	c.Assert(arg.reportId, Equals, 4)
+	arg.parseIntArg("report#5")
+	c.Assert(arg.reportId, Equals, 5)
 }
 
 
 func (ate *ArgumentTestEngine) TestParseAllArgsReturnsManyAsserts(c *C) {
 	var arg TimeTrackingArgs = GetArguments()
 
-	arg.parseAllArguments([]string{"go", "run", "timetracking.go", "-t", "#report=4"})
+	arg.parseAllArguments([]string{"go", "run", "timetracking.go", "-t", "report#4"})
 
 	c.Assert(arg.testing, Equals, true)
 	c.Assert(arg.reportId, Equals, 4)
