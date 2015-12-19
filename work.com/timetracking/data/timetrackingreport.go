@@ -5,10 +5,10 @@ import (
 	"strconv"
 	"fmt"
 	"strings"
-	. "work.com/timetracking/jira/Timeentry"
-	. "work.com/timetracking/helper"
-	. "work.com/timetracking/jira/UrlDate"
-	. "work.com/timetracking/arguments"
+	. "../jira/Timeentry"
+	. "../helper"
+	. "../jira/UrlDate"
+	. "../arguments"
 )
 
 type TimeTrackingReport struct {

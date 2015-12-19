@@ -2,7 +2,7 @@ package jira
 
 import (
 	"gopkg.in/yaml.v2"
-	. "work.com/timetracking/helper"
+	. "../../helper"
 )
 
 type Config struct {

@@ -7,13 +7,13 @@ import (
     "path/filepath"
     "strings"
     "time"
-    arguments "work.com/timetracking/arguments"
-    . "work.com/timetracking/data"
-    . "work.com/timetracking/helper"
-    jiraConfig "work.com/timetracking/jira/Config"
-    . "work.com/timetracking/jira/HTMLParser"
-    jiraConnection "work.com/timetracking/jira/HtmlConnection"
-    . "work.com/timetracking/report"
+    arguments "./arguments"
+    . "./data"
+    . "./helper"
+    jiraConfig "./jira/Config"
+    . "./jira/HTMLParser"
+    jiraConnection "./jira/HtmlConnection"
+    . "./report"
 )
 
 func main() {

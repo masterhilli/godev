@@ -1,8 +1,8 @@
 package report
 
 import (
-	. "work.com/timetracking/arguments"
-	. "work.com/timetracking/data"
+	. "../arguments"
+	. "../data"
 	"strconv"
 	"fmt"
 )

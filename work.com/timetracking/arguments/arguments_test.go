@@ -168,6 +168,6 @@ func (ate *ArgumentTestEngine) TestParseAllArgsReturnsManyAsserts(c *C) {
 
 	arg.parseAllArguments([]string{"go", "run", "timetracking.go", "-t", "#report=4"})
 
-	c.Assert(GetArguments().testing, Equals, true)
-	c.Assert(GetArguments().reportId, Equals, 4)
+	c.Assert(arg.testing, Equals, true)
+	c.Assert(arg.reportId, Equals, 4)
 }

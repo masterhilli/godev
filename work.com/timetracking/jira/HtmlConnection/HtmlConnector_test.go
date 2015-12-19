@@ -3,9 +3,9 @@ package jira
 import (
 	. "gopkg.in/check.v1"
 	"testing"
-	. "work.com/timetracking/jira/Config"
-	. "work.com/timetracking/jira/UrlDate"
-	. "work.com/timetracking/data"
+	. "../Config"
+	. "../UrlDate"
+	. "../../data"
 )
 
 type YamlTestEngine struct {

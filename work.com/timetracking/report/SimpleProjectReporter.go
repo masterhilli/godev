@@ -1,7 +1,7 @@
 package report
 
 import (
-	. "work.com/timetracking/data"
+	. "../data"
 	"fmt"
 )
 

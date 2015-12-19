@@ -1,8 +1,8 @@
 package data
 
 import (
-	. "work.com/timetracking/jira/UrlDate"
-	. "work.com/timetracking/jira/Timeentry"
+	. "../jira/UrlDate"
+	. "../jira/Timeentry"
 )
 
 type ProjectReportSetting struct {

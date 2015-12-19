@@ -2,7 +2,7 @@ package report
 
 import (
 	"fmt"
-	. "work.com/timetracking/data"
+	. "../data"
 )
 
 var reporter CCSReporter

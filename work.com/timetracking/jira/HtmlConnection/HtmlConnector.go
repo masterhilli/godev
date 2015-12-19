@@ -4,9 +4,9 @@ import (
     "io/ioutil"
     "net/http"
     "strconv"
-    . "work.com/timetracking/data"
-    . "work.com/timetracking/helper"
-    . "work.com/timetracking/jira/Config"
+    . "../../data"
+    . "../../helper"
+    . "../Config"
 )
 
 type HtmlConnector struct {

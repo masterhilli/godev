@@ -37,6 +37,7 @@ trace.out
 *.html
 *.csv
 *.zip
+*.iml
 teammembers.txt
 teammembers_all.txt
 teammembers_test.txt

@@ -4,10 +4,10 @@ import (
     "fmt"
     "regexp"
     "time"
-    . "work.com/timetracking/data"
-    . "work.com/timetracking/helper"
-    jiraConnection "work.com/timetracking/jira/HtmlConnection"
-    . "work.com/timetracking/arguments"
+    . "../../data"
+    . "../../helper"
+    jiraConnection "../HtmlConnection"
+    . "../../arguments"
 )
 
 func RetrieveNameTimePairPerProject(retChan chan ProjectReportSetting, prjInfo ProjectReportSetting, jc jiraConnection.HtmlConnector) {
