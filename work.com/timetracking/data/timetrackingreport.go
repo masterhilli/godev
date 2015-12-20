@@ -7,7 +7,6 @@ import (
 	"strings"
 )
 
-
 func NewTimeTrackingReport(countProjects int) TimeTrackingReport {
 	var retVal TimeTrackingReport
 	retVal.settings = make(map[string]ProjectReportSetting, countProjects)
@@ -16,8 +15,17 @@ func NewTimeTrackingReport(countProjects int) TimeTrackingReport {
 
 type TimeTrackingReport struct {
 	settings             map[string]ProjectReportSetting
+	reportName			 string
 	SumOfAllProjectTimes float64
 	teammembers          map[string]bool
+}
+
+func (this *TimeTrackingReport) SetReportName(reportName string) {
+	this.reportName = reportName
+}
+
+func (this TimeTrackingReport) GetReportName() string{
+	return this.reportName
 }
 
 func (this *TimeTrackingReport) GetAllSettings() map[string]ProjectReportSetting {

@@ -34,7 +34,7 @@ func (s *ReadInDataTestEngine) checkForError(c *C, e error) {
 func (s *ReadInDataTestEngine) TestReadingInWholeFile(c *C) {
 	data, err := ioutil.ReadFile(pathToTestReportJiraHtml)
 	s.checkForError(c, err)
-	c.Assert(len(data), Equals, 175812)
+	c.Assert(len(data), Equals, 176349)
 }
 
 func (s *ReadInDataTestEngine) TestReadInAndSubMatchForNames(c *C) {

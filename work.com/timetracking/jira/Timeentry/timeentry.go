@@ -112,7 +112,7 @@ func (p *TimeEntry) ToCsvFormat(seperator rune) string {
 		}
 
 	}
-	var retVal string = "LCC eServices Region South-East" + string(seperator) + sumParticipants + string(seperator) + p.name
+	var retVal string = sumParticipants + string(seperator) + p.name
 	if p.overallTimeOfAllProjects > 0.0 {
 		percentOfOverallPrj := strconv.FormatFloat(p.GetInPercent(), 'f', 1, 64)
 		retVal = retVal + string(seperator) + percentOfOverallPrj + "%"

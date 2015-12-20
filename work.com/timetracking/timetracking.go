@@ -3,7 +3,6 @@ package main
 import (
 	arguments "./arguments"
 	. "./data"
-	. "./helper"
 	jiraConfig "./jira/Config"
 	. "./jira/HTMLParser"
 	jiraConnection "./jira/HtmlConnection"
@@ -11,7 +10,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 )
@@ -26,20 +24,10 @@ func main() {
 	config.Jiradata.Password = SetEmptyPasswordOverConsoleInput(config.Jiradata.Password)
 
 	var jc jiraConnection.HtmlConnector = jiraConnection.NewHtmlConnector(config)
-	var tm map[string]bool = config.GetTeammembersAsMap() //ReadTeammembers(args.GetFilePathToTeammembers())
 	var pi TimeTrackingReport = config.GetTimeTrackingReportData()
-
-	//pi.Initialize(args.GetFilePathToProjects())
-
-	if args.IsTesting() {
-		for k := range tm {
-			fmt.Printf("Read in:\t%s\n", k)
-		}
-	}
 
 	timeStart := time.Now()
 	var retChannel chan ProjectReportSetting = make(chan ProjectReportSetting)
-	//var nameTimePairs map[string]HTMLParser = make(map[string]HTMLParser)
 	for i := range pi.GetAllSettings() {
 		go RetrieveNameTimePairPerProject(retChannel, pi.GetEntry(i), jc) // I really do not like this one! you can not add the pointer of an element of the map as param to a method :(
 	}
@@ -49,9 +37,6 @@ func main() {
 		pi.SetEntry(prjSetting)
 	}
 	close(retChannel)
-
-	pi.SetTeamMembers(tm)
-
 	timeStop := time.Now()
 	fmt.Printf("-->All projects retrieved in %v\n", timeStop.Sub(timeStart))
 	var reporter ReporterInterface
@@ -71,34 +56,3 @@ func SetEmptyPasswordOverConsoleInput(pwd string) string {
 	}
 	return pwd
 }
-/*
-func ReadTeammembers(file string) map[string]bool {
-	var reader *bufio.Reader
-	reader = GetBufferIOReader(file)
-	return ReadEachLineAndAddTeamMemberToMap(reader)
-}
-*/
-func GetBufferIOReader(file string) *bufio.Reader {
-	filename, errAbs := filepath.Abs(file)
-	PanicOnError(errAbs)
-
-	f, errOpen := os.Open(filename)
-	PanicOnError(errOpen)
-
-	return bufio.NewReader(f)
-}
-/*
-func ReadEachLineAndAddTeamMemberToMap(reader *bufio.Reader) map[string]bool {
-	var teammembers map[string]bool = make(map[string]bool)
-	line, errLine := reader.ReadString('\n')
-
-	for errLine == nil {
-		line = strings.TrimSpace(line)
-		if len(line) > 0 {
-			teammembers[line] = true
-		}
-		line, errLine = reader.ReadString('\n')
-	}
-	return teammembers
-}
-*/

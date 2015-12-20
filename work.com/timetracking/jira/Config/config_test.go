@@ -88,7 +88,7 @@ func (y *YamlTestEngine) TestReadJiraConfig(c *C) {
     c.Assert(jiraData.Username, Equals, "xyz")
 	c.Assert(jiraData.Password, Equals, "abcdefgh")
 
-	c.Assert(jiraData.Url, Equals, "http://10.207.121.181/j/secure/")
+	c.Assert(jiraData.Url, Equals, "http://10.99.11.333/j/secure/")
 	c.Assert(jiraData.GetQuery(), Equals, "&jqlQueryId=")
 }
 
