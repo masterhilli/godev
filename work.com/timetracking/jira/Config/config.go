@@ -1,4 +1,4 @@
-package jira
+	package jira
 
 import (
 	"gopkg.in/yaml.v2"
