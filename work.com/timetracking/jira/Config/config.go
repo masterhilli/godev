@@ -118,6 +118,32 @@ func (this JiraData) GetQuery() string {
 }
 
 func (this Project) GetQuery()string {
-	// TODO: actually really return the necessary information!
-	return this.Platform + " " + this.Project
+	var sqlQuery string = this.returnUrlEncodedPlatform()
+	if len(this.Project) > 0 && len(this.Platform) > 0 {
+		sqlQuery = sqlQuery + this.returnUrlEncodedOr()
+	}
+	sqlQuery = sqlQuery + this.returnUrlEncodedProject()
+
+	/* TODO: Missing, standard project where we book everything,
+	   need to skip all others, their! IDEA: not in using ;)
+	*/
+	return sqlQuery
+}
+
+func (this Project) returnUrlEncodedPlatform() string {
+	if len(this.Platform) > 0 {
+		return "Platform+%3D+%22" + this.Platform + "%22"
+	}
+	return ""
+}
+
+func (this Project) returnUrlEncodedOr() string {
+	return "+or+"
+}
+
+func (this Project) returnUrlEncodedProject() string {
+	if len(this.Project) > 0 {
+		return "project%3D" + this.Project
+	}
+	return ""
 }

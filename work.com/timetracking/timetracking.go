@@ -15,6 +15,7 @@ import (
 )
 
 func main() {
+	// TODO: have to split up to more than 1 method
 	args := arguments.GetArguments()
 	if args.IsHelpCall() || args.HasNoRunArgs() {
 		return
