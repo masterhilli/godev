@@ -48,6 +48,7 @@ projects:
     SOLUT:
         project: SOLUT
         platform: Solution Tool
+        excludeothers: true
         productowner: Hillbrand
     RMA:
         project: RMA
@@ -75,6 +76,8 @@ teammembers: [
 	c.Assert(config.JiraUrl.Url, Equals, "www.google.at")
 	c.Assert(len(config.Projects), Equals, 3)
 	c.Assert(config.Projects["RB"].Platform, Equals, "RasenBall")
+    c.Assert(config.Projects["RB"].Excludeothers, Equals, false)
+    c.Assert(config.Projects["SOLUT"].Excludeothers, Equals, true)
 	c.Assert(len(config.Teammembers), Equals, 9)
 	c.Assert(config.Teammembers[2], Equals, "Leonardo.Vastic")
 }

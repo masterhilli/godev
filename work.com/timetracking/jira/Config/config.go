@@ -33,6 +33,7 @@ type Project struct {
 	Project      string
 	Platform     string
 	Productowner string
+	Excludeothers bool
 }
 
 var Reader configReader
