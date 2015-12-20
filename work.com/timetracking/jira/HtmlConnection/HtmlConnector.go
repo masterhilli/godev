@@ -1,59 +1,59 @@
 package jira
 
 import (
-    "io/ioutil"
-    "net/http"
-    "strconv"
-    . "../../data"
-    . "../../helper"
-    . "../Config"
+	. "../../data"
+	. "../../helper"
+	. "../Config"
+	"io/ioutil"
+	"net/http"
+	"strconv"
 )
 
 type HtmlConnector struct {
-    config Config
+	config Config
 }
 
 func NewHtmlConnector(config Config) HtmlConnector {
-    var htmlConnector HtmlConnector
-    htmlConnector.config = config
-    return htmlConnector
+	var htmlConnector HtmlConnector
+	htmlConnector.config = config
+	return htmlConnector
 }
 
 func (jc *HtmlConnector) GetReportContentForProjectInTimeframe(projectInfo ProjectReportSetting) string {
-    requ := jc.generateRequest(projectInfo)
-    return jc.getHTMLBodyFromRequest(requ)
+	requ := jc.generateRequest(projectInfo)
+	return jc.getHTMLBodyFromRequest(requ)
 }
 
 func (jc *HtmlConnector) generateRequest(projectInfo ProjectReportSetting) *http.Request {
-    requ, err := http.NewRequest("GET", jc.generateUrlToConnect(projectInfo), nil)
-    PanicOnError(err)
-    requ.SetBasicAuth(jc.config.JiraLogin.Username, jc.config.JiraLogin.Password)
-    return requ
+	requ, err := http.NewRequest("GET", jc.generateUrlToConnect(projectInfo), nil)
+	PanicOnError(err)
+	requ.SetBasicAuth(jc.config.JiraLogin.Username, jc.config.JiraLogin.Password)
+	return requ
 }
 
 func (jc *HtmlConnector) generateUrlToConnect(projectInfo ProjectReportSetting) string {
-    return jc.config.JiraUrl.Url +
-        jc.config.JiraUrl.Reportname +
-        jc.config.JiraUrl.Startdate +
-        projectInfo.Startdate.GetTimeForUrl() +
-        jc.config.JiraUrl.Enddate +
-        projectInfo.Enddate.GetTimeForUrl() +
-        jc.config.JiraUrl.Prjid +
-        strconv.Itoa(projectInfo.Id) +
-        jc.config.JiraUrl.Query +
-        projectInfo.Query +
-        jc.config.JiraUrl.Selectedprjid +
-        strconv.Itoa(projectInfo.Id) +
-        jc.config.JiraUrl.Prefix
+	return jc.config.JiraUrl.Url +
+		jc.config.JiraUrl.GetReportName() +
+		jc.config.JiraUrl.GetStartDate() +
+		projectInfo.Startdate.GetTimeForUrl() +
+		jc.config.JiraUrl.GetEndDate() +
+		projectInfo.Enddate.GetTimeForUrl() +
+		jc.config.JiraUrl.GetPrjId() +
+		strconv.Itoa(projectInfo.Id) +
+		jc.config.JiraUrl.GetQuery() +
+		projectInfo.Query +
+		jc.config.JiraUrl.GetSelectedPrjId() +
+		strconv.Itoa(projectInfo.Id) +
+		jc.config.JiraUrl.GetReportKey()
 }
 
 func (jc *HtmlConnector) getHTMLBodyFromRequest(requ *http.Request) string {
-    client := &http.Client{}
+	client := &http.Client{}
 
-    resp, err := client.Do(requ)
-    PanicOnError(err)
-    defer resp.Body.Close()
-    content, errReader := ioutil.ReadAll(resp.Body)
-    PanicOnError(errReader)
-    return string(content)
+	resp, err := client.Do(requ)
+	PanicOnError(err)
+	defer resp.Body.Close()
+	content, errReader := ioutil.ReadAll(resp.Body)
+	PanicOnError(errReader)
+	return string(content)
 }

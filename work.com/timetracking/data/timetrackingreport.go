@@ -1,20 +1,20 @@
 package data
 
 import (
-	"encoding/csv"
-	"strconv"
-	"fmt"
-	"strings"
-	. "../jira/Timeentry"
-	. "../helper"
-	. "../jira/UrlDate"
 	. "../arguments"
+	. "../helper"
+	. "../jira/Timeentry"
+	. "../jira/UrlDate"
+	"encoding/csv"
+	"fmt"
+	"strconv"
+	"strings"
 )
 
 type TimeTrackingReport struct {
-	settings  map[string]ProjectReportSetting
+	settings             map[string]ProjectReportSetting
 	SumOfAllProjectTimes float64
-	teammembers map[string]bool
+	teammembers          map[string]bool
 }
 
 func (this *TimeTrackingReport) GetAllSettings() map[string]ProjectReportSetting {
@@ -90,7 +90,7 @@ func (this TimeTrackingReport) createTotalOfPrj(prjName string, prjSpecificSetti
 			sumOfTimes = sumOfTimes + personsTimes[key].ToFloat64InHours()
 			if personsTimes[key].ToFloat64InHours() > 0.0 {
 				lastname := personsTimes[key].GetName()
-				lastname = lastname[strings.IndexRune(lastname, '.') + 1:]
+				lastname = lastname[strings.IndexRune(lastname, '.')+1:]
 				personsWithTime = append(personsWithTime, lastname)
 			}
 			if args.IsTesting() {

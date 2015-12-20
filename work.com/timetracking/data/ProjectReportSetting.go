@@ -1,8 +1,8 @@
 package data
 
 import (
-	. "../jira/UrlDate"
 	. "../jira/Timeentry"
+	. "../jira/UrlDate"
 )
 
 type ProjectReportSetting struct {
@@ -27,7 +27,7 @@ func (pi *ProjectReportSetting) SetNames(names []string) {
 	pi.names = names
 }
 
-func (this *ProjectReportSetting) GetTimeEntry() TimeEntry{
+func (this *ProjectReportSetting) GetTimeEntry() TimeEntry {
 	return this.timeEntry
 }
 

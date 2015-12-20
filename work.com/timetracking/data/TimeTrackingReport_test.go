@@ -2,14 +2,15 @@ package data
 
 import (
 	. "gopkg.in/check.v1"
+	"strings"
 	"testing"
 	"time"
-	"strings"
 )
 
 type DataTestEngine struct{}
 
 const pathToTestCSVFileOfProjects string = "../__testdata/moreofAKind.csv"
+
 func TestDataTestEngine(t *testing.T) {
 	Suite(&DataTestEngine{})
 	TestingT(t)
@@ -21,7 +22,7 @@ func (y *DataTestEngine) TestReadPrjDetails(c *C) {
 	myTime := time.Now()
 	c.Assert(projects.GetSettingsLen(), Equals, 2)
 	if projects.GetSettingsLen() == 2 {
-		entry:= projects.GetEntry(strings.ToLower("SOLUT"))
+		entry := projects.GetEntry(strings.ToLower("SOLUT"))
 		c.Assert(entry.Prj, Equals, "SOLUT")
 		c.Assert(entry.Id, Equals, 10941)
 		c.Assert(entry.Query, Equals, "project = SOLUT")

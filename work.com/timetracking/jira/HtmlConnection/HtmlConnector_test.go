@@ -1,11 +1,11 @@
 package jira
 
 import (
-	. "gopkg.in/check.v1"
-	"testing"
+	. "../../data"
 	. "../Config"
 	. "../UrlDate"
-	. "../../data"
+	. "gopkg.in/check.v1"
+	"testing"
 )
 
 type YamlTestEngine struct {

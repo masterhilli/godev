@@ -1,31 +1,30 @@
 package testinterfaces
 
-	
 import (
-    "io/ioutil"
-    "testing"
-    . "gopkg.in/check.v1"
-    "regexp"
+	. "gopkg.in/check.v1"
+	"io/ioutil"
+	"regexp"
+	"testing"
 )
 
+const pathToTestReportJiraHtml string = "../__testdata/Report-Jira.html"
 
-const pathToTestReportJiraHtml string= "../__testdata/Report-Jira.html"
 // Hook up gocheck into the "go test" runner.
-type ReadInDataTestEngine struct{
-    regexpToFindNames string
-    regexpToFindTotalTimes string
+type ReadInDataTestEngine struct {
+	regexpToFindNames      string
+	regexpToFindTotalTimes string
 }
 
 func NewReadInDataTestEngine() *ReadInDataTestEngine {
-    return &ReadInDataTestEngine {
-        regexpToFindNames : "(?is)<tr>.*[<td [[:ascii:]]*>[[:alpha:]]*\\.[[:alpha:]]*</td>]*[[:space:]]*<td class=\"main\"><b>Total</b></td>[[:space:]]*</tr>",
-        regexpToFindTotalTimes  : "(?is)<tr>([[:space:]]*<td class=\"total\"><b>(([0-9]*[wdhms]{1})+|total|Issue)</b></td>)+[[:space:]]*</tr>",
-    }
+	return &ReadInDataTestEngine{
+		regexpToFindNames:      "(?is)<tr>.*[<td [[:ascii:]]*>[[:alpha:]]*\\.[[:alpha:]]*</td>]*[[:space:]]*<td class=\"main\"><b>Total</b></td>[[:space:]]*</tr>",
+		regexpToFindTotalTimes: "(?is)<tr>([[:space:]]*<td class=\"total\"><b>(([0-9]*[wdhms]{1})+|total|Issue)</b></td>)+[[:space:]]*</tr>",
+	}
 }
 
 func TestReadInData(t *testing.T) {
 	Suite(NewReadInDataTestEngine())
-	TestingT(t) 
+	TestingT(t)
 }
 
 func (s *ReadInDataTestEngine) checkForError(c *C, e error) {
@@ -33,9 +32,9 @@ func (s *ReadInDataTestEngine) checkForError(c *C, e error) {
 }
 
 func (s *ReadInDataTestEngine) TestReadingInWholeFile(c *C) {
-    data, err := ioutil.ReadFile(pathToTestReportJiraHtml)
-    s.checkForError(c, err)
-    c.Assert(len(data), Equals, 175812)
+	data, err := ioutil.ReadFile(pathToTestReportJiraHtml)
+	s.checkForError(c, err)
+	c.Assert(len(data), Equals, 175812)
 }
 
 func (s *ReadInDataTestEngine) TestReadInAndSubMatchForNames(c *C) {
@@ -48,16 +47,16 @@ func (s *ReadInDataTestEngine) TestReadInAndSubMatchForTotalTimes(c *C) {
 
 func (s *ReadInDataTestEngine) ReadInFileAndFindRegExp(c *C, regexpToFind string, countToAssertOn int) {
 	data, err := ioutil.ReadFile(pathToTestReportJiraHtml)
-    s.checkForError(c, err)
-    s.AssertOnSubmatch(c, regexpToFind, countToAssertOn, string(data))
+	s.checkForError(c, err)
+	s.AssertOnSubmatch(c, regexpToFind, countToAssertOn, string(data))
 }
 
 func (s *ReadInDataTestEngine) AssertOnSubmatch(c *C, regexpToFind string, countToAssertOn int, dataString string) {
-    regexpForMatchingNames := regexp.MustCompile(regexpToFind)//<td class=\"main\">Total</td>"
-    indexArray := regexpForMatchingNames.FindAllStringSubmatchIndex(dataString, -1)
-    var countOfFoundSubmatches int = 0
-    if (indexArray != nil) {
-        countOfFoundSubmatches = len(indexArray)
-    }   
-    c.Assert(countOfFoundSubmatches, Equals, countToAssertOn)
+	regexpForMatchingNames := regexp.MustCompile(regexpToFind) //<td class=\"main\">Total</td>"
+	indexArray := regexpForMatchingNames.FindAllStringSubmatchIndex(dataString, -1)
+	var countOfFoundSubmatches int = 0
+	if indexArray != nil {
+		countOfFoundSubmatches = len(indexArray)
+	}
+	c.Assert(countOfFoundSubmatches, Equals, countToAssertOn)
 }

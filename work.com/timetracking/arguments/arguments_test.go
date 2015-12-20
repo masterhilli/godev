@@ -15,7 +15,6 @@ func TestRegisterArgumentTestEngine(t *testing.T) {
 	TestingT(t)
 }
 
-
 // we ignore that one because depending on the IDE we use, the args are different
 func (ate *ArgumentTestEngine) IgnoreSettingArgumentsWithOnly1Argument(c *C) {
 	var ta TimeTrackingArgs = GetArguments()
@@ -137,7 +136,6 @@ func (ate *ArgumentTestEngine) TestParseIntoTimeObjAll1digit(c *C) {
 	c.Assert(parsedTime, Equals, t)
 }
 
-
 func (ate *ArgumentTestEngine) TestParseAllArgumentsIntIntoReportId(c *C) {
 	var arg TimeTrackingArgs
 	arg.parseAllArguments([]string{"bla.ignore", "report#7", "-t"})
@@ -161,7 +159,6 @@ func (ate *ArgumentTestEngine) TestParseIntArgReturns5asReportId(c *C) {
 	arg.parseIntArg("report#5")
 	c.Assert(arg.reportId, Equals, 5)
 }
-
 
 func (ate *ArgumentTestEngine) TestParseAllArgsReturnsManyAsserts(c *C) {
 	var arg TimeTrackingArgs = GetArguments()

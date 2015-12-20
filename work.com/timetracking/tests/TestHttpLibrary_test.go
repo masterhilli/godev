@@ -1,22 +1,21 @@
 package testinterfaces
 
 import (
-	"net/http"
-	"path/filepath"
-	"io/ioutil"
-	"testing"
+	. "../jira/Config"
 	. "gopkg.in/check.v1"
 	"gopkg.in/yaml.v2"
-	. "../jira/Config"
+	"io/ioutil"
+	"net/http"
+	"path/filepath"
+	"testing"
 )
-
 
 // Hook up gocheck into the "go test" runner.
 type HttpTestEngine struct{}
 
-func TestHttpLibrary(t *testing.T) { 
+func TestHttpLibrary(t *testing.T) {
 	Suite(&HttpTestEngine{})
-	TestingT(t) 
+	TestingT(t)
 }
 
 func (s *HttpTestEngine) TestHttpGetOnGoogleReturnsNoError(c *C) {
@@ -31,7 +30,7 @@ func (s *HttpTestEngine) TestHttpGetOnExampleReturnsError(c *C) {
 
 func (s *HttpTestEngine) TestHttpGetParseForBodyNoError(c *C) {
 	resp, err := http.Get("http://www.google.com/")
-	if (err == nil) {
+	if err == nil {
 		_, errReader := ioutil.ReadAll(resp.Body)
 		c.Assert(errReader, IsNil)
 		resp.Body.Close()
@@ -42,7 +41,7 @@ func (s *HttpTestEngine) TestHttpGetParseForBodyNoError(c *C) {
 
 func (s *HttpTestEngine) TestHttpsGetParseForBodyNoError(c *C) {
 	resp, err := http.Get("https://www.google.com")
-	if (err == nil) {
+	if err == nil {
 		_, errReader := ioutil.ReadAll(resp.Body)
 		c.Assert(errReader, IsNil)
 		resp.Body.Close()
@@ -54,7 +53,7 @@ func (s *HttpTestEngine) TestHttpsGetParseForBodyNoError(c *C) {
 func (s *HttpTestEngine) TTestHttpsGetJiraUrl(c *C) {
 	var url string = "http://10.207.121.181/j/"
 	resp, err := http.Get(url)
-	if (err == nil) {
+	if err == nil {
 		respBody, errReader := ioutil.ReadAll(resp.Body)
 		c.Assert(errReader, IsNil)
 		s.WriteOutToFile([]byte(respBody), "jira-report.html")
@@ -72,8 +71,8 @@ func (s *HttpTestEngine) TTestJiraCreateRequestAndLogin(c *C) {
 	}
 
 	var config Config
-    err = yaml.Unmarshal(yamlInformation, &config)
-    if err != nil {
+	err = yaml.Unmarshal(yamlInformation, &config)
+	if err != nil {
 		panic(err)
 	}
 	requ, errReq := http.NewRequest("GET", config.JiraUrl.Url, nil)
@@ -85,7 +84,7 @@ func (s *HttpTestEngine) TTestJiraCreateRequestAndLogin(c *C) {
 
 	resp, errDo := client.Do(requ)
 	defer resp.Body.Close()
-	if (errDo == nil) {
+	if errDo == nil {
 		respBody, errReader := ioutil.ReadAll(resp.Body)
 		c.Assert(errReader, IsNil)
 		s.WriteOutToFile([]byte(respBody), "TestJiraCreateRequestAndLogin.html")
@@ -94,9 +93,9 @@ func (s *HttpTestEngine) TTestJiraCreateRequestAndLogin(c *C) {
 	}
 }
 
-func (s *HttpTestEngine) WriteOutToFile(data []byte, fileName string)  {
+func (s *HttpTestEngine) WriteOutToFile(data []byte, fileName string) {
 	err := ioutil.WriteFile("./"+fileName, data, 0644)
-    if err != nil {
-        panic(err)
-    }
+	if err != nil {
+		panic(err)
+	}
 }

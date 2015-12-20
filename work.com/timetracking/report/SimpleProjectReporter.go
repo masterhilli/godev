@@ -6,7 +6,6 @@ import (
 )
 
 type SimpleProjectReporter struct {
-
 }
 
 var simpleReporter SimpleProjectReporter
