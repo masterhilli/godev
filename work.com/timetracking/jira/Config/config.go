@@ -1,13 +1,23 @@
-	package jira
+package jira
 
 import (
-	"gopkg.in/yaml.v2"
 	. "../../helper"
+	"gopkg.in/yaml.v2"
 )
 
+const reportName string = "ConfigureReport.jspa?"
+const startDate string = "startDateId="
+const endDate string = "&endDateId="
+const prjId string = "&projectId="
+const query string = "&jqlQueryId="
+const selectedPrjId string = "&selectedProjectId="
+const reportKey string = "&reportKey=com.synergyapps.plugins.jira.timepo-timesheet-plugin%3Aissues-report&Next=Next"
+
 type Config struct {
-	JiraLogin LoginData
-	JiraUrl   UrlInformation
+	JiraLogin   LoginData
+	JiraUrl     UrlInformation
+	Projects    map[string]Project
+	Teammembers []string
 }
 
 type LoginData struct {
@@ -16,14 +26,13 @@ type LoginData struct {
 }
 
 type UrlInformation struct {
-	Url           string
-	Reportname    string // "ConfigureReport.jspa?"
-	Startdate     string //  "startDateId="
-	Enddate       string //  "&endDateId="
-	Prjid         string //  "&projectId="
-	Query         string //  "&jqlQueryId="
-	Selectedprjid string //  "&selectedProjectId="
-	Prefix        string //  "&reportKey=com.synergyapps.plugins.jira.timepo-timesheet-plugin%3Aissues-report&Next=Next"
+	Url string
+}
+
+type Project struct {
+	Project      string
+	Platform     string
+	Productowner string
 }
 
 var Reader configReader
@@ -40,4 +49,32 @@ func (cr configReader) unmarshalToConfig(content []byte) Config {
 	err := yaml.Unmarshal(content, &config)
 	PanicOnError(err)
 	return config
+}
+
+func (this UrlInformation) GetReportName() string {
+	return reportName
+}
+
+func (this UrlInformation) GetStartDate() string {
+	return startDate
+}
+
+func (this UrlInformation) GetEndDate() string {
+	return endDate
+}
+
+func (this UrlInformation) GetPrjId() string {
+	return prjId
+}
+
+func (this UrlInformation) GetSelectedPrjId() string {
+	return selectedPrjId
+}
+
+func (this UrlInformation) GetReportKey() string {
+	return reportKey
+}
+
+func (this UrlInformation) GetQuery() string {
+	return query
 }
