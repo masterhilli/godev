@@ -19,7 +19,7 @@ func TestYamlEngine(t *testing.T) {
 	yte.ProjectInfo.SetQuery("")
 
 	yte.ProjectInfo.SetStartEndDateFromString("01.09.2015","11.11.2015")
-	yte.jc = NewHtmlConnector(Reader.Read("../../__testdata/jira_html.yaml"))
+	yte.jc = NewHtmlConnector(Reader.Read("../../__testdata/jira.yaml"))
 	Suite(&yte)
 	TestingT(t)
 }

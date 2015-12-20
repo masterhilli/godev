@@ -8,11 +8,8 @@ import (
 	"time"
 )
 
-const defaultTeamMemberFilepath string = "./__configFiles/teammembers.txt"
-const defaultProjectsFilepath string = "./__configFiles/projects.csv"
 const defaultConfigFilepath string = "./__configFiles/jira.yaml"
-const testTeamMemberFilepath string = "./__configFiles/teammembers_test.txt"
-const testProjectsFilepath string = "./__configFiles/projects_test.csv"
+const testConfigFilepath string = "./__testdata/jira.yaml"
 
 var args TimeTrackingArgs
 var isInitialized bool
@@ -20,8 +17,6 @@ var isInitialized bool
 type TimeTrackingArgs struct {
 	countParsedArgs       int
 	reportId              int
-	filePathToTeamMembers string
-	filePathToProjects    string
 	filePathToConfig      string
 	startDate             time.Time
 	sprintStatistic       bool
@@ -56,21 +51,10 @@ func (t *TimeTrackingArgs) GetCountParsedArgs() int {
 	return t.countParsedArgs
 }
 
-func (t *TimeTrackingArgs) GetFilePathToTeammembers() string {
-	if t.testing {
-		return testTeamMemberFilepath
-	}
-	return t.filePathToTeamMembers
-}
-
-func (t *TimeTrackingArgs) GetFilePathToProjects() string {
-	if t.testing {
-		return testProjectsFilepath
-	}
-	return t.filePathToProjects
-}
-
 func (t *TimeTrackingArgs) GetFilePathConfig() string {
+	if t.testing {
+		return testConfigFilepath
+	}
 	return t.filePathToConfig
 }
 
@@ -103,8 +87,6 @@ func (t *TimeTrackingArgs) resetArguments() {
 	t.countParsedArgs = 0
 	t.SetReporterId(0)
 	t.filePathToConfig = defaultConfigFilepath
-	t.filePathToProjects = defaultProjectsFilepath
-	t.filePathToTeamMembers = defaultTeamMemberFilepath
 	t.startDate = time.Date(0, time.January, 0, 0, 0, 0, 0, time.UTC)
 	t.sprintStatistic = false
 	t.testing = false
@@ -159,10 +141,8 @@ func (t *TimeTrackingArgs) parseStringArg(stringArg string) {
 
 func (t *TimeTrackingArgs) setStringVariable(prefix string, value string) {
 	switch prefix {
-	case "tm":
-		t.filePathToTeamMembers = value
-	case "prj":
-		t.filePathToProjects = value
+	case "config":
+		t.filePathToConfig= value
 	default:
 		fmt.Printf("Unknown String argument: %s\n", prefix)
 	}

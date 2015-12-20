@@ -23,20 +23,20 @@ func (ate *ArgumentTestEngine) IgnoreSettingArgumentsWithOnly1Argument(c *C) {
 
 func (ate *ArgumentTestEngine) TestSetTeammemberFile(c *C) {
 	var ta TimeTrackingArgs = GetArguments()
-	ta.parseAllArguments([]string{"test.exe", "tm=TestFilename"})
-	c.Assert(ta.GetFilePathToTeammembers(), Equals, "TestFilename")
+	ta.parseAllArguments([]string{"test.exe", "config=TestFilename"})
+	c.Assert(ta.GetFilePathConfig(), Equals, "TestFilename")
 }
 
 func (ate *ArgumentTestEngine) TestSetProjectsFile(c *C) {
 	var ta TimeTrackingArgs = GetArguments()
-	ta.parseAllArguments([]string{"test.exe", "tm=TestFilename", "prj=myProjectFile.csv"})
-	c.Assert(ta.GetFilePathToProjects(), Equals, "myProjectFile.csv")
+	ta.parseAllArguments([]string{"test.exe", "config=TestFilename"})
+	c.Assert(ta.GetFilePathConfig(), Equals, "TestFilename")
 }
 
 func (ate *ArgumentTestEngine) TestSetProjectsFileNotLowerCase(c *C) {
 	var ta TimeTrackingArgs = GetArguments()
-	ta.parseAllArguments([]string{"test.exe", "tm=TestFilename", "PRJ=myProjectFile.csv"})
-	c.Assert(ta.GetFilePathToProjects(), Equals, "myProjectFile.csv")
+	ta.parseAllArguments([]string{"test.exe", "config=TestFilename"})
+	c.Assert(ta.GetFilePathConfig(), Equals, "TestFilename")
 }
 
 func (ate *ArgumentTestEngine) TestIsStringArgument(c *C) {

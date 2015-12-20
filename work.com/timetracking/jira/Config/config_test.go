@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-const pathToTestJiraConfigYaml string = "../../__testdata/jira_config.yaml"
+const pathToTestJiraConfigYaml string = "../../__testdata/jira.yaml"
 const typicalProjectTemplate string = `
 jiradata:
     username: abc
