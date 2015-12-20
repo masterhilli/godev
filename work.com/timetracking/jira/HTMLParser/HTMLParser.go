@@ -10,13 +10,14 @@ import (
     . "../../arguments"
 )
 
+const pathToTemplateReportJiraHTML string = "./__testdata/Report-Jira.html"
 func RetrieveNameTimePairPerProject(retChan chan ProjectReportSetting, prjInfo ProjectReportSetting, jc jiraConnection.HtmlConnector) {
     timeStart := time.Now()
     var htmlParser HTMLParser
     var content string
     args := GetArguments()
     if args.IsTesting() {
-      content = string(ReadInFile("./testdata/Report-Jira.html"))
+        content = string(ReadInFile(pathToTemplateReportJiraHTML))
     } else {
       content = jc.GetReportContentForProjectInTimeframe(prjInfo)
     }

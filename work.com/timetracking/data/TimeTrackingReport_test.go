@@ -9,6 +9,7 @@ import (
 
 type DataTestEngine struct{}
 
+const pathToTestCSVFileOfProjects string = "../__testdata/moreofAKind.csv"
 func TestDataTestEngine(t *testing.T) {
 	Suite(&DataTestEngine{})
 	TestingT(t)
@@ -16,7 +17,7 @@ func TestDataTestEngine(t *testing.T) {
 
 func (y *DataTestEngine) TestReadPrjDetails(c *C) {
 	var projects TimeTrackingReport
-	projects.Initialize("./moreofAKind.csv")
+	projects.Initialize(pathToTestCSVFileOfProjects)
 	myTime := time.Now()
 	c.Assert(projects.GetSettingsLen(), Equals, 2)
 	if projects.GetSettingsLen() == 2 {

@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+const pathToTestJiraConfigYaml string = "../../__testdata/jira_config.yaml"
 type YamlTestEngine struct{}
 
 func TestYamlEngine(t *testing.T) {
@@ -13,7 +14,7 @@ func TestYamlEngine(t *testing.T) {
 }
 
 func (y *YamlTestEngine) TestReadJiraConfig(c *C) {
-	config := Reader.Read("./jira.yaml")
+	config := Reader.Read(pathToTestJiraConfigYaml)
 	c.Assert(config.JiraLogin.Username, Equals, "xyz")
 	c.Assert(config.JiraLogin.Password, Equals, "abcdefgh")
 	c.Assert(config.JiraUrl.Url, Equals, "http://10.207.121.181/j/secure/")

@@ -20,7 +20,7 @@ func TestHttpLibrary(t *testing.T) {
 }
 
 func (s *HttpTestEngine) TestHttpGetOnGoogleReturnsNoError(c *C) {
-	_, err := http.Get("https://www.google.com")
+	_, err := http.Get("http://www.google.com")
 	c.Assert(err, IsNil)
 }
 
