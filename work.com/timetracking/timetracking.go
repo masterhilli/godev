@@ -23,6 +23,17 @@ func main() {
     }
 
     var config jiraConfig.Config = jiraConfig.Reader.Read(args.GetFilePathConfig())
+
+    if len(config.JiraLogin.Password) == 0 {
+
+        reader := bufio.NewReader(os.Stdin)
+        fmt.Print("Enter password: ")
+        pwd, _ := reader.ReadString('\n')
+        fmt.Println("Reported pwd: " +strings.TrimSpace(pwd) + "*")
+
+        config.JiraLogin.Password = strings.TrimSpace(pwd)
+    }
+
     var jc jiraConnection.HtmlConnector = jiraConnection.NewHtmlConnector(config)
     var tm map[string]bool = ReadTeammembers(args.GetFilePathToTeammembers())
     var pi TimeTrackingReport
