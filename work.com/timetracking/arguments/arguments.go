@@ -254,37 +254,34 @@ options:
 What you need to run the program:
 -----------------------------------------------------------------------
 
-A file called projects.csv in the same folder as the executable in the following format:
-PROJECT SHORTNAME, PRJ ID, <not yet used, keep empty>, START DATE in the format: DD.MM.YYYY (fill up with zero), END DATE (same format, if ZERO then actual is taken)
-pjname, 001,, 16.11.2015,
-pjname1, 002,, 16.11.2015,
-pjname2, 003,, 16.11.2015,
-
-
-A file called teammembers.txt, with all teammembers of the team. JIRA username in every line.  Last Line must be empty!
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-
-And finally a jira.yaml, with the connection details:
-jiralogin:
+A jira.yaml, with the connection details, Teammembers and the project you need: (for further details ask me :) )
+jiradata:
     username: <yourJIRAUsername>
     password: <yourPWD>
-jiraurl:
     url: "http://10.207.121.181/j/secure/"
-    reportname: "ConfigureReport.jspa?"
-    startdate: "startDateId="
-    enddate: "&endDateId="
-    prjid: "&projectId="
-    query: "&jqlQueryId="
-    selectedprjid: "&selectedProjectId="
-    prefix: "&reportKey=com.synergyapps.plugins.jira.timepo-timesheet-plugin%3Aissues-report&Next=Next"`
+projects:
+    DAILCS:
+        project: DAILCS
+        productowner: Priesching
+        excludeothers: true
+    SOLUT:
+        project: SOLUT
+        productowner: Hillbrand
+    TAIR:
+        project: TAIR
+        productowner: Priesching
+    RMA:
+        project: RMA
+        productowner: HILLBRAND
+teammembers: [
+    anton.fressner,
+    david.huggl,
+    leonardo.vastic,
+    marc.Soriano,
+    martin.hillbrand,
+    richard.Friesenbichler,
+    serhat.Kalowski,
+    thomas.Eisenherz,
+    thomas.Fridolino
+]
+`

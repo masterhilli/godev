@@ -2,9 +2,7 @@ package data
 
 import (
 	. "../arguments"
-	. "../helper"
 	. "../jira/Timeentry"
-	"encoding/csv"
 	"fmt"
 	"strings"
 )
@@ -45,12 +43,6 @@ func (this *TimeTrackingReport) SetTeamMembers(tm map[string]bool) {
 		this.teammembers[strings.ToLower(i)] = true
 	}
 }
-
-func (this *TimeTrackingReport) Initialize(path string) {
-	content := ReadInFile(path)
-	this.parseProjectsFromByteStream(content)
-}
-
 
 func (this *TimeTrackingReport) Finish() {
 	this.calculateSumOfAllTimes()
@@ -109,38 +101,5 @@ func (this TimeTrackingReport) createTotalOfPrj(prjName string, prjSpecificSetti
 
 	total.InitializeFromFloat(prjName, sumOfTimes, personsWithTime)
 	return total
-}
-
-func (this *TimeTrackingReport) parseProjectsFromByteStream(content []byte) {
-	records := this.readRecordsFromContent(string(content))
-
-	this.settings = make(map[string]ProjectReportSetting, len(records))
-	for i := 0; i < len(records); i++ {
-		this.setPrjInfoAtPosition(i, records[i])
-	}
-}
-
-func (this TimeTrackingReport) readRecordsFromContent(content string) [][]string {
-	r := csv.NewReader(strings.NewReader(content))
-	r.Comma = ','
-	r.Comment = '#'
-
-	records, err := r.ReadAll()
-	PanicOnError(err)
-	return records
-}
-
-func (this *TimeTrackingReport) setPrjInfoAtPosition(position int, record []string) {
-	if len(record) != 6 {
-		panic("Length of items not enough, we need 6 items")
-		return
-	}
-	var newElement ProjectReportSetting
-	newElement.SetProject(record[0])
-	newElement.SetIdFromString(record[1])
-	newElement.SetQuery(record[2])
-	newElement.SetStartEndDateFromString(record[3], record[4])
-	newElement.SetProductOwner(record[5])
-	this.settings[strings.ToLower(newElement.prj)] = newElement
 }
 
