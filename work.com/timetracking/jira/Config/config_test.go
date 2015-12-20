@@ -8,37 +8,7 @@ import (
 )
 
 const pathToTestJiraConfigYaml string = "../../__testdata/jira_config.yaml"
-
-type YamlTestEngine struct{}
-
-func TestYamlEngine(t *testing.T) {
-	Suite(&YamlTestEngine{})
-	TestingT(t)
-}
-
-type YamlWithList struct {
-	Mylist       []string
-	Mypairlist   [][]string
-	Mymaplist    map[string][]string
-	Myobjectlist map[string]Pair
-}
-
-type Pair struct {
-	Test    string
-	Another string
-}
-
-func (y *YamlTestEngine) TestReadJiraConfig(c *C) {
-	config := Reader.Read(pathToTestJiraConfigYaml)
-	c.Assert(config.JiraLogin.Username, Equals, "xyz")
-	c.Assert(config.JiraLogin.Password, Equals, "abcdefgh")
-	urlInfo := config.JiraUrl
-	c.Assert(urlInfo.Url, Equals, "http://10.207.121.181/j/secure/")
-	c.Assert(urlInfo.GetQuery(), Equals, "&jqlQueryId=")
-}
-
-func (y *YamlTestEngine) TestYamlUnmarshaler(c *C) {
-	var content string = `
+const typicalProjectTemplate string = `
 jiralogin:
     username: abc
     password: xyz
@@ -70,20 +40,7 @@ teammembers: [
     thomas.Fridolino,
 ]
 `
-	config := Reader.unmarshalToConfig([]byte(content))
-	c.Assert(config.JiraLogin.Username, Equals, "abc")
-	c.Assert(config.JiraLogin.Password, Equals, "xyz")
-	c.Assert(config.JiraUrl.Url, Equals, "www.google.at")
-	c.Assert(len(config.Projects), Equals, 3)
-	c.Assert(config.Projects["RB"].Platform, Equals, "RasenBall")
-    c.Assert(config.Projects["RB"].Excludeothers, Equals, false)
-    c.Assert(config.Projects["SOLUT"].Excludeothers, Equals, true)
-	c.Assert(len(config.Teammembers), Equals, 9)
-	c.Assert(config.Teammembers[2], Equals, "Leonardo.Vastic")
-}
-
-func (this *YamlTestEngine) TestReadingInStringList(c *C) {
-	var content string = `
+const contentForTestingYaml string = `
 mylist: [test1, test2]
 mypairlist: [
     [abc, def],
@@ -105,8 +62,55 @@ myobjectlist:
         test: second
         another: so on
 `
-	yamlList := this.unmarshalList([]byte(content))
 
+type YamlTestEngine struct{}
+
+func TestYamlEngine(t *testing.T) {
+	Suite(&YamlTestEngine{})
+	TestingT(t)
+}
+
+type YamlWithList struct {
+	Mylist       []string
+	Mypairlist   [][]string
+	Mymaplist    map[string][]string
+	Myobjectlist map[string]Pair
+}
+
+type Pair struct {
+	Test    string
+	Another string
+}
+
+func (y *YamlTestEngine) TestReadJiraConfig(c *C) {
+	config := Reader.Read(pathToTestJiraConfigYaml)
+	c.Assert(config.JiraLogin.Username, Equals, "xyz")
+	c.Assert(config.JiraLogin.Password, Equals, "abcdefgh")
+	urlInfo := config.JiraUrl
+	c.Assert(urlInfo.Url, Equals, "http://10.207.121.181/j/secure/")
+	c.Assert(urlInfo.GetQuery(), Equals, "&jqlQueryId=")
+}
+
+func (y *YamlTestEngine) TestYamlUnmarshaler(c *C) {
+	config := Reader.unmarshalToConfig([]byte(typicalProjectTemplate))
+	c.Assert(config.JiraLogin.Username, Equals, "abc")
+	c.Assert(config.JiraLogin.Password, Equals, "xyz")
+	c.Assert(config.JiraUrl.Url, Equals, "www.google.at")
+	c.Assert(len(config.Projects), Equals, 3)
+	c.Assert(config.Projects["RB"].Platform, Equals, "RasenBall")
+    c.Assert(config.Projects["RB"].Excludeothers, Equals, false)
+    c.Assert(config.Projects["SOLUT"].Excludeothers, Equals, true)
+	c.Assert(len(config.Teammembers), Equals, 9)
+	c.Assert(config.Teammembers[2], Equals, "Leonardo.Vastic")
+}
+
+func (this *YamlTestEngine) TestGetTeamMembersAsMapReturnsCount9(c *C) {
+    config := Reader.unmarshalToConfig([]byte(typicalProjectTemplate))
+    c.Assert(len(config.GetTeammembersAsMap()), Equals, 9)
+}
+
+func (this *YamlTestEngine) TestReadingInStringList(c *C) {
+	yamlList := this.unmarshalList([]byte(contentForTestingYaml))
 	c.Assert(len(yamlList.Mylist), Equals, 2)
 	c.Assert(yamlList.Mylist[0], Equals, "test1")
 	c.Assert(yamlList.Mylist[1], Equals, "test2")

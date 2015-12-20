@@ -2,6 +2,7 @@ package jira
 
 import (
 	. "../../helper"
+	"strings"
 	"gopkg.in/yaml.v2"
 )
 
@@ -50,6 +51,15 @@ func (cr configReader) unmarshalToConfig(content []byte) Config {
 	err := yaml.Unmarshal(content, &config)
 	PanicOnError(err)
 	return config
+}
+
+func (this Config) GetTeammembersAsMap() map[string]bool {
+	var retVal map[string]bool = make(map[string]bool)
+	for i := range this.Teammembers {
+		retVal[strings.ToLower(strings.TrimSpace(this.Teammembers[i]))] = true
+	}
+
+	return retVal
 }
 
 func (this UrlInformation) GetReportName() string {

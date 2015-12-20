@@ -26,7 +26,7 @@ func main() {
 	config.JiraLogin.Password = SetEmptyPasswordOverConsoleInput(config.JiraLogin.Password)
 
 	var jc jiraConnection.HtmlConnector = jiraConnection.NewHtmlConnector(config)
-	var tm map[string]bool = ReadTeammembers(args.GetFilePathToTeammembers())
+	var tm map[string]bool = config.GetTeammembersAsMap() //ReadTeammembers(args.GetFilePathToTeammembers())
 	var pi TimeTrackingReport
 
 	pi.Initialize(args.GetFilePathToProjects())
