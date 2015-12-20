@@ -9,10 +9,9 @@ import (
 
 const pathToTestJiraConfigYaml string = "../../__testdata/jira_config.yaml"
 const typicalProjectTemplate string = `
-jiralogin:
+jiradata:
     username: abc
     password: xyz
-jiraurl:
     url: www.google.at
 projects:
     SOLUT:
@@ -84,18 +83,20 @@ type Pair struct {
 
 func (y *YamlTestEngine) TestReadJiraConfig(c *C) {
 	config := Reader.Read(pathToTestJiraConfigYaml)
-	c.Assert(config.JiraLogin.Username, Equals, "xyz")
-	c.Assert(config.JiraLogin.Password, Equals, "abcdefgh")
-	urlInfo := config.JiraUrl
-	c.Assert(urlInfo.Url, Equals, "http://10.207.121.181/j/secure/")
-	c.Assert(urlInfo.GetQuery(), Equals, "&jqlQueryId=")
+    jiraData := config.Jiradata
+
+    c.Assert(jiraData.Username, Equals, "xyz")
+	c.Assert(jiraData.Password, Equals, "abcdefgh")
+
+	c.Assert(jiraData.Url, Equals, "http://10.207.121.181/j/secure/")
+	c.Assert(jiraData.GetQuery(), Equals, "&jqlQueryId=")
 }
 
 func (y *YamlTestEngine) TestYamlUnmarshaler(c *C) {
 	config := Reader.unmarshalToConfig([]byte(typicalProjectTemplate))
-	c.Assert(config.JiraLogin.Username, Equals, "abc")
-	c.Assert(config.JiraLogin.Password, Equals, "xyz")
-	c.Assert(config.JiraUrl.Url, Equals, "www.google.at")
+	c.Assert(config.Jiradata.Username, Equals, "abc")
+	c.Assert(config.Jiradata.Password, Equals, "xyz")
+	c.Assert(config.Jiradata.Url, Equals, "www.google.at")
 	c.Assert(len(config.Projects), Equals, 3)
 	c.Assert(config.Projects["RB"].Platform, Equals, "RasenBall")
     c.Assert(config.Projects["RB"].Excludeothers, Equals, false)

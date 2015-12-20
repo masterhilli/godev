@@ -75,11 +75,11 @@ func (s *HttpTestEngine) TTestJiraCreateRequestAndLogin(c *C) {
 	if err != nil {
 		panic(err)
 	}
-	requ, errReq := http.NewRequest("GET", config.JiraUrl.Url, nil)
+	requ, errReq := http.NewRequest("GET", config.Jiradata.Url, nil)
 	if errReq != nil {
 		panic("Error while building jira request")
 	}
-	requ.SetBasicAuth(config.JiraLogin.Username, config.JiraLogin.Password)
+	requ.SetBasicAuth(config.Jiradata.Username, config.Jiradata.Password)
 	client := &http.Client{}
 
 	resp, errDo := client.Do(requ)

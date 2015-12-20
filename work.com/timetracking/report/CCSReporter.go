@@ -46,5 +46,5 @@ func (r CCSReporter) printValuesInCSVFormatPersTime(prjTime ProjectReportSetting
 	productOwner := prjTime.GetProductOwner()
 	timeEntry := prjTime.GetTimeEntry()
 	teamMembers := timeEntry.GetTeamMembersCommaSeperated(productOwner)
-	r.printValuesInCSVFormatSFF("LCC eServices Region South-East", teamMembers+","+productOwner, prjTime.Prj, timeEntry.ToFloat64InHours(), timeEntry.GetInPercent())
+	r.printValuesInCSVFormatSFF("LCC eServices Region South-East", teamMembers+","+productOwner, prjTime.GetProject(), timeEntry.ToFloat64InHours(), timeEntry.GetInPercent())
 }

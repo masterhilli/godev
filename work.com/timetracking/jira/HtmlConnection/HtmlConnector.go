@@ -27,24 +27,26 @@ func (jc *HtmlConnector) GetReportContentForProjectInTimeframe(projectInfo Proje
 func (jc *HtmlConnector) generateRequest(projectInfo ProjectReportSetting) *http.Request {
 	requ, err := http.NewRequest("GET", jc.generateUrlToConnect(projectInfo), nil)
 	PanicOnError(err)
-	requ.SetBasicAuth(jc.config.JiraLogin.Username, jc.config.JiraLogin.Password)
+	requ.SetBasicAuth(jc.config.Jiradata.Username, jc.config.Jiradata.Password)
 	return requ
 }
 
 func (jc *HtmlConnector) generateUrlToConnect(projectInfo ProjectReportSetting) string {
-	return jc.config.JiraUrl.Url +
-		jc.config.JiraUrl.GetReportName() +
-		jc.config.JiraUrl.GetStartDate() +
-		projectInfo.Startdate.GetTimeForUrl() +
-		jc.config.JiraUrl.GetEndDate() +
-		projectInfo.Enddate.GetTimeForUrl() +
-		jc.config.JiraUrl.GetPrjId() +
-		strconv.Itoa(projectInfo.Id) +
-		jc.config.JiraUrl.GetQuery() +
-		projectInfo.Query +
-		jc.config.JiraUrl.GetSelectedPrjId() +
-		strconv.Itoa(projectInfo.Id) +
-		jc.config.JiraUrl.GetReportKey()
+	startDate := projectInfo.GetStartDate()
+	endDate := projectInfo.GetEndDate()
+	return jc.config.Jiradata.Url +
+		jc.config.Jiradata.GetReportName() +
+		jc.config.Jiradata.GetStartDate() +
+		startDate.GetTimeForUrl() +
+		jc.config.Jiradata.GetEndDate() +
+		endDate.GetTimeForUrl() +
+		jc.config.Jiradata.GetPrjId() +
+		strconv.Itoa(projectInfo.GetId()) +
+		jc.config.Jiradata.GetQuery() +
+		projectInfo.GetQuery() +
+		jc.config.Jiradata.GetSelectedPrjId() +
+		strconv.Itoa(projectInfo.GetId()) +
+		jc.config.Jiradata.GetReportKey()
 }
 
 func (jc *HtmlConnector) getHTMLBodyFromRequest(requ *http.Request) string {

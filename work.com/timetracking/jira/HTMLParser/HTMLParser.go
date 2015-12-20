@@ -28,7 +28,7 @@ func RetrieveNameTimePairPerProject(retChan chan ProjectReportSetting, prjInfo P
 	prjInfo.SetNames(htmlParser.GetNames())
 	prjInfo.SetTimes(htmlParser.GetTimes())
 	timeStop := time.Now()
-	fmt.Printf("-->%s DONE in %v\n", prjInfo.Prj, timeStop.Sub(timeStart))
+	fmt.Printf("-->%s DONE in %v\n", prjInfo.GetProject(), timeStop.Sub(timeStart))
 	retChan <- prjInfo
 }
 

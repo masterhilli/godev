@@ -23,13 +23,13 @@ func main() {
 	}
 
 	var config jiraConfig.Config = jiraConfig.Reader.Read(args.GetFilePathConfig())
-	config.JiraLogin.Password = SetEmptyPasswordOverConsoleInput(config.JiraLogin.Password)
+	config.Jiradata.Password = SetEmptyPasswordOverConsoleInput(config.Jiradata.Password)
 
 	var jc jiraConnection.HtmlConnector = jiraConnection.NewHtmlConnector(config)
 	var tm map[string]bool = config.GetTeammembersAsMap() //ReadTeammembers(args.GetFilePathToTeammembers())
-	var pi TimeTrackingReport
+	var pi TimeTrackingReport = config.GetTimeTrackingReportData()
 
-	pi.Initialize(args.GetFilePathToProjects())
+	//pi.Initialize(args.GetFilePathToProjects())
 
 	if args.IsTesting() {
 		for k := range tm {
@@ -71,13 +71,13 @@ func SetEmptyPasswordOverConsoleInput(pwd string) string {
 	}
 	return pwd
 }
-
+/*
 func ReadTeammembers(file string) map[string]bool {
 	var reader *bufio.Reader
 	reader = GetBufferIOReader(file)
 	return ReadEachLineAndAddTeamMemberToMap(reader)
 }
-
+*/
 func GetBufferIOReader(file string) *bufio.Reader {
 	filename, errAbs := filepath.Abs(file)
 	PanicOnError(errAbs)
@@ -87,7 +87,7 @@ func GetBufferIOReader(file string) *bufio.Reader {
 
 	return bufio.NewReader(f)
 }
-
+/*
 func ReadEachLineAndAddTeamMemberToMap(reader *bufio.Reader) map[string]bool {
 	var teammembers map[string]bool = make(map[string]bool)
 	line, errLine := reader.ReadString('\n')
@@ -101,3 +101,4 @@ func ReadEachLineAndAddTeamMemberToMap(reader *bufio.Reader) map[string]bool {
 	}
 	return teammembers
 }
+*/

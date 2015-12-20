@@ -4,12 +4,17 @@ import (
 	. "../arguments"
 	. "../helper"
 	. "../jira/Timeentry"
-	. "../jira/UrlDate"
 	"encoding/csv"
 	"fmt"
-	"strconv"
 	"strings"
 )
+
+
+func NewTimeTrackingReport(countProjects int) TimeTrackingReport {
+	var retVal TimeTrackingReport
+	retVal.settings = make(map[string]ProjectReportSetting, countProjects)
+	return retVal
+}
 
 type TimeTrackingReport struct {
 	settings             map[string]ProjectReportSetting
@@ -31,7 +36,7 @@ func (this *TimeTrackingReport) GetEntry(index string) ProjectReportSetting {
 }
 
 func (this *TimeTrackingReport) SetEntry(prjRepSettings ProjectReportSetting) {
-	this.settings[strings.ToLower(prjRepSettings.Prj)] = prjRepSettings
+	this.settings[strings.ToLower(prjRepSettings.prj)] = prjRepSettings
 }
 
 func (this *TimeTrackingReport) SetTeamMembers(tm map[string]bool) {
@@ -46,6 +51,7 @@ func (this *TimeTrackingReport) Initialize(path string) {
 	this.parseProjectsFromByteStream(content)
 }
 
+
 func (this *TimeTrackingReport) Finish() {
 	this.calculateSumOfAllTimes()
 	this.finishPrjSettings()
@@ -55,7 +61,7 @@ func (this *TimeTrackingReport) calculateSumOfAllTimes() {
 	for i := range this.settings {
 		entry := this.settings[i]
 		var retTotalTime TimeEntry
-		retTotalTime = this.createTotalOfPrj(this.settings[i].Prj, entry)
+		retTotalTime = this.createTotalOfPrj(this.settings[i].prj, entry)
 		this.SumOfAllProjectTimes = this.SumOfAllProjectTimes + retTotalTime.ToFloat64InHours()
 		entry.SetTimeEntry(retTotalTime)
 		this.settings[i] = entry
@@ -130,31 +136,11 @@ func (this *TimeTrackingReport) setPrjInfoAtPosition(position int, record []stri
 		return
 	}
 	var newElement ProjectReportSetting
-	newElement.Prj = this.setStringValue(record[0])
-	newElement.Id = this.setIntValue(record[1])
-	newElement.Query = this.setStringValue(record[2])
-	newElement.Startdate = this.setUrlDateValue(record[3])
-	newElement.Enddate = this.setUrlDateValue(record[4])
-	newElement.productOwner = this.setStringValue(record[5])
-	this.settings[strings.ToLower(newElement.Prj)] = newElement
+	newElement.SetProject(record[0])
+	newElement.SetIdFromString(record[1])
+	newElement.SetQuery(record[2])
+	newElement.SetStartEndDateFromString(record[3], record[4])
+	newElement.SetProductOwner(record[5])
+	this.settings[strings.ToLower(newElement.prj)] = newElement
 }
 
-func (this TimeTrackingReport) setStringValue(value string) string {
-	return strings.TrimSpace(value)
-}
-
-func (this TimeTrackingReport) setIntValue(value string) int {
-	k, parseErr := strconv.Atoi(strings.TrimSpace(value))
-	if parseErr != nil {
-		return -1
-	} else {
-		return k
-	}
-}
-
-func (this TimeTrackingReport) setUrlDateValue(value string) UrlDate {
-	var jiraDate UrlDate
-	jiraDate.Initialize(strings.TrimSpace(value))
-
-	return jiraDate
-}

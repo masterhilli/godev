@@ -3,7 +3,6 @@ package jira
 import (
 	. "../../data"
 	. "../Config"
-	. "../UrlDate"
 	. "gopkg.in/check.v1"
 	"testing"
 )
@@ -15,16 +14,11 @@ type YamlTestEngine struct {
 
 func TestYamlEngine(t *testing.T) {
 	var yte YamlTestEngine
-	yte.ProjectInfo.Prj = "SOLUT"
-	yte.ProjectInfo.Id = 10941
-	yte.ProjectInfo.Query = ""
-	var myStartDate UrlDate
-	var myEndDate UrlDate
+	yte.ProjectInfo.SetProject("SOLUT")
+	yte.ProjectInfo.SetIdFromString("10941")
+	yte.ProjectInfo.SetQuery("")
 
-	myStartDate.Initialize("01.09.2015")
-	myEndDate.Initialize("11.11.2015")
-	yte.ProjectInfo.Startdate = myStartDate
-	yte.ProjectInfo.Enddate = myEndDate
+	yte.ProjectInfo.SetStartEndDateFromString("01.09.2015","11.11.2015")
 	yte.jc = NewHtmlConnector(Reader.Read("../../__testdata/jira_html.yaml"))
 	Suite(&yte)
 	TestingT(t)

@@ -4,6 +4,7 @@ import (
 	. "../../helper"
 	"strings"
 	"gopkg.in/yaml.v2"
+	data "../../data"
 )
 
 const reportName string = "ConfigureReport.jspa?"
@@ -15,19 +16,21 @@ const selectedPrjId string = "&selectedProjectId="
 const reportKey string = "&reportKey=com.synergyapps.plugins.jira.timepo-timesheet-plugin%3Aissues-report&Next=Next"
 
 type Config struct {
-	JiraLogin   LoginData
-	JiraUrl     UrlInformation
+	Jiradata    JiraData
+	Dates       TimeFrame
 	Projects    map[string]Project
 	Teammembers []string
 }
 
-type LoginData struct {
+type JiraData struct {
 	Username string
 	Password string
+	Url string
 }
 
-type UrlInformation struct {
-	Url string
+type TimeFrame struct {
+	Startdate string
+	Enddate   string
 }
 
 type Project struct {
@@ -62,30 +65,57 @@ func (this Config) GetTeammembersAsMap() map[string]bool {
 	return retVal
 }
 
-func (this UrlInformation) GetReportName() string {
+func (this Config) GetTimeTrackingReportData() data.TimeTrackingReport {
+	var dataForReport data.TimeTrackingReport = data.NewTimeTrackingReport(len(this.Projects))
+	dataForReport.SetTeamMembers(this.GetTeammembersAsMap())
+	for i := range this.Projects {
+		dataForReport.SetEntry(this.CreateProjectReportSetting(i))
+	}
+	return dataForReport
+}
+
+func (this Config) CreateProjectReportSetting(key string) data.ProjectReportSetting {
+	var newProjectReportData data.ProjectReportSetting
+	project := this.Projects[key]
+
+	newProjectReportData.SetProductOwner(project.Productowner)
+	newProjectReportData.SetProject(strings.ToUpper(key))
+	newProjectReportData.SetIdFromString("")
+	newProjectReportData.SetQuery(project.GetQuery())
+	newProjectReportData.SetStartEndDateFromString(this.Dates.Startdate, this.Dates.Enddate)
+
+	return newProjectReportData
+}
+
+func (this JiraData) GetReportName() string {
 	return reportName
 }
 
-func (this UrlInformation) GetStartDate() string {
+func (this JiraData) GetStartDate() string {
 	return startDate
 }
 
-func (this UrlInformation) GetEndDate() string {
+func (this JiraData) GetEndDate() string {
 	return endDate
 }
 
-func (this UrlInformation) GetPrjId() string {
+func (this JiraData) GetPrjId() string {
 	return prjId
 }
 
-func (this UrlInformation) GetSelectedPrjId() string {
+func (this JiraData) GetSelectedPrjId() string {
 	return selectedPrjId
 }
 
-func (this UrlInformation) GetReportKey() string {
+func (this JiraData) GetReportKey() string {
 	return reportKey
 }
 
-func (this UrlInformation) GetQuery() string {
+func (this JiraData) GetQuery() string {
 	return query
+}
+
+func (this Project) GetQuery()string {
+	// TODO: actually really return the necessary information!
+	return this.Platform + " " + this.Project
 }
