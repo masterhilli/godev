@@ -4,7 +4,6 @@ import (
 	. "../arguments"
 	. "../data"
 	"strconv"
-	"fmt"
 )
 
 type ReporterInterface interface {

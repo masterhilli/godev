@@ -1,43 +1,16 @@
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
-*.o
-*.a
-*.so
+
 
 # Folders
-_obj
-_test
-pkg
-gopkg.in
-9fans.net
-nsf
-rogpeppe
-golang.org
-configFiles
+__testdata
+__configFiles
 
 # Architecture specific extensions/prefixes
-*.[568vq]
-[568vq].out
-
 *.cgo1.go
 *.cgo2.c
 _cgo_defun.c
 _cgo_gotypes.go
 _cgo_export.*
 .idea
-godev.iml
-
-_testmain.go
-trace.out
-
-*.exe
-*.test
-*.prof
-*.help
-*.yaml
-*.html
-*.csv
-*.zip
 *.iml
-teammembers.txt
-teammembers_all.txt
-teammembers_test.txt
+*.exe

@@ -8,11 +8,11 @@ import (
 "strconv"
 )
 
-const defaultTeamMemberFilepath string = "./configFiles/teammembers.txt"
-const defaultProjectsFilepath string = "./configFiles/projects.csv"
-const defaultConfigFilepath string = "./configFiles/jira.yaml"
-const testTeamMemberFilepath string = "./configFiles/teammembers_test.txt"
-const testProjectsFilepath string = "./configFiles/projects_test.csv"
+const defaultTeamMemberFilepath string = "./__configFiles/teammembers.txt"
+const defaultProjectsFilepath string = "./__configFiles/projects.csv"
+const defaultConfigFilepath string = "./__configFiles/jira.yaml"
+const testTeamMemberFilepath string = "./__configFiles/teammembers_test.txt"
+const testProjectsFilepath string = "./__configFiles/projects_test.csv"
 
 var args TimeTrackingArgs
 var isInitialized bool

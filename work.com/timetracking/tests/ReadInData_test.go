@@ -8,6 +8,8 @@ import (
     "regexp"
 )
 
+
+const pathToTestReportJiraHtml string= "../__testdata/Report-Jira.html"
 // Hook up gocheck into the "go test" runner.
 type ReadInDataTestEngine struct{
     regexpToFindNames string
@@ -31,9 +33,9 @@ func (s *ReadInDataTestEngine) checkForError(c *C, e error) {
 }
 
 func (s *ReadInDataTestEngine) TestReadingInWholeFile(c *C) {
-	data, err := ioutil.ReadFile("./testdata/Report-Jira.html")
+    data, err := ioutil.ReadFile(pathToTestReportJiraHtml)
     s.checkForError(c, err)
-    c.Assert(len(data), Equals, 175551)
+    c.Assert(len(data), Equals, 175812)
 }
 
 func (s *ReadInDataTestEngine) TestReadInAndSubMatchForNames(c *C) {
@@ -45,7 +47,7 @@ func (s *ReadInDataTestEngine) TestReadInAndSubMatchForTotalTimes(c *C) {
 }
 
 func (s *ReadInDataTestEngine) ReadInFileAndFindRegExp(c *C, regexpToFind string, countToAssertOn int) {
-	data, err := ioutil.ReadFile("./testdata/Report-Jira.html")
+	data, err := ioutil.ReadFile(pathToTestReportJiraHtml)
     s.checkForError(c, err)
     s.AssertOnSubmatch(c, regexpToFind, countToAssertOn, string(data))
 }
