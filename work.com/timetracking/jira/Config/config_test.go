@@ -113,7 +113,6 @@ func (this *YamlTestEngine) TestGetTeamMembersAsMapReturnsCount9(c *C) {
 }
 
 func (this *YamlTestEngine) TestGetQueryForPlatformAndProject(c *C) {
-	// TODO: need to add a + for strings if whitespace!
 	c.Assert(this.config.Projects["SOLUT"].GetQuery(), Equals, "Platform+%3D+%22Solution+Tool%22+or+project+%3D+%22SOLUT%22")
 }
 

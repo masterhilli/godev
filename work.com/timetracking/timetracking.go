@@ -49,7 +49,7 @@ func main() {
 
 func SetEmptyPasswordOverConsoleInput(pwd string) string {
 	if len(pwd) == 0 {
-
+		//TODO: need to read it in without echo of input
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Enter password: ")
 		pwd, _ = reader.ReadString('\n')
