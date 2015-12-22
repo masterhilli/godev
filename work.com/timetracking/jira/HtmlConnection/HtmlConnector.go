@@ -6,7 +6,6 @@ import (
 	. "../Config"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 )
 
 type HtmlConnector struct {
@@ -41,11 +40,11 @@ func (jc *HtmlConnector) generateUrlToConnect(projectInfo ProjectReportSetting) 
 		jc.config.Jiradata.GetEndDate() +
 		endDate.GetTimeForUrl() +
 		jc.config.Jiradata.GetPrjId() +
-		strconv.Itoa(projectInfo.GetId()) +
+		projectInfo.GetIdAsString() +
 		jc.config.Jiradata.GetQuery() +
 		projectInfo.GetQuery() +
 		jc.config.Jiradata.GetSelectedPrjId() +
-		strconv.Itoa(projectInfo.GetId()) +
+		projectInfo.GetIdAsString() +
 		jc.config.Jiradata.GetReportKey()
 }
 

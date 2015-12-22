@@ -15,7 +15,7 @@ func NewTimeTrackingReport(countProjects int) TimeTrackingReport {
 
 type TimeTrackingReport struct {
 	settings             map[string]ProjectReportSetting
-	reportName			 string
+	reportName           string
 	SumOfAllProjectTimes float64
 	teammembers          map[string]bool
 }
@@ -24,7 +24,7 @@ func (this *TimeTrackingReport) SetReportName(reportName string) {
 	this.reportName = reportName
 }
 
-func (this TimeTrackingReport) GetReportName() string{
+func (this TimeTrackingReport) GetReportName() string {
 	return this.reportName
 }
 
@@ -87,6 +87,7 @@ func (this TimeTrackingReport) createTotalOfPrj(prjName string, prjSpecificSetti
 	for i = 0; i < len(prjSpecificSettings.GetNames()); i++ {
 		var person TimeEntry
 		person.InitializeFromString(prjSpecificSettings.GetNames()[i], prjSpecificSettings.GetTimes()[i])
+		//fmt.Printf("__name: %s ***times: %s\n", prjSpecificSettings.GetNames()[i], prjSpecificSettings.GetTimes()[i])
 		personsTimes[i] = person
 	}
 
@@ -110,4 +111,3 @@ func (this TimeTrackingReport) createTotalOfPrj(prjName string, prjSpecificSetti
 	total.InitializeFromFloat(prjName, sumOfTimes, personsWithTime)
 	return total
 }
-

@@ -3,8 +3,8 @@ package data
 import (
 	. "../jira/Timeentry"
 	. "../jira/UrlDate"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 type ProjectReportSetting struct {
@@ -15,10 +15,10 @@ type ProjectReportSetting struct {
 	enddate      UrlDate
 	productOwner string
 
-	names        []string
-	times        []string
+	names []string
+	times []string
 
-	timeEntry    TimeEntry
+	timeEntry TimeEntry
 }
 
 func (pi *ProjectReportSetting) GetNames() []string {
@@ -65,6 +65,10 @@ func (this ProjectReportSetting) GetId() int {
 	return this.id
 }
 
+func (this ProjectReportSetting) GetIdAsString() string {
+	return this.emptyStringForItoA(this.id)
+}
+
 func (this *ProjectReportSetting) SetIdFromString(id string) {
 	this.id = this.setIntValue(id)
 }
@@ -90,8 +94,6 @@ func (this *ProjectReportSetting) SetStartEndDateFromString(start, end string) {
 	this.enddate = this.setUrlDateValue(end)
 }
 
-
-
 func (this ProjectReportSetting) setStringValue(value string) string {
 	return strings.TrimSpace(value)
 }
@@ -110,4 +112,12 @@ func (this ProjectReportSetting) setUrlDateValue(value string) UrlDate {
 	jiraDate.Initialize(strings.TrimSpace(value))
 
 	return jiraDate
+}
+
+func (this ProjectReportSetting) emptyStringForItoA(val int) string {
+	if val >= 0 {
+		return strconv.Itoa(val)
+	} else {
+		return ""
+	}
 }

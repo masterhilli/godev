@@ -15,14 +15,14 @@ var args TimeTrackingArgs
 var isInitialized bool
 
 type TimeTrackingArgs struct {
-	countParsedArgs       int
-	reportId              int
-	filePathToConfig      string
-	startDate             time.Time
-	sprintStatistic       bool
-	testing               bool
-	run                   bool
-	help                  bool
+	countParsedArgs  int
+	reportId         int
+	filePathToConfig string
+	startDate        time.Time
+	sprintStatistic  bool
+	testing          bool
+	run              bool
+	help             bool
 }
 
 func GetArguments() TimeTrackingArgs {
@@ -142,7 +142,7 @@ func (t *TimeTrackingArgs) parseStringArg(stringArg string) {
 func (t *TimeTrackingArgs) setStringVariable(prefix string, value string) {
 	switch prefix {
 	case "config":
-		t.filePathToConfig= value
+		t.filePathToConfig = value
 	default:
 		fmt.Printf("Unknown String argument: %s\n", prefix)
 	}

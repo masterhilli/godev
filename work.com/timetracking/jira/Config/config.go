@@ -1,10 +1,11 @@
 package jira
 
 import (
-	. "../../helper"
-	"strings"
-	"gopkg.in/yaml.v2"
 	data "../../data"
+	. "../../helper"
+	"gopkg.in/yaml.v2"
+	"net/url"
+	"strings"
 )
 
 const reportName string = "ConfigureReport.jspa?"
@@ -26,7 +27,7 @@ type Config struct {
 type JiraData struct {
 	Username string
 	Password string
-	Url string
+	Url      string
 }
 
 type TimeFrame struct {
@@ -35,9 +36,9 @@ type TimeFrame struct {
 }
 
 type Project struct {
-	Project      string
-	Platform     string
-	Productowner string
+	Project       string
+	Platform      string
+	Productowner  string
 	Excludeothers bool
 }
 
@@ -117,33 +118,20 @@ func (this JiraData) GetQuery() string {
 	return query
 }
 
-func (this Project) GetQuery()string {
-	var sqlQuery string = this.returnUrlEncodedPlatform()
-	if len(this.Project) > 0 && len(this.Platform) > 0 {
-		sqlQuery = sqlQuery + this.returnUrlEncodedOr()
+func (this Project) GetQuery() string {
+	var sqlQuery string
+	if len(this.Platform) > 0 {
+		sqlQuery = "Platform = \"" + this.Platform + "\""
 	}
-	sqlQuery = sqlQuery + this.returnUrlEncodedProject()
+	if len(this.Project) > 0 && len(this.Platform) > 0 {
+		sqlQuery = sqlQuery + " or "
+	}
+	if len(this.Project) > 0 {
+		sqlQuery = sqlQuery + "project = \"" + this.Project + "\""
+	}
 
 	/* TODO: Missing, standard project where we book everything,
 	   need to skip all others, their! IDEA: not in using ;)
 	*/
-	return sqlQuery
-}
-
-func (this Project) returnUrlEncodedPlatform() string {
-	if len(this.Platform) > 0 {
-		return "Platform+%3D+%22" + this.Platform + "%22"
-	}
-	return ""
-}
-
-func (this Project) returnUrlEncodedOr() string {
-	return "+or+"
-}
-
-func (this Project) returnUrlEncodedProject() string {
-	if len(this.Project) > 0 {
-		return "project%3D" + this.Project
-	}
-	return ""
+	return url.QueryEscape(sqlQuery)
 }

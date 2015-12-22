@@ -60,13 +60,13 @@ myobjectlist:
         another: so on
 `
 
-type YamlTestEngine struct{
-    config Config
+type YamlTestEngine struct {
+	config Config
 }
 
 func TestYamlEngine(t *testing.T) {
-    var testEngine YamlTestEngine
-    testEngine.config = Reader.unmarshalToConfig([]byte(typicalProjectTemplate))
+	var testEngine YamlTestEngine
+	testEngine.config = Reader.unmarshalToConfig([]byte(typicalProjectTemplate))
 	Suite(&testEngine)
 	TestingT(t)
 }
@@ -85,9 +85,9 @@ type Pair struct {
 
 func (y *YamlTestEngine) TestReadJiraConfig(c *C) {
 	config := Reader.Read(pathToTestJiraConfigYaml)
-    jiraData := config.Jiradata
+	jiraData := config.Jiradata
 
-    c.Assert(jiraData.Username, Equals, "xyz")
+	c.Assert(jiraData.Username, Equals, "xyz")
 	c.Assert(jiraData.Password, Equals, "abcdefgh")
 
 	c.Assert(jiraData.Url, Equals, "http://10.99.11.333/j/secure/")
@@ -101,45 +101,42 @@ func (y *YamlTestEngine) TestYamlUnmarshaler(c *C) {
 	c.Assert(y.config.Jiradata.Url, Equals, "www.google.at")
 	c.Assert(len(y.config.Projects), Equals, 3)
 	c.Assert(y.config.Projects["RB"].Platform, Equals, "RasenBall")
-    c.Assert(y.config.Projects["RB"].Excludeothers, Equals, false)
-    c.Assert(y.config.Projects["SOLUT"].Excludeothers, Equals, true)
+	c.Assert(y.config.Projects["RB"].Excludeothers, Equals, false)
+	c.Assert(y.config.Projects["SOLUT"].Excludeothers, Equals, true)
 	c.Assert(len(y.config.Teammembers), Equals, 9)
 	c.Assert(y.config.Teammembers[2], Equals, "Leonardo.Vastic")
 }
 
 func (this *YamlTestEngine) TestGetTeamMembersAsMapReturnsCount9(c *C) {
-    config := Reader.unmarshalToConfig([]byte(typicalProjectTemplate))
-    c.Assert(len(config.GetTeammembersAsMap()), Equals, 9)
+	config := Reader.unmarshalToConfig([]byte(typicalProjectTemplate))
+	c.Assert(len(config.GetTeammembersAsMap()), Equals, 9)
 }
 
 func (this *YamlTestEngine) TestGetQueryForPlatformAndProject(c *C) {
-    // TODO: need to add a + for strings if whitespace!
-    c.Assert(this.config.Projects["SOLUT"].GetQuery(), Equals, "Platform+%3D+%22Solution Tool%22+or+project%3DSOLUT")
+	// TODO: need to add a + for strings if whitespace!
+	c.Assert(this.config.Projects["SOLUT"].GetQuery(), Equals, "Platform+%3D+%22Solution+Tool%22+or+project+%3D+%22SOLUT%22")
 }
-
 
 func (this *YamlTestEngine) TestGetQueryForNoPlatformButProject(c *C) {
-    c.Assert(this.config.Projects["RMA"].GetQuery(), Equals, "project%3DRMA")
+	c.Assert(this.config.Projects["RMA"].GetQuery(), Equals, "project+%3D+%22RMA%22")
 }
 
-
 func (this *YamlTestEngine) TestGetQueryForPlatformAndNoProject(c *C) {
-    c.Assert(this.config.Projects["RB"].GetQuery(), Equals, "Platform+%3D+%22RasenBall%22")
+	c.Assert(this.config.Projects["RB"].GetQuery(), Equals, "Platform+%3D+%22RasenBall%22")
 }
 
 func (this *YamlTestEngine) TestReadingInStringList(c *C) {
-    yamlList := this.unmarshalList([]byte(contentForTestingYaml))
-    c.Assert(len(yamlList.Mylist), Equals, 2)
-    c.Assert(yamlList.Mylist[0], Equals, "test1")
-    c.Assert(yamlList.Mylist[1], Equals, "test2")
-    c.Assert(len(yamlList.Mypairlist), Equals, 3)
-    c.Assert(len(yamlList.Mypairlist[0]), Equals, 2)
-    c.Assert(len(yamlList.Mypairlist[1]), Equals, 2)
-    c.Assert(len(yamlList.Mypairlist[2]), Equals, 3)
-    c.Assert(len(yamlList.Mymaplist["abc"]), Equals, 2)
-    c.Assert(yamlList.Mymaplist["abc"][1], Equals, "test2")
+	yamlList := this.unmarshalList([]byte(contentForTestingYaml))
+	c.Assert(len(yamlList.Mylist), Equals, 2)
+	c.Assert(yamlList.Mylist[0], Equals, "test1")
+	c.Assert(yamlList.Mylist[1], Equals, "test2")
+	c.Assert(len(yamlList.Mypairlist), Equals, 3)
+	c.Assert(len(yamlList.Mypairlist[0]), Equals, 2)
+	c.Assert(len(yamlList.Mypairlist[1]), Equals, 2)
+	c.Assert(len(yamlList.Mypairlist[2]), Equals, 3)
+	c.Assert(len(yamlList.Mymaplist["abc"]), Equals, 2)
+	c.Assert(yamlList.Mymaplist["abc"][1], Equals, "test2")
 }
-
 
 func (this *YamlTestEngine) unmarshalList(content []byte) YamlWithList {
 	var yamlWithList YamlWithList
