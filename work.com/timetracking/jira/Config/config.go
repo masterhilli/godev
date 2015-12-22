@@ -48,7 +48,11 @@ type configReader struct{}
 
 func (cr configReader) Read(pathToConfig string) Config {
 	content := ReadInFile(pathToConfig)
-	return cr.unmarshalToConfig(content)
+	config := cr.unmarshalToConfig(content)
+	if len(config.Teammembers) == 1 {
+		panic("Sorry, I do not allow you to track the times of single persons, use more then 1 person in the team!")
+	}
+	return config
 }
 
 func (cr configReader) unmarshalToConfig(content []byte) Config {
