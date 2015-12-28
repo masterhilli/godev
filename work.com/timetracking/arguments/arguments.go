@@ -1,33 +1,28 @@
 package arguments
 
 import (
-"fmt"
-"os"
-"strings"
-"time"
-"strconv"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+	"time"
 )
 
-const defaultTeamMemberFilepath string = "./__configFiles/teammembers.txt"
-const defaultProjectsFilepath string = "./__configFiles/projects.csv"
 const defaultConfigFilepath string = "./__configFiles/jira.yaml"
-const testTeamMemberFilepath string = "./__configFiles/teammembers_test.txt"
-const testProjectsFilepath string = "./__configFiles/projects_test.csv"
+const testConfigFilepath string = "./__testdata/jira.yaml"
 
 var args TimeTrackingArgs
 var isInitialized bool
 
 type TimeTrackingArgs struct {
-countParsedArgs       int
-reportId			  int
-filePathToTeamMembers string
-filePathToProjects    string
-filePathToConfig      string
-startDate             time.Time
-sprintStatistic       bool
-testing               bool
-run                   bool
-help                  bool
+	countParsedArgs  int
+	reportId         int
+	filePathToConfig string
+	startDate        time.Time
+	sprintStatistic  bool
+	testing          bool
+	run              bool
+	help             bool
 }
 
 func GetArguments() TimeTrackingArgs {
@@ -45,73 +40,59 @@ func GetArguments() TimeTrackingArgs {
 }
 
 func (this *TimeTrackingArgs) GetReporterId() int {
-return this.reportId
+	return this.reportId
 }
 
 func (this *TimeTrackingArgs) SetReporterId(reportid int) {
-this.reportId = reportid
+	this.reportId = reportid
 }
 
 func (t *TimeTrackingArgs) GetCountParsedArgs() int {
-return t.countParsedArgs
-}
-
-func (t *TimeTrackingArgs) GetFilePathToTeammembers() string {
-if t.testing {
-	return testTeamMemberFilepath
-}
-return t.filePathToTeamMembers
-}
-
-func (t *TimeTrackingArgs) GetFilePathToProjects() string {
-if t.testing {
-	return testProjectsFilepath
-}
-return t.filePathToProjects
+	return t.countParsedArgs
 }
 
 func (t *TimeTrackingArgs) GetFilePathConfig() string {
-return t.filePathToConfig
+	if t.testing {
+		return testConfigFilepath
+	}
+	return t.filePathToConfig
 }
 
 func (t *TimeTrackingArgs) GetEndDate() time.Time {
-if t.sprintStatistic {
-	duration := time.Hour * 24 * 7
-	endDate := t.startDate.Add(duration)
-	return endDate
-}
-return time.Now()
+	if t.sprintStatistic {
+		duration := time.Hour * 24 * 7
+		endDate := t.startDate.Add(duration)
+		return endDate
+	}
+	return time.Now()
 }
 
 func (t *TimeTrackingArgs) IsTesting() bool {
-return t.testing
+	return t.testing
 }
 
 func (t *TimeTrackingArgs) IsRunning() bool {
-return t.run
+	return t.run
 }
 
 func (t *TimeTrackingArgs) IsHelpCall() bool {
-return t.help
+	return t.help
 }
 
 func (t *TimeTrackingArgs) HasNoRunArgs() bool {
-return !t.IsHelpCall() && !t.IsRunning() && !t.IsTesting()
+	return !t.IsHelpCall() && !t.IsRunning() && !t.IsTesting()
 }
 
 func (t *TimeTrackingArgs) resetArguments() {
-t.countParsedArgs = 0
-t.SetReporterId(0)
-t.filePathToConfig = defaultConfigFilepath
-t.filePathToProjects = defaultProjectsFilepath
-t.filePathToTeamMembers = defaultTeamMemberFilepath
-t.startDate = time.Date(0, time.January, 0, 0, 0, 0, 0, time.UTC)
-t.sprintStatistic = false
-t.testing = false
-t.run = false
-t.help = false
+	t.countParsedArgs = 0
+	t.SetReporterId(0)
+	t.filePathToConfig = defaultConfigFilepath
+	t.startDate = time.Date(0, time.January, 0, 0, 0, 0, 0, time.UTC)
+	t.sprintStatistic = false
+	t.testing = false
+	t.run = false
+	t.help = false
 }
-
 
 func (t *TimeTrackingArgs) parseAllArguments(args []string) {
 	t.countParsedArgs = 0
@@ -160,10 +141,8 @@ func (t *TimeTrackingArgs) parseStringArg(stringArg string) {
 
 func (t *TimeTrackingArgs) setStringVariable(prefix string, value string) {
 	switch prefix {
-	case "tm":
-		t.filePathToTeamMembers = value
-	case "prj":
-		t.filePathToProjects = value
+	case "config":
+		t.filePathToConfig = value
 	default:
 		fmt.Printf("Unknown String argument: %s\n", prefix)
 	}
@@ -222,7 +201,7 @@ func (this *TimeTrackingArgs) setIntVariable(prefix, intArg string) {
 	switch prefix {
 	case "report":
 		report, err := strconv.Atoi(intArg)
-		if (err != nil) {
+		if err != nil {
 			panic(err)
 		}
 		this.SetReporterId(report)
@@ -275,37 +254,34 @@ options:
 What you need to run the program:
 -----------------------------------------------------------------------
 
-A file called projects.csv in the same folder as the executable in the following format:
-PROJECT SHORTNAME, PRJ ID, <not yet used, keep empty>, START DATE in the format: DD.MM.YYYY (fill up with zero), END DATE (same format, if ZERO then actual is taken)
-pjname, 001,, 16.11.2015,
-pjname1, 002,, 16.11.2015,
-pjname2, 003,, 16.11.2015,
-
-
-A file called teammembers.txt, with all teammembers of the team. JIRA username in every line.  Last Line must be empty!
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-vorname.nachname
-
-And finally a jira.yaml, with the connection details:
-jiralogin:
+A jira.yaml, with the connection details, Teammembers and the project you need: (for further details ask me :) )
+jiradata:
     username: <yourJIRAUsername>
     password: <yourPWD>
-jiraurl:
     url: "http://10.207.121.181/j/secure/"
-    reportname: "ConfigureReport.jspa?"
-    startdate: "startDateId="
-    enddate: "&endDateId="
-    prjid: "&projectId="
-    query: "&jqlQueryId="
-    selectedprjid: "&selectedProjectId="
-    prefix: "&reportKey=com.synergyapps.plugins.jira.timepo-timesheet-plugin%3Aissues-report&Next=Next"`
+projects:
+    DAILCS:
+        project: DAILCS
+        productowner: Priesching
+        excludeothers: true
+    SOLUT:
+        project: SOLUT
+        productowner: Hillbrand
+    TAIR:
+        project: TAIR
+        productowner: Priesching
+    RMA:
+        project: RMA
+        productowner: HILLBRAND
+teammembers: [
+    anton.fressner,
+    david.huggl,
+    leonardo.vastic,
+    marc.Soriano,
+    martin.hillbrand,
+    richard.Friesenbichler,
+    serhat.Kalowski,
+    thomas.Eisenherz,
+    thomas.Fridolino
+]
+`

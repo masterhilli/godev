@@ -1,8 +1,8 @@
 package report
 
 import (
-	"fmt"
 	. "../data"
+	"fmt"
 )
 
 var reporter CCSReporter
@@ -22,7 +22,7 @@ func (this *CCSReporter) setSeparator(separator rune) {
 func (r CCSReporter) ExportReport(pi TimeTrackingReport) {
 	r.printValuesInCSVFormatSSS("Team", "Members", "Projectname", "Hours", "Percent")
 	r.printAllProjectTimeEntries(pi)
-	r.printValuesInCSVFormatSFF("LCC eServices Region South-East", "All", "OVERALLTIME", pi.SumOfAllProjectTimes, 100.0)
+	r.printValuesInCSVFormatSFF(pi.GetReportName(), "All", "OVERALLTIME", pi.SumOfAllProjectTimes, 100.0)
 }
 
 func (this CCSReporter) printAllProjectTimeEntries(reportData TimeTrackingReport) {
@@ -30,7 +30,7 @@ func (this CCSReporter) printAllProjectTimeEntries(reportData TimeTrackingReport
 		entry := reportData.GetEntry(i)
 		timeEntry := entry.GetTimeEntry()
 		if timeEntry.ToFloat64InHours() > 0.0 {
-			this.printValuesInCSVFormatPersTime(entry)
+			this.printValuesInCSVFormatPersTime(entry, reportData.GetReportName())
 		}
 	}
 }
@@ -42,9 +42,9 @@ func (r CCSReporter) printValuesInCSVFormatSSS(teamName string, teamMembers stri
 	fmt.Printf("%s%c%s%c%s%c%s%c%s%c\n", teamName, r.separator, teamMembers, r.separator, projectname, r.separator, hours, r.separator, percent, r.separator)
 }
 
-func (r CCSReporter) printValuesInCSVFormatPersTime(prjTime ProjectReportSetting) {
+func (r CCSReporter) printValuesInCSVFormatPersTime(prjTime ProjectReportSetting, reportName string) {
 	productOwner := prjTime.GetProductOwner()
 	timeEntry := prjTime.GetTimeEntry()
 	teamMembers := timeEntry.GetTeamMembersCommaSeperated(productOwner)
-	r.printValuesInCSVFormatSFF("LCC eServices Region South-East", teamMembers + "," + productOwner, prjTime.Prj, timeEntry.ToFloat64InHours(), timeEntry.GetInPercent())
+	r.printValuesInCSVFormatSFF(reportName, teamMembers+","+productOwner, prjTime.GetProject(), timeEntry.ToFloat64InHours(), timeEntry.GetInPercent())
 }

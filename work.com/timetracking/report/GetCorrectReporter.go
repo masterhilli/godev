@@ -15,12 +15,11 @@ func GetReporter(separator rune) ReporterInterface {
 	if args.GetReporterId() == 0 {
 		return GetSimpleProjectReporter()
 	}
-	ccsRep :=  GetCCSReporter()
+	ccsRep := GetCCSReporter()
 	ccsRep.setSeparator(separator)
 	return ccsRep
 }
 
-
 func convertFloat64ToString(floatToConvert float64) string {
-	return strconv.FormatFloat(floatToConvert , 'f', 2, 64)
+	return strconv.FormatFloat(floatToConvert, 'f', 2, 64)
 }

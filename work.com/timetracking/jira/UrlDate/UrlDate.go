@@ -1,8 +1,8 @@
 package jira
 
 import (
-	"time"
 	. "../../helper"
+	"time"
 )
 
 type UrlDate struct {

@@ -1,20 +1,31 @@
 package data
 
 import (
-	"encoding/csv"
-	"strconv"
+	. "../arguments"
+	. "../jira/Timeentry"
 	"fmt"
 	"strings"
-	. "../jira/Timeentry"
-	. "../helper"
-	. "../jira/UrlDate"
-	. "../arguments"
 )
 
+func NewTimeTrackingReport(countProjects int) TimeTrackingReport {
+	var retVal TimeTrackingReport
+	retVal.settings = make(map[string]ProjectReportSetting, countProjects)
+	return retVal
+}
+
 type TimeTrackingReport struct {
-	settings  map[string]ProjectReportSetting
+	settings             map[string]ProjectReportSetting
+	reportName           string
 	SumOfAllProjectTimes float64
-	teammembers map[string]bool
+	teammembers          map[string]bool
+}
+
+func (this *TimeTrackingReport) SetReportName(reportName string) {
+	this.reportName = reportName
+}
+
+func (this TimeTrackingReport) GetReportName() string {
+	return this.reportName
 }
 
 func (this *TimeTrackingReport) GetAllSettings() map[string]ProjectReportSetting {
@@ -31,7 +42,7 @@ func (this *TimeTrackingReport) GetEntry(index string) ProjectReportSetting {
 }
 
 func (this *TimeTrackingReport) SetEntry(prjRepSettings ProjectReportSetting) {
-	this.settings[strings.ToLower(prjRepSettings.Prj)] = prjRepSettings
+	this.settings[strings.ToLower(prjRepSettings.prj)] = prjRepSettings
 }
 
 func (this *TimeTrackingReport) SetTeamMembers(tm map[string]bool) {
@@ -39,11 +50,6 @@ func (this *TimeTrackingReport) SetTeamMembers(tm map[string]bool) {
 	for i := range tm {
 		this.teammembers[strings.ToLower(i)] = true
 	}
-}
-
-func (this *TimeTrackingReport) Initialize(path string) {
-	content := ReadInFile(path)
-	this.parseProjectsFromByteStream(content)
 }
 
 func (this *TimeTrackingReport) Finish() {
@@ -55,7 +61,7 @@ func (this *TimeTrackingReport) calculateSumOfAllTimes() {
 	for i := range this.settings {
 		entry := this.settings[i]
 		var retTotalTime TimeEntry
-		retTotalTime = this.createTotalOfPrj(this.settings[i].Prj, entry)
+		retTotalTime = this.createTotalOfPrj(this.settings[i].prj, entry)
 		this.SumOfAllProjectTimes = this.SumOfAllProjectTimes + retTotalTime.ToFloat64InHours()
 		entry.SetTimeEntry(retTotalTime)
 		this.settings[i] = entry
@@ -81,6 +87,7 @@ func (this TimeTrackingReport) createTotalOfPrj(prjName string, prjSpecificSetti
 	for i = 0; i < len(prjSpecificSettings.GetNames()); i++ {
 		var person TimeEntry
 		person.InitializeFromString(prjSpecificSettings.GetNames()[i], prjSpecificSettings.GetTimes()[i])
+		//fmt.Printf("__name: %s ***times: %s\n", prjSpecificSettings.GetNames()[i], prjSpecificSettings.GetTimes()[i])
 		personsTimes[i] = person
 	}
 
@@ -90,7 +97,7 @@ func (this TimeTrackingReport) createTotalOfPrj(prjName string, prjSpecificSetti
 			sumOfTimes = sumOfTimes + personsTimes[key].ToFloat64InHours()
 			if personsTimes[key].ToFloat64InHours() > 0.0 {
 				lastname := personsTimes[key].GetName()
-				lastname = lastname[strings.IndexRune(lastname, '.') + 1:]
+				lastname = lastname[strings.IndexRune(lastname, '.')+1:]
 				personsWithTime = append(personsWithTime, lastname)
 			}
 			if args.IsTesting() {
@@ -103,58 +110,4 @@ func (this TimeTrackingReport) createTotalOfPrj(prjName string, prjSpecificSetti
 
 	total.InitializeFromFloat(prjName, sumOfTimes, personsWithTime)
 	return total
-}
-
-func (this *TimeTrackingReport) parseProjectsFromByteStream(content []byte) {
-	records := this.readRecordsFromContent(string(content))
-
-	this.settings = make(map[string]ProjectReportSetting, len(records))
-	for i := 0; i < len(records); i++ {
-		this.setPrjInfoAtPosition(i, records[i])
-	}
-}
-
-func (this TimeTrackingReport) readRecordsFromContent(content string) [][]string {
-	r := csv.NewReader(strings.NewReader(content))
-	r.Comma = ','
-	r.Comment = '#'
-
-	records, err := r.ReadAll()
-	PanicOnError(err)
-	return records
-}
-
-func (this *TimeTrackingReport) setPrjInfoAtPosition(position int, record []string) {
-	if len(record) != 6 {
-		panic("Length of items not enough, we need 6 items")
-		return
-	}
-	var newElement ProjectReportSetting
-	newElement.Prj = this.setStringValue(record[0])
-	newElement.Id = this.setIntValue(record[1])
-	newElement.Query = this.setStringValue(record[2])
-	newElement.Startdate = this.setUrlDateValue(record[3])
-	newElement.Enddate = this.setUrlDateValue(record[4])
-	newElement.productOwner = this.setStringValue(record[5])
-	this.settings[strings.ToLower(newElement.Prj)] = newElement
-}
-
-func (this TimeTrackingReport) setStringValue(value string) string {
-	return strings.TrimSpace(value)
-}
-
-func (this TimeTrackingReport) setIntValue(value string) int {
-	k, parseErr := strconv.Atoi(strings.TrimSpace(value))
-	if parseErr != nil {
-		return -1
-	} else {
-		return k
-	}
-}
-
-func (this TimeTrackingReport) setUrlDateValue(value string) UrlDate {
-	var jiraDate UrlDate
-	jiraDate.Initialize(strings.TrimSpace(value))
-
-	return jiraDate
 }

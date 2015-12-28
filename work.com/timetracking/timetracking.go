@@ -1,91 +1,59 @@
 package main
 
 import (
-    "bufio"
-    "fmt"
-    "os"
-    "path/filepath"
-    "strings"
-    "time"
-    arguments "./arguments"
-    . "./data"
-    . "./helper"
-    jiraConfig "./jira/Config"
-    . "./jira/HTMLParser"
-    jiraConnection "./jira/HtmlConnection"
-    . "./report"
+	arguments "./arguments"
+	. "./data"
+	jiraConfig "./jira/Config"
+	. "./jira/HTMLParser"
+	jiraConnection "./jira/HtmlConnection"
+	. "./report"
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+	"time"
 )
 
 func main() {
-    args := arguments.GetArguments()
-    if args.IsHelpCall() || args.HasNoRunArgs() {
-        return
-    }
+	// TODO: have to split up to more than 1 method
+	args := arguments.GetArguments()
+	if args.IsHelpCall() || args.HasNoRunArgs() {
+		return
+	}
 
-    var config jiraConfig.Config = jiraConfig.Reader.Read(args.GetFilePathConfig())
-    var jc jiraConnection.HtmlConnector = jiraConnection.NewHtmlConnector(config)
-    var tm map[string]bool = ReadTeammembers(args.GetFilePathToTeammembers())
-    var pi TimeTrackingReport
+	var config jiraConfig.Config = jiraConfig.Reader.Read(args.GetFilePathConfig())
+	config.Jiradata.Password = SetEmptyPasswordOverConsoleInput(config.Jiradata.Password)
 
-    pi.Initialize(args.GetFilePathToProjects())
+	var jc jiraConnection.HtmlConnector = jiraConnection.NewHtmlConnector(config)
+	var pi TimeTrackingReport = config.GetTimeTrackingReportData()
 
-    if args.IsTesting() {
-        for k := range tm {
-            fmt.Printf("Read in:\t%s\n", k)
-        }
-    }
+	timeStart := time.Now()
+	var retChannel chan ProjectReportSetting = make(chan ProjectReportSetting)
+	for i := range pi.GetAllSettings() {
+		go RetrieveNameTimePairPerProject(retChannel, pi.GetEntry(i), jc) // I really do not like this one! you can not add the pointer of an element of the map as param to a method :(
+	}
 
-    timeStart := time.Now()
-    var retChannel chan ProjectReportSetting = make(chan ProjectReportSetting)
-    //var nameTimePairs map[string]HTMLParser = make(map[string]HTMLParser)
-    for i := range pi.GetAllSettings() {
-        go RetrieveNameTimePairPerProject(retChannel, pi.GetEntry(i), jc) // I really do not like this one! you can not add the pointer of an element of the map as param to a method :(
-    }
-
-    for j := 0; j < pi.GetSettingsLen(); j++ {
-        prjSetting := <-retChannel
-        pi.SetEntry(prjSetting)
-    }
-    close(retChannel)
-
-    pi.SetTeamMembers(tm)
-
-    timeStop := time.Now()
-    fmt.Printf("-->All projects retrieved in %v\n", timeStop.Sub(timeStart))
-    var reporter ReporterInterface
-    pi.Finish()
-    reporter = GetReporter(';')
-    reporter.ExportReport(pi)
+	for j := 0; j < pi.GetSettingsLen(); j++ {
+		prjSetting := <-retChannel
+		pi.SetEntry(prjSetting)
+	}
+	close(retChannel)
+	timeStop := time.Now()
+	fmt.Printf("-->All projects retrieved in %v\n", timeStop.Sub(timeStart))
+	var reporter ReporterInterface
+	pi.Finish()
+	reporter = GetReporter(';')
+	reporter.ExportReport(pi)
 
 }
 
-
-func ReadTeammembers(file string) map[string]bool {
-    var reader *bufio.Reader
-    reader = GetBufferIOReader(file)
-    return ReadEachLineAndAddTeamMemberToMap(reader)
-}
-
-func GetBufferIOReader(file string) *bufio.Reader{
-    filename, errAbs := filepath.Abs(file)
-    PanicOnError(errAbs)
-
-    f, errOpen := os.Open(filename)
-    PanicOnError(errOpen)
-
-    return bufio.NewReader(f)
-}
-
-func ReadEachLineAndAddTeamMemberToMap(reader *bufio.Reader) map[string]bool {
-    var teammembers map[string]bool = make(map[string]bool)
-    line, errLine := reader.ReadString('\n')
-
-    for errLine == nil {
-        line = strings.TrimSpace(line)
-        if len(line) > 0 {
-            teammembers[line] = true
-        }
-        line, errLine = reader.ReadString('\n')
-    }
-    return teammembers
+func SetEmptyPasswordOverConsoleInput(pwd string) string {
+	if len(pwd) == 0 {
+		//TODO: need to read it in without echo of input, by 28.12.2015 there is no possibility to turn off echoing
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Enter password: ")
+		pwd, _ = reader.ReadString('\n')
+		pwd = strings.TrimSpace(pwd)
+	}
+	return pwd
 }
