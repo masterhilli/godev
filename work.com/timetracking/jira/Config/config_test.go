@@ -113,15 +113,15 @@ func (this *YamlTestEngine) TestGetTeamMembersAsMapReturnsCount9(c *C) {
 }
 
 func (this *YamlTestEngine) TestGetQueryForPlatformAndProject(c *C) {
-	c.Assert(this.config.Projects["SOLUT"].GetQuery(), Equals, "Platform+%3D+%22Solution+Tool%22+or+project+%3D+%22SOLUT%22")
+	c.Assert(this.config.Projects["SOLUT"].GetQuery(nil), Equals, "%28Platform+%3D+%22Solution+Tool%22+OR+project+%3D+%22SOLUT%22%29")
 }
 
 func (this *YamlTestEngine) TestGetQueryForNoPlatformButProject(c *C) {
-	c.Assert(this.config.Projects["RMA"].GetQuery(), Equals, "project+%3D+%22RMA%22")
+	c.Assert(this.config.Projects["RMA"].GetQuery(nil), Equals, "%28project+%3D+%22RMA%22%29")
 }
 
 func (this *YamlTestEngine) TestGetQueryForPlatformAndNoProject(c *C) {
-	c.Assert(this.config.Projects["RB"].GetQuery(), Equals, "Platform+%3D+%22RasenBall%22")
+	c.Assert(this.config.Projects["RB"].GetQuery(nil), Equals, "%28Platform+%3D+%22RasenBall%22%29")
 }
 
 func (this *YamlTestEngine) TestReadingInStringList(c *C) {

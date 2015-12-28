@@ -85,10 +85,20 @@ func (this Config) CreateProjectReportSetting(key string) data.ProjectReportSett
 	var newProjectReportData data.ProjectReportSetting
 	project := this.Projects[key]
 
+	var platformsNotPartOfQuery []string = nil
+	if (project.Excludeothers) {
+		platformsNotPartOfQuery = make([]string, 0, len(this.Projects))
+		for i := range this.Projects {
+			platform := this.Projects[i].Platform
+			if  len(platform) > 0 {
+				platformsNotPartOfQuery = append(platformsNotPartOfQuery, platform)
+			}
+		}
+	}
 	newProjectReportData.SetProductOwner(project.Productowner)
 	newProjectReportData.SetProject(strings.ToUpper(key))
 	newProjectReportData.SetIdFromString("")
-	newProjectReportData.SetQuery(project.GetQuery())
+	newProjectReportData.SetQuery(project.GetQuery(platformsNotPartOfQuery))
 	newProjectReportData.SetStartEndDateFromString(this.Dates.Startdate, this.Dates.Enddate)
 
 	return newProjectReportData
@@ -122,20 +132,33 @@ func (this JiraData) GetQuery() string {
 	return query
 }
 
-func (this Project) GetQuery() string {
+func (this Project) GetQuery(platforms []string) string {
 	var sqlQuery string
 	if len(this.Platform) > 0 {
 		sqlQuery = "Platform = \"" + this.Platform + "\""
 	}
 	if len(this.Project) > 0 && len(this.Platform) > 0 {
-		sqlQuery = sqlQuery + " or "
+		sqlQuery = sqlQuery + " OR "
 	}
 	if len(this.Project) > 0 {
 		sqlQuery = sqlQuery + "project = \"" + this.Project + "\""
 	}
 
-	/* TODO: Missing, standard project where we book everything,
-	   need to skip all others, their! IDEA: not in using ;)
-	*/
+	sqlQuery = "(" + sqlQuery + ")"
+
+	if (platforms != nil) {
+		notInPart := " AND Platform not in ("
+		for i := range platforms {
+			if (len(platforms[i]) > 0) {
+				if i > 0 {
+					notInPart = notInPart + ","
+				}
+				notInPart = notInPart + "\"" + platforms[i] + "\""
+			}
+		}
+		notInPart = notInPart + ")"
+		sqlQuery = sqlQuery + notInPart
+	}
+
 	return url.QueryEscape(sqlQuery)
 }

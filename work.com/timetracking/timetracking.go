@@ -49,7 +49,7 @@ func main() {
 
 func SetEmptyPasswordOverConsoleInput(pwd string) string {
 	if len(pwd) == 0 {
-		//TODO: need to read it in without echo of input
+		//TODO: need to read it in without echo of input, by 28.12.2015 there is no possibility to turn off echoing
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Enter password: ")
 		pwd, _ = reader.ReadString('\n')
