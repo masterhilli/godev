@@ -15,8 +15,7 @@ func GetReporter(separator rune) ReporterInterface {
 	if args.GetReporterId() == 0 {
 		return GetSimpleProjectReporter()
 	}
-	ccsRep := GetCCSReporter()
-	ccsRep.setSeparator(separator)
+	ccsRep := GetCCSReporter(separator)
 	return ccsRep
 }
 

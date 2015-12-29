@@ -86,11 +86,11 @@ func (this Config) CreateProjectReportSetting(key string) data.ProjectReportSett
 	project := this.Projects[key]
 
 	var platformsNotPartOfQuery []string = nil
-	if (project.Excludeothers) {
+	if project.Excludeothers {
 		platformsNotPartOfQuery = make([]string, 0, len(this.Projects))
 		for i := range this.Projects {
 			platform := this.Projects[i].Platform
-			if  len(platform) > 0 {
+			if len(platform) > 0 {
 				platformsNotPartOfQuery = append(platformsNotPartOfQuery, platform)
 			}
 		}
@@ -146,10 +146,10 @@ func (this Project) GetQuery(platforms []string) string {
 
 	sqlQuery = "(" + sqlQuery + ")"
 
-	if (platforms != nil) {
+	if platforms != nil {
 		notInPart := " AND Platform not in ("
 		for i := range platforms {
-			if (len(platforms[i]) > 0) {
+			if len(platforms[i]) > 0 {
 				if i > 0 {
 					notInPart = notInPart + ","
 				}
