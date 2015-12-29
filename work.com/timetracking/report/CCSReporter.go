@@ -18,7 +18,8 @@ type CCSReporter struct {
 
 func (this *CCSReporter) Initialize(separator rune) {
 	if !this.isInitialized {
-		this.writer = NewCmdLineWriter()
+		this.writer = NewExcelWriter()
+		//this.writer = NewCmdLineWriter()
 		this.writer.Initialize([]string{string(separator)})
 		this.isInitialized = true
 	}

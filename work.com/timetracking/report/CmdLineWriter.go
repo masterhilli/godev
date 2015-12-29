@@ -25,9 +25,7 @@ func NewCmdLineWriter() *CmdLineWriter {
 func (this *CmdLineWriter) Initialize(values []string) {
 	valLen := len(values)
 	if valLen > 0 {
-        fmt.Println("Do we get a problem here?")
 		this.separator = ([]rune(values[0]))[0]
-        fmt.Println("No we did not")
 	}
 }
 
