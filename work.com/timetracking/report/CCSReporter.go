@@ -12,7 +12,7 @@ func GetCCSReporter(separator rune) CCSReporter {
 }
 
 type CCSReporter struct {
-	writer Writer
+	writer        Writer
 	isInitialized bool
 }
 
@@ -24,7 +24,6 @@ func (this *CCSReporter) Initialize(separator rune) {
 		this.isInitialized = true
 	}
 }
-
 
 func (this CCSReporter) ExportReport(pi TimeTrackingReport) {
 	this.writer.PrintLine("Team", "Members", "Projectname", "Hours", "Percent")
@@ -46,7 +45,6 @@ func (this CCSReporter) printAllProjectTimeEntries(reportData TimeTrackingReport
 func (r CCSReporter) printValuesInCSVFormatSFF(teamName string, teamMembers string, projectname string, hours float64, percent float64) {
 	r.writer.PrintLine(teamName, teamMembers, projectname, convertFloat64ToString(hours), convertFloat64ToString(percent)+"%")
 }
-
 
 func (r CCSReporter) printValuesInCSVFormatPersTime(prjTime ProjectReportSetting, reportName string) {
 	productOwner := prjTime.GetProductOwner()
