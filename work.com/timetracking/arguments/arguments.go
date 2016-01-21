@@ -1,13 +1,13 @@
 package arguments
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 )
 
+// constant values
 const defaultConfigFilepath string = "./__configFiles/jira.yaml"
 const testConfigFilepath string = "./__testdata/jira.yaml"
 
@@ -17,10 +17,10 @@ const argBTesting string = "-t"
 const argBRunning string = "-r"
 const argBHelp	string = "--help"
 const argDStart string = "start"
-const argDEnd string = "end"
 const argIReport string = "report"
+const noArgumentsMessage string = "If you do not know how to use this program please call with \"--help\""
 
-const wrongArgMessage string = "Unknown argument: %s\n"
+const wrongArgMessage string = "Unknown argument: "
 
 
 var args TimeTrackingArgs
@@ -37,20 +37,26 @@ type TimeTrackingArgs struct {
 	help             bool
 }
 
+// Singleton creator
 func GetArguments() TimeTrackingArgs {
 	if isInitialized == false {
 		var timeTrackingArgs TimeTrackingArgs
-		timeTrackingArgs.resetArguments()
-		timeTrackingArgs.parseAllArguments(os.Args)
-		if timeTrackingArgs.HasNoRunArgs() {
-			fmt.Println("If you do not know how to use this program please call with \"--help\"")
-		}
+		timeTrackingArgs.Initialize(true)
 		args = timeTrackingArgs
 		isInitialized = true
 	}
 	return args
 }
 
+// Initialize TimetrackingArgs
+func (this *TimeTrackingArgs) Initialize(parseOSArgs bool) {
+	this.resetArguments()
+	if parseOSArgs {
+		this.parseAllArguments(os.Args)
+	}
+}
+
+// Getter and setter
 func (this *TimeTrackingArgs) GetReporterId() int {
 	return this.reportId
 }
@@ -108,7 +114,6 @@ func (this *TimeTrackingArgs) resetArguments() {
 
 func (this *TimeTrackingArgs) parseAllArguments(args []string) {
 	this.countParsedArgs = 0
-
 	for i := 1; i < len(args); i++ {
 		arg := args[i]
 		this.countParsedArgs++
@@ -121,9 +126,11 @@ func (this *TimeTrackingArgs) parseAllArguments(args []string) {
 		} else if this.isDateArg(arg) {
 			this.parseDateArg(arg)
 		} else {
-			this.printWrongArgMessage(arg)
+			this.printWrongArgMessageToUI(arg)
 		}
-
+	}
+	if this.HasNoRunArgs() {
+		this.printMessageToUI(noArgumentsMessage)
 	}
 }
 
@@ -156,7 +163,7 @@ func (this *TimeTrackingArgs) setStringVariable(prefix string, value string) {
 	case argConfig:
 		this.filePathToConfig = value
 	default:
-		this.printWrongArgMessage(prefix)
+		this.printWrongArgMessageToUI(prefix)
 	}
 }
 
@@ -180,10 +187,10 @@ func (this *TimeTrackingArgs) setBooleanVariable(boolArg string) {
 	case argBRunning:
 		this.run = true
 	case argBHelp:
-		fmt.Printf("%s\n", helpContent)
+		this.printMessageToUI(helpContent)
 		this.help = true
 	default:
-		this.printWrongArgMessage(boolArg)
+		this.printWrongArgMessageToUI(boolArg)
 	}
 }
 
@@ -200,7 +207,7 @@ func (this *TimeTrackingArgs) setDateVariable(prefix, dateArg string) {
 	case argDStart:
 		this.startDate = this.parseIntoTimeObj(dateArg)
 	default:
-		this.printWrongArgMessage( prefix)
+		this.printWrongArgMessageToUI( prefix)
 	}
 }
 
@@ -221,7 +228,7 @@ func (this *TimeTrackingArgs) setIntVariable(prefix, intArg string) {
 		}
 		this.SetReporterId(report)
 	default:
-		this.printWrongArgMessage( prefix)
+		this.printWrongArgMessageToUI( prefix)
 	}
 }
 
@@ -256,8 +263,16 @@ func (this *TimeTrackingArgs) createTimeLayout(date string) string {
 
 }
 
-func (this TimeTrackingArgs) printWrongArgMessage(prefix string) {
-	fmt.Printf(wrongArgMessage, prefix)
+func (this TimeTrackingArgs) printWrongArgMessageToUI(prefix string) {
+	out := ArgOutGetter.GetPrinter("Unknown Argument: " + prefix)
+	out.PrintLn()
+	ArgOutGetter.SetLastArgument(prefix)
+}
+
+func (this TimeTrackingArgs) printMessageToUI(prefix string) {
+	out := ArgOutGetter.GetPrinter(prefix)
+	out.PrintLn()
+	ArgOutGetter.SetLastArgument(prefix)
 }
 
 const helpContent string = `Possible Arguments: 
