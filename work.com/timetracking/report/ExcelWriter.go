@@ -10,15 +10,23 @@ type ExcelWriter struct {
     sheet *xlsx.Sheet
 }
 
+const savedFilePath string = "./test.xlsx"
+
 var excelWriter ExcelWriter
 
 func NewExcelWriter() *ExcelWriter {
     return &excelWriter
 }
 
-func (this *ExcelWriter) Initialize(values []string) {
-    this.file = xlsx.NewFile()
-    this.sheet, _ = this.file.AddSheet("test")
+func (this *ExcelWriter) Initialize(values []string, reportname string) {
+    //pathToXLSX, _ := filepath.Abs(savedFilePath)
+    //openFile, err := xlsx.OpenFile(pathToXLSX)
+    //if err != nil {
+        this.file = xlsx.NewFile()
+/*    } else {
+        this.file = openFile
+    }*/
+    this.sheet, _ = this.file.AddSheet(reportname)
 }
 
 func (this *ExcelWriter) PrintLine(teamName string, teamMembers string, projectname string, hours string, percent string) {
@@ -38,6 +46,6 @@ func (this *ExcelWriter) addCell(row *xlsx.Row, value string) {
 }
 
 func (this *ExcelWriter) Close() {
-    pathToXLSX, _ := filepath.Abs("./test.xslx")
+    pathToXLSX, _ := filepath.Abs(savedFilePath)
     this.file.Save(pathToXLSX)
 }

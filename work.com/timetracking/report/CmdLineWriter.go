@@ -7,7 +7,7 @@ import (
 
 
 type Writer interface {
-	Initialize(values []string)
+	Initialize(values []string, reportname string)
 	PrintLine(teamName string, teamMembers string, projectname string, hours string, percent string)
 	Close()
 }
@@ -22,7 +22,7 @@ func NewCmdLineWriter() *CmdLineWriter {
     return &cmdLineWriter
 }
 
-func (this *CmdLineWriter) Initialize(values []string) {
+func (this *CmdLineWriter) Initialize(values []string, reportname string) {
 	valLen := len(values)
 	if valLen > 0 {
 		this.separator = ([]rune(values[0]))[0]

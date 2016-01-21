@@ -6,6 +6,14 @@ import (
 	"time"
 )
 
+const executableArg string = "test.exe"
+
+const stringArgument string = "tm=TestFilename"
+
+const boolArgSprint string = "-sprint"
+
+const dateArgStart string =  "start?5.1.2015"
+
 type ArgumentTestEngine struct {
 	ta TimeTrackingArgs
 }
@@ -23,19 +31,19 @@ func (ate *ArgumentTestEngine) IgnoreSettingArgumentsWithOnly1Argument(c *C) {
 
 func (ate *ArgumentTestEngine) TestSetTeammemberFile(c *C) {
 	var ta TimeTrackingArgs = GetArguments()
-	ta.parseAllArguments([]string{"test.exe", "config=TestFilename"})
+	ta.parseAllArguments([]string{executableArg, "config=TestFilename"})
 	c.Assert(ta.GetFilePathConfig(), Equals, "TestFilename")
 }
 
 func (ate *ArgumentTestEngine) TestSetProjectsFile(c *C) {
 	var ta TimeTrackingArgs = GetArguments()
-	ta.parseAllArguments([]string{"test.exe", "config=TestFilename"})
+	ta.parseAllArguments([]string{executableArg, "config=TestFilename"})
 	c.Assert(ta.GetFilePathConfig(), Equals, "TestFilename")
 }
 
 func (ate *ArgumentTestEngine) TestSetProjectsFileNotLowerCase(c *C) {
 	var ta TimeTrackingArgs = GetArguments()
-	ta.parseAllArguments([]string{"test.exe", "config=TestFilename"})
+	ta.parseAllArguments([]string{executableArg, "config=TestFilename"})
 	c.Assert(ta.GetFilePathConfig(), Equals, "TestFilename")
 }
 
@@ -61,33 +69,33 @@ func (ate *ArgumentTestEngine) TestIsNotBooleanArgument(c *C) {
 
 func (ate *ArgumentTestEngine) TestSetFlagForSprintStatistic(c *C) {
 	var ta TimeTrackingArgs = GetArguments()
-	ta.parseAllArguments([]string{"test.exe", "tm=TestFilename", "prj=myProjectFile.csv", "-sprint"})
+	ta.parseAllArguments([]string{executableArg, stringArgument, stringArgument, boolArgSprint})
 	c.Assert(ta.sprintStatistic, Equals, true)
 }
 
 func (ate *ArgumentTestEngine) TestNotSetFlagForSprintStatistic(c *C) {
 	var ta TimeTrackingArgs = GetArguments()
-	ta.parseAllArguments([]string{"test.exe", "tm=TestFilename", "prj=myProjectFile.csv"})
+	ta.parseAllArguments([]string{executableArg, stringArgument, stringArgument})
 	c.Assert(ta.sprintStatistic, Equals, false)
 }
 
 func (ate *ArgumentTestEngine) TestSetStartDate(c *C) {
 	var ta TimeTrackingArgs = GetArguments()
-	ta.parseAllArguments([]string{"test.exe", "tm=TestFilename", "PRJ=myProjectFile.csv", "start?5.1.2015", "-sprint"})
+	ta.parseAllArguments([]string{executableArg, stringArgument, stringArgument,dateArgStart, boolArgSprint})
 	t := time.Date(2015, time.January, 5, 0, 0, 0, 0, time.UTC)
 	c.Assert(ta.startDate, Equals, t)
 }
 
 func (ate *ArgumentTestEngine) TestGetEndDate(c *C) {
 	var ta TimeTrackingArgs = GetArguments()
-	ta.parseAllArguments([]string{"test.exe", "tm=TestFilename", "PRJ=myProjectFile.csv", "start?25.12.2015", "-sprint"})
-	t := time.Date(2016, time.January, 1, 0, 0, 0, 0, time.UTC)
+	ta.parseAllArguments([]string{executableArg, stringArgument, stringArgument, dateArgStart, boolArgSprint})
+	t := time.Date(2015, time.January, 12, 0, 0, 0, 0, time.UTC)
 	c.Assert(ta.GetEndDate(), Equals, t)
 }
 
 func (ate *ArgumentTestEngine) TestNotSetAStartDate(c *C) {
 	var ta TimeTrackingArgs = GetArguments()
-	ta.parseAllArguments([]string{"test.exe", "tm=TestFilename", "PRJ=myProjectFile.csv"})
+	ta.parseAllArguments([]string{executableArg, stringArgument, stringArgument})
 	t := time.Date(0, time.January, 0, 0, 0, 0, 0, time.UTC)
 	c.Assert(ta.startDate, Equals, t)
 }

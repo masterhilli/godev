@@ -42,7 +42,7 @@ func main() {
 	fmt.Printf("-->All projects retrieved in %v\n", timeStop.Sub(timeStart))
 	var reporter ReporterInterface
 	pi.Finish()
-	reporter = GetReporter(';')
+	reporter = GetReporter(';', config)
 	reporter.ExportReport(pi)
 
 }

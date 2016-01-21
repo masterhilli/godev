@@ -11,6 +11,18 @@ import (
 const defaultConfigFilepath string = "./__configFiles/jira.yaml"
 const testConfigFilepath string = "./__testdata/jira.yaml"
 
+const argConfig string = "config"
+const argBSprint string = "-sprint"
+const argBTesting string = "-t"
+const argBRunning string = "-r"
+const argBHelp	string = "--help"
+const argDStart string = "start"
+const argDEnd string = "end"
+const argIReport string = "report"
+
+const wrongArgMessage string = "Unknown argument: %s\n"
+
+
 var args TimeTrackingArgs
 var isInitialized bool
 
@@ -47,83 +59,83 @@ func (this *TimeTrackingArgs) SetReporterId(reportid int) {
 	this.reportId = reportid
 }
 
-func (t *TimeTrackingArgs) GetCountParsedArgs() int {
-	return t.countParsedArgs
+func (this *TimeTrackingArgs) GetCountParsedArgs() int {
+	return this.countParsedArgs
 }
 
-func (t *TimeTrackingArgs) GetFilePathConfig() string {
-	if t.testing {
+func (this *TimeTrackingArgs) GetFilePathConfig() string {
+	if this.testing {
 		return testConfigFilepath
 	}
-	return t.filePathToConfig
+	return this.filePathToConfig
 }
 
-func (t *TimeTrackingArgs) GetEndDate() time.Time {
-	if t.sprintStatistic {
+func (this *TimeTrackingArgs) GetEndDate() time.Time {
+	if this.sprintStatistic {
 		duration := time.Hour * 24 * 7
-		endDate := t.startDate.Add(duration)
+		endDate := this.startDate.Add(duration)
 		return endDate
 	}
 	return time.Now()
 }
 
-func (t *TimeTrackingArgs) IsTesting() bool {
-	return t.testing
+func (this *TimeTrackingArgs) IsTesting() bool {
+	return this.testing
 }
 
-func (t *TimeTrackingArgs) IsRunning() bool {
-	return t.run
+func (this *TimeTrackingArgs) IsRunning() bool {
+	return this.run
 }
 
-func (t *TimeTrackingArgs) IsHelpCall() bool {
-	return t.help
+func (this *TimeTrackingArgs) IsHelpCall() bool {
+	return this.help
 }
 
-func (t *TimeTrackingArgs) HasNoRunArgs() bool {
-	return !t.IsHelpCall() && !t.IsRunning() && !t.IsTesting()
+func (this *TimeTrackingArgs) HasNoRunArgs() bool {
+	return !this.IsHelpCall() && !this.IsRunning() && !this.IsTesting()
 }
 
-func (t *TimeTrackingArgs) resetArguments() {
-	t.countParsedArgs = 0
-	t.SetReporterId(0)
-	t.filePathToConfig = defaultConfigFilepath
-	t.startDate = time.Date(0, time.January, 0, 0, 0, 0, 0, time.UTC)
-	t.sprintStatistic = false
-	t.testing = false
-	t.run = false
-	t.help = false
+func (this *TimeTrackingArgs) resetArguments() {
+	this.countParsedArgs = 0
+	this.SetReporterId(0)
+	this.filePathToConfig = defaultConfigFilepath
+	this.startDate = time.Date(0, time.January, 0, 0, 0, 0, 0, time.UTC)
+	this.sprintStatistic = false
+	this.testing = false
+	this.run = false
+	this.help = false
 }
 
-func (t *TimeTrackingArgs) parseAllArguments(args []string) {
-	t.countParsedArgs = 0
+func (this *TimeTrackingArgs) parseAllArguments(args []string) {
+	this.countParsedArgs = 0
 
 	for i := 1; i < len(args); i++ {
 		arg := args[i]
-		t.countParsedArgs++
-		if t.isIntArg(arg) {
-			t.parseIntArg(arg)
-		} else if t.isStringArg(arg) {
-			t.parseStringArg(arg)
-		} else if t.isBooleanArg(arg) {
-			t.parseBooleanArg(arg)
-		} else if t.isDateArg(arg) {
-			t.parseDateArg(arg)
+		this.countParsedArgs++
+		if this.isIntArg(arg) {
+			this.parseIntArg(arg)
+		} else if this.isStringArg(arg) {
+			this.parseStringArg(arg)
+		} else if this.isBooleanArg(arg) {
+			this.parseBooleanArg(arg)
+		} else if this.isDateArg(arg) {
+			this.parseDateArg(arg)
 		} else {
-			fmt.Printf("Unknown argument: %d", arg)
+			this.printWrongArgMessage(arg)
 		}
 
 	}
 }
 
-func (t *TimeTrackingArgs) isStringArg(arg string) bool {
+func (this *TimeTrackingArgs) isStringArg(arg string) bool {
 	return (strings.IndexRune(arg, '=') >= 0)
 }
 
-func (t *TimeTrackingArgs) isBooleanArg(arg string) bool {
+func (this *TimeTrackingArgs) isBooleanArg(arg string) bool {
 	return (strings.IndexRune(arg, '-') == 0)
 }
 
-func (t *TimeTrackingArgs) isDateArg(arg string) bool {
+func (this *TimeTrackingArgs) isDateArg(arg string) bool {
 	return (strings.IndexRune(arg, '?') >= 0)
 }
 
@@ -131,87 +143,90 @@ func (this *TimeTrackingArgs) isIntArg(arg string) bool {
 	return (strings.IndexRune(arg, '#') >= 0)
 }
 
-func (t *TimeTrackingArgs) parseStringArg(stringArg string) {
+func (this *TimeTrackingArgs) parseStringArg(stringArg string) {
 	index := strings.IndexRune(stringArg, '=')
 	if index < 0 {
 		return // this is not a string arg
 	}
-	t.setStringVariable(strings.ToLower(stringArg[0:index]), stringArg[index+1:])
+	this.setStringVariable(strings.ToLower(stringArg[0:index]), stringArg[index+1:])
 }
 
-func (t *TimeTrackingArgs) setStringVariable(prefix string, value string) {
+func (this *TimeTrackingArgs) setStringVariable(prefix string, value string) {
 	switch prefix {
-	case "config":
-		t.filePathToConfig = value
+	case argConfig:
+		this.filePathToConfig = value
 	default:
-		fmt.Printf("Unknown String argument: %s\n", prefix)
+		this.printWrongArgMessage(prefix)
 	}
 }
 
-func (t *TimeTrackingArgs) parseBooleanArg(boolArg string) {
+func (this *TimeTrackingArgs) parseBooleanArg(boolArg string) {
 	index := strings.IndexRune(boolArg, '-')
 	if index != 0 {
 		return // this is not a string arg
 	}
-	t.setBooleanVariable(strings.ToLower(boolArg))
+	this.setBooleanVariable(strings.ToLower(boolArg))
 }
 
-func (t *TimeTrackingArgs) setBooleanVariable(boolArg string) {
+
+
+
+func (this *TimeTrackingArgs) setBooleanVariable(boolArg string) {
 	switch boolArg {
-	case "-sprint":
-		t.sprintStatistic = true
-	case "-t":
-		t.testing = true
-	case "-r":
-		t.run = true
-	case "--help":
+	case argBSprint:
+		this.sprintStatistic = true
+	case argBTesting:
+		this.testing = true
+	case argBRunning:
+		this.run = true
+	case argBHelp:
 		fmt.Printf("%s\n", helpContent)
-		t.help = true
+		this.help = true
 	default:
-		fmt.Printf("Unknown Boolean argument: %s\n", boolArg)
+		this.printWrongArgMessage(boolArg)
 	}
 }
 
-func (t *TimeTrackingArgs) parseDateArg(dateArg string) {
+func (this *TimeTrackingArgs) parseDateArg(dateArg string) {
 	index := strings.IndexRune(dateArg, '?')
 	if index <= 0 {
 		return // this is not a string arg
 	}
-	t.setDateVariable(strings.ToLower(dateArg[0:index]), dateArg[index+1:])
+	this.setDateVariable(strings.ToLower(dateArg[0:index]), dateArg[index+1:])
 }
 
-func (t *TimeTrackingArgs) setDateVariable(prefix, dateArg string) {
+func (this *TimeTrackingArgs) setDateVariable(prefix, dateArg string) {
 	switch prefix {
-	case "start":
-		t.startDate = t.parseIntoTimeObj(dateArg)
+	case argDStart:
+		this.startDate = this.parseIntoTimeObj(dateArg)
 	default:
-		fmt.Printf("Unknown Date argument: %s\n", prefix)
+		this.printWrongArgMessage( prefix)
 	}
 }
 
-func (t *TimeTrackingArgs) parseIntArg(intArg string) {
+func (this *TimeTrackingArgs) parseIntArg(intArg string) {
 	index := strings.IndexRune(intArg, '#')
 	if index <= 0 {
 		return // this is not a int arg
 	}
-	t.setIntVariable(strings.ToLower(intArg[0:index]), intArg[index+1:])
+	this.setIntVariable(strings.ToLower(intArg[0:index]), intArg[index+1:])
 }
 
 func (this *TimeTrackingArgs) setIntVariable(prefix, intArg string) {
 	switch prefix {
-	case "report":
+	case argIReport:
 		report, err := strconv.Atoi(intArg)
 		if err != nil {
 			panic(err)
 		}
 		this.SetReporterId(report)
 	default:
-		fmt.Printf("Unknown Int argument: %s\n", prefix)
+		this.printWrongArgMessage( prefix)
 	}
 }
 
-func (t *TimeTrackingArgs) parseIntoTimeObj(date string) time.Time {
-	layout := t.createTimeLayout(date)
+func (this *TimeTrackingArgs) parseIntoTimeObj(date string) time.Time {
+	layout := this.createTimeLayout(date)
 	var myTime time.Time
 	myTime, err := time.Parse(layout, date)
 	if err != nil {
@@ -220,7 +235,7 @@ func (t *TimeTrackingArgs) parseIntoTimeObj(date string) time.Time {
 	return myTime
 }
 
-func (t *TimeTrackingArgs) createTimeLayout(date string) string {
+func (this *TimeTrackingArgs) createTimeLayout(date string) string {
 	index := strings.IndexRune(date, '.')
 	var layout string = ""
 	if index == 1 {
@@ -239,6 +254,10 @@ func (t *TimeTrackingArgs) createTimeLayout(date string) string {
 	layout = layout + "2006"
 	return layout
 
+}
+
+func (this TimeTrackingArgs) printWrongArgMessage(prefix string) {
+	fmt.Printf(wrongArgMessage, prefix)
 }
 
 const helpContent string = `Possible Arguments: 
@@ -263,16 +282,11 @@ projects:
     DAILCS:
         project: DAILCS
         productowner: Priesching
-        excludeothers: true
-    SOLUT:
-        project: SOLUT
-        productowner: Hillbrand
-    TAIR:
-        project: TAIR
-        productowner: Priesching
-    RMA:
-        project: RMA
-        productowner: HILLBRAND
+        excludeothers: true ----------> This can only set once, to exclude all others
+IMCD: --------------------------------> Projektname wie er dann im EXCEL steht
+    project: IMINT -------------------> Shortcut zur Identifizierung des JIRA Projektes
+    platform: IMCD -------------------> Wert der unter Plattform steht.
+    productowner: Priesching ---------> ProductOwner für diese Plattform
 teammembers: [
     anton.fressner,
     david.huggl,

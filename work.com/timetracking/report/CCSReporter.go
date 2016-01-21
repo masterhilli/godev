@@ -6,8 +6,8 @@ import (
 
 var reporter CCSReporter
 
-func GetCCSReporter(separator rune) CCSReporter {
-	reporter.Initialize(separator)
+func GetCCSReporter(separator rune, reportname string) CCSReporter {
+	reporter.Initialize(separator, reportname)
 	return reporter
 }
 
@@ -16,11 +16,11 @@ type CCSReporter struct {
 	isInitialized bool
 }
 
-func (this *CCSReporter) Initialize(separator rune) {
+func (this *CCSReporter) Initialize(separator rune, reportname string) {
 	if !this.isInitialized {
 		this.writer = NewExcelWriter()
 		//this.writer = NewCmdLineWriter()
-		this.writer.Initialize([]string{string(separator)})
+		this.writer.Initialize([]string{string(separator)}, reportname)
 		this.isInitialized = true
 	}
 }
