@@ -135,7 +135,7 @@ func (this *TimeTrackingArgs) parseAllArguments(args []string) {
 }
 
 func (this *TimeTrackingArgs) isStringArg(arg string) bool {
-	return (strings.IndexRune(arg, '=') >= 0)
+	return (strings.IndexRune(arg, '=') > 0)
 }
 
 func (this *TimeTrackingArgs) isBooleanArg(arg string) bool {
@@ -143,16 +143,17 @@ func (this *TimeTrackingArgs) isBooleanArg(arg string) bool {
 }
 
 func (this *TimeTrackingArgs) isDateArg(arg string) bool {
-	return (strings.IndexRune(arg, '?') >= 0)
+	return (strings.IndexRune(arg, '?') > 0)
 }
 
 func (this *TimeTrackingArgs) isIntArg(arg string) bool {
-	return (strings.IndexRune(arg, '#') >= 0)
+	return (strings.IndexRune(arg, '#') > 0)
 }
 
 func (this *TimeTrackingArgs) parseStringArg(stringArg string) {
 	index := strings.IndexRune(stringArg, '=')
-	if index < 0 {
+	if index <= 0 {
+		this.printFailedParsedArg("String", stringArg)
 		return // this is not a string arg
 	}
 	this.setStringVariable(strings.ToLower(stringArg[0:index]), stringArg[index+1:])
@@ -170,7 +171,8 @@ func (this *TimeTrackingArgs) setStringVariable(prefix string, value string) {
 func (this *TimeTrackingArgs) parseBooleanArg(boolArg string) {
 	index := strings.IndexRune(boolArg, '-')
 	if index != 0 {
-		return // this is not a string arg
+		this.printFailedParsedArg("Bool", boolArg)
+		return
 	}
 	this.setBooleanVariable(strings.ToLower(boolArg))
 }
@@ -197,7 +199,8 @@ func (this *TimeTrackingArgs) setBooleanVariable(boolArg string) {
 func (this *TimeTrackingArgs) parseDateArg(dateArg string) {
 	index := strings.IndexRune(dateArg, '?')
 	if index <= 0 {
-		return // this is not a string arg
+		this.printFailedParsedArg("Date", dateArg)
+		return
 	}
 	this.setDateVariable(strings.ToLower(dateArg[0:index]), dateArg[index+1:])
 }
@@ -214,7 +217,8 @@ func (this *TimeTrackingArgs) setDateVariable(prefix, dateArg string) {
 func (this *TimeTrackingArgs) parseIntArg(intArg string) {
 	index := strings.IndexRune(intArg, '#')
 	if index <= 0 {
-		return // this is not a int arg
+		this.printFailedParsedArg("Number", intArg)
+		return
 	}
 	this.setIntVariable(strings.ToLower(intArg[0:index]), intArg[index+1:])
 }
@@ -224,7 +228,8 @@ func (this *TimeTrackingArgs) setIntVariable(prefix, intArg string) {
 	case argIReport:
 		report, err := strconv.Atoi(intArg)
 		if err != nil {
-			panic(err)
+			this.printParsingError(intArg, err)
+			return
 		}
 		this.SetReporterId(report)
 	default:
@@ -237,7 +242,8 @@ func (this *TimeTrackingArgs) parseIntoTimeObj(date string) time.Time {
 	var myTime time.Time
 	myTime, err := time.Parse(layout, date)
 	if err != nil {
-		panic(err)
+		this.printParsingError(date, err)
+		return time.Now()  // is this good? we do not know the outcome here!
 	}
 	return myTime
 }
@@ -261,6 +267,20 @@ func (this *TimeTrackingArgs) createTimeLayout(date string) string {
 	layout = layout + "2006"
 	return layout
 
+}
+
+// printParsingError
+func (this TimeTrackingArgs) printParsingError(argument string, err error) {
+	out := ArgOutGetter.GetPrinter("Error parsing argument:  " + argument + " \n paniced error: \n" + err.Error())
+	out.PrintLn()
+	ArgOutGetter.SetLastArgument(argument)
+}
+
+
+func (this TimeTrackingArgs) printFailedParsedArg(argType string, prefix string) {
+	out := ArgOutGetter.GetPrinter("Unknown Argument " + argType + " type: " + prefix)
+	out.PrintLn()
+	ArgOutGetter.SetLastArgument(prefix)
 }
 
 func (this TimeTrackingArgs) printWrongArgMessageToUI(prefix string) {

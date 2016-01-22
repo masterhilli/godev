@@ -97,6 +97,12 @@ func (this *ArgumentTestEngine) TestParseStringArgumentThatIsConfigFile(c *C) {
 	c.Assert(this.ta.GetFilePathConfig(), Equals, fileNameToCompare)
 }
 
+func (this *ArgumentTestEngine) TestParseStringArgThatIsConfigFileAndBoolArgTestResultsToTestConfig(c *C) {
+    this.ta.Initialize(false)
+    this.ta.parseAllArguments([]string{executableArg, stringConfigArg, boolArgTest})
+    c.Assert(this.ta.GetFilePathConfig(), Equals, testConfigFilepath)
+}
+
 func (this *ArgumentTestEngine) TestParseStringArgumentThatIsNotPartOfArguments(c *C) {
     this.ta.Initialize(false)
     this.ta.parseAllArguments([]string{executableArg, boolArgRun, stringArgument})
@@ -179,9 +185,9 @@ func (this *ArgumentTestEngine) TestParseAllExistingArguments(c *C) {
     ArgOutGetter.DisableTestMockUp()
 	this.ta.parseAllArguments([]string{ executableArg,  stringConfigArg,
                                         boolArgRun,     boolArgSprint,  boolArgTest,
-                                        dateArgStart,   intArgReport})
+                                        dateArgStart,   intArgReport, argBAny})
 
-	c.Assert(this.ta.GetCountParsedArgs(), Equals, 6)
+	c.Assert(this.ta.GetCountParsedArgs(), Equals, 7)
     ArgOutGetter.EnableTestMockUp()
 }
 
@@ -244,4 +250,38 @@ func (this *ArgumentTestEngine) TestIsBooleanArgument(c *C) {
 func (this *ArgumentTestEngine) TestIsNotBooleanArgument(c *C) {
     retVal := this.ta.isBooleanArg("b-laSomthingElse")
     c.Assert(retVal, Equals, false)
+}
+
+const parseFailStringArg string = "=something"
+func (this *ArgumentTestEngine) TestParseStringWithWrongStringResultsInReturn(c *C) {
+    this.ta.parseStringArg(parseFailStringArg)
+    c.Assert(ArgOutGetter.GetLastArgument(), Equals, parseFailStringArg)
+}
+
+const parseFailNumberArg string = "#something"
+func (this *ArgumentTestEngine) TestParseNumberWithWrongNumberResultsInReturn(c *C) {
+    this.ta.parseIntArg(parseFailNumberArg)
+    c.Assert(ArgOutGetter.GetLastArgument(), Equals, parseFailNumberArg)
+}
+
+const parseFailDateArg string = "?something"
+func (this *ArgumentTestEngine) TestParseDateWithWrongDateResultsInReturn(c *C) {
+    this.ta.parseDateArg(parseFailDateArg)
+    c.Assert(ArgOutGetter.GetLastArgument(), Equals, parseFailDateArg)
+}
+
+const parseFailBoolArg string = ";-something"
+func (this *ArgumentTestEngine) TestParseBoolWithWrongBoolResultsInReturn(c *C) {
+    this.ta.parseBooleanArg(parseFailBoolArg)
+    c.Assert(ArgOutGetter.GetLastArgument(), Equals, parseFailBoolArg)
+}
+
+func (this *ArgumentTestEngine) TestSetIntVariableWithStringResultsInAnError(c *C) {
+    this.ta.setIntVariable("report", "1ds")
+    c.Assert(ArgOutGetter.GetLastArgument(), Equals, "1ds")
+}
+
+func (this *ArgumentTestEngine) TestSetDateVariableWithWrongLayoutResultsInAnError(c *C) {
+    this.ta.setDateVariable("start", "1.1.15 00:00:15")
+    c.Assert(ArgOutGetter.GetLastArgument(), Equals, "1.1.15 00:00:15")
 }

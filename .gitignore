@@ -14,3 +14,7 @@ _cgo_export.*
 .idea
 *.iml
 *.exe
+
+#test coverage files
+*.out
+*.html
