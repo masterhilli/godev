@@ -35,13 +35,16 @@ type TimeTrackingArgs struct {
 	testing          bool
 	run              bool
 	help             bool
+	out 			 ArgOut
 }
+
+var uiConsole *Console = new(Console)
 
 // Singleton creator
 func GetArguments() TimeTrackingArgs {
 	if isInitialized == false {
 		var timeTrackingArgs TimeTrackingArgs
-		timeTrackingArgs.Initialize(true)
+		timeTrackingArgs.Initialize(true, uiConsole)
 		args = timeTrackingArgs
 		isInitialized = true
 	}
@@ -49,8 +52,9 @@ func GetArguments() TimeTrackingArgs {
 }
 
 // Initialize TimetrackingArgs
-func (this *TimeTrackingArgs) Initialize(parseOSArgs bool) {
+func (this *TimeTrackingArgs) Initialize(parseOSArgs bool, uiOut ArgOut) {
 	this.resetArguments()
+	this.out = uiOut
 	if parseOSArgs {
 		this.parseAllArguments(os.Args)
 	}
@@ -271,28 +275,20 @@ func (this *TimeTrackingArgs) createTimeLayout(date string) string {
 
 // printParsingError
 func (this TimeTrackingArgs) printParsingError(argument string, err error) {
-	out := ArgOutGetter.GetPrinter("Error parsing argument:  " + argument + " \n paniced error: \n" + err.Error())
-	out.PrintLn()
-	ArgOutGetter.SetLastArgument(argument)
+	this.out.Println("Error parsing argument:  %s \n paniced error: \n%s", argument, err.Error())
 }
 
 
-func (this TimeTrackingArgs) printFailedParsedArg(argType string, prefix string) {
-	out := ArgOutGetter.GetPrinter("Unknown Argument " + argType + " type: " + prefix)
-	out.PrintLn()
-	ArgOutGetter.SetLastArgument(prefix)
+func (this TimeTrackingArgs) printFailedParsedArg(argType string, argument string) {
+	this.out.Println("Unknown Argument: %s (%s)", argument, argType)
 }
 
-func (this TimeTrackingArgs) printWrongArgMessageToUI(prefix string) {
-	out := ArgOutGetter.GetPrinter("Unknown Argument: " + prefix)
-	out.PrintLn()
-	ArgOutGetter.SetLastArgument(prefix)
+func (this TimeTrackingArgs) printWrongArgMessageToUI(argument string) {
+	this.out.Println("%s", argument, "")
 }
 
-func (this TimeTrackingArgs) printMessageToUI(prefix string) {
-	out := ArgOutGetter.GetPrinter(prefix)
-	out.PrintLn()
-	ArgOutGetter.SetLastArgument(prefix)
+func (this TimeTrackingArgs) printMessageToUI(argument string) {
+	this.out.Println("%s", argument, "")
 }
 
 const helpContent string = `Possible Arguments: 
