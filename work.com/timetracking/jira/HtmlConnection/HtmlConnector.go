@@ -9,10 +9,10 @@ import (
 )
 
 type HtmlConnector struct {
-	config Config
+	config *Config
 }
 
-func NewHtmlConnector(config Config) HtmlConnector {
+func NewHtmlConnector(config *Config) HtmlConnector {
 	var htmlConnector HtmlConnector
 	htmlConnector.config = config
 	return htmlConnector

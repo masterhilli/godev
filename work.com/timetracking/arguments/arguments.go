@@ -284,11 +284,11 @@ func (this TimeTrackingArgs) printFailedParsedArg(argType string, argument strin
 }
 
 func (this TimeTrackingArgs) printWrongArgMessageToUI(argument string) {
-	this.out.Println("%s", argument, "")
+	this.out.Println("Incorrect Argument: %s", argument)
 }
 
 func (this TimeTrackingArgs) printMessageToUI(argument string) {
-	this.out.Println("%s", argument, "")
+	this.out.Println("%s", argument)
 }
 
 const helpContent string = `Possible Arguments: 

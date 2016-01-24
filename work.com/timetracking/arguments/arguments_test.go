@@ -288,3 +288,10 @@ func (this *ArgumentTestEngine) TestSetDateVariableWithWrongLayoutResultsInAnErr
     this.ta.setDateVariable("start", "1.1.15 00:00:15")
     c.Assert(this.ta.out.getValue(), Equals, "1.1.15 00:00:15")
 }
+
+func (this *ArgumentTestEngine) TestPrintFailedParsedArg(c *C) {
+    this.ta.out = uiConsole
+    this.ta.printFailedParsedArg("int", "test")
+    c.Assert(this.ta.out.getValue(), Equals, "test")
+    this.ta.out = uiMocker
+}

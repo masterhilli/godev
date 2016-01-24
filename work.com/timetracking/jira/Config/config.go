@@ -1,20 +1,11 @@
 package jira
 
 import (
+	. "./Data"
+	. "./Project"
 	data "../../data"
-	. "../../helper"
-	"gopkg.in/yaml.v2"
-	"net/url"
 	"strings"
 )
-
-const reportName string = "ConfigureReport.jspa?"
-const startDate string = "startDateId="
-const endDate string = "&endDateId="
-const prjId string = "&projectId="
-const query string = "&jqlQueryId="
-const selectedPrjId string = "&selectedProjectId="
-const reportKey string = "&reportKey=com.synergyapps.plugins.jira.timepo-timesheet-plugin%3Aissues-report&Next=Next"
 
 type Config struct {
 	Jiradata    JiraData
@@ -24,42 +15,9 @@ type Config struct {
 	Teammembers []string
 }
 
-type JiraData struct {
-	Username string
-	Password string
-	Url      string
-}
-
 type TimeFrame struct {
 	Startdate string
 	Enddate   string
-}
-
-type Project struct {
-	Project       string
-	Platform      string
-	Productowner  string
-	Excludeothers bool
-}
-
-var Reader configReader
-
-type configReader struct{}
-
-func (cr configReader) Read(pathToConfig string) Config {
-	content := ReadInFile(pathToConfig)
-	config := cr.unmarshalToConfig(content)
-	if len(config.Teammembers) == 1 {
-		panic("Sorry, I do not allow you to track the times of single persons, use more then 1 person in the team!")
-	}
-	return config
-}
-
-func (cr configReader) unmarshalToConfig(content []byte) Config {
-	var config Config
-	err := yaml.Unmarshal(content, &config)
-	PanicOnError(err)
-	return config
 }
 
 func (this Config) GetTeammembersAsMap() map[string]bool {
@@ -102,63 +60,4 @@ func (this Config) CreateProjectReportSetting(key string) data.ProjectReportSett
 	newProjectReportData.SetStartEndDateFromString(this.Dates.Startdate, this.Dates.Enddate)
 
 	return newProjectReportData
-}
-
-func (this JiraData) GetReportName() string {
-	return reportName
-}
-
-func (this JiraData) GetStartDate() string {
-	return startDate
-}
-
-func (this JiraData) GetEndDate() string {
-	return endDate
-}
-
-func (this JiraData) GetPrjId() string {
-	return prjId
-}
-
-func (this JiraData) GetSelectedPrjId() string {
-	return selectedPrjId
-}
-
-func (this JiraData) GetReportKey() string {
-	return reportKey
-}
-
-func (this JiraData) GetQuery() string {
-	return query
-}
-
-func (this Project) GetQuery(platforms []string) string {
-	var sqlQuery string
-	if len(this.Platform) > 0 {
-		sqlQuery = "Platform = \"" + this.Platform + "\""
-	}
-	if len(this.Project) > 0 && len(this.Platform) > 0 {
-		sqlQuery = sqlQuery + " OR "
-	}
-	if len(this.Project) > 0 {
-		sqlQuery = sqlQuery + "project = \"" + this.Project + "\""
-	}
-
-	sqlQuery = "(" + sqlQuery + ")"
-
-	if platforms != nil {
-		notInPart := " AND Platform not in ("
-		for i := range platforms {
-			if len(platforms[i]) > 0 {
-				if i > 0 {
-					notInPart = notInPart + ","
-				}
-				notInPart = notInPart + "\"" + platforms[i] + "\""
-			}
-		}
-		notInPart = notInPart + ")"
-		sqlQuery = sqlQuery + notInPart
-	}
-
-	return url.QueryEscape(sqlQuery)
 }

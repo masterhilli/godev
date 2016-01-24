@@ -4,41 +4,8 @@ import (
     "fmt"
 )
 
-/*
-var ArgOutGetter ArgOutFactory
-
-type ArgOutFactory struct {
-    mockEnabled bool
-    lastValue string
-}
-
-func (this *ArgOutFactory) EnableTestMockUp() {
-    this.mockEnabled = true
-}
-
-func (this *ArgOutFactory) DisableTestMockUp() {
-    this.mockEnabled = false
-}
-
-func (this *ArgOutFactory) SetLastArgument(value string) {
-    this.lastValue = value
-}
-
-func (this *ArgOutFactory) GetLastArgument() string {
-    return this.lastValue
-}
-
-func (this *ArgOutFactory) GetPrinter(argument string) ArgOut {
-    if this.mockEnabled {
-        return &TestMockUp{value:argument}
-    } else {
-        return &Console{value:argument}
-    }
-}
-
-*/
 type ArgOut interface {
-    Println(format string, argument string,  args ...string)
+    Println(format string, argument string,  args ...interface{})
     getValue() string
 }
 
@@ -47,8 +14,13 @@ type Console struct {
     value string
 }
 
-func (this *Console) Println(format string, argument string, args ...string) {
-    fmt.Printf(format + "\n", argument, args)
+func (this *Console) Println(format string, argument string, args ...interface{}) {
+    newArgList := make([]interface{}, 1)
+    newArgList[0] = argument
+    for i := range args {
+        newArgList = append(newArgList, args[i])
+    }
+    fmt.Printf(format + "\n", newArgList...)
     this.value = argument
 }
 
@@ -59,7 +31,7 @@ type TestMockUp struct {
     value string
 }
 
-func (this *TestMockUp) Println(format string,argument string, args ...string) {
+func (this *TestMockUp) Println(format string,argument string, args ...interface{}) {
     this.value = argument
 }
 

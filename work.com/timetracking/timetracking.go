@@ -3,7 +3,7 @@ package main
 import (
 	arguments "./arguments"
 	. "./data"
-	jiraConfig "./jira/Config"
+	reader "./jira/Config/Reader"
 	. "./jira/HTMLParser"
 	jiraConnection "./jira/HtmlConnection"
 	. "./report"
@@ -21,7 +21,10 @@ func main() {
 		return
 	}
 
-	var config jiraConfig.Config = jiraConfig.Reader.Read(args.GetFilePathConfig())
+	config := reader.GetReader().Read(args.GetFilePathConfig())
+	if (config == nil) {
+		return
+	}
 	config.Jiradata.Password = SetEmptyPasswordOverConsoleInput(config.Jiradata.Password)
 
 	var jc jiraConnection.HtmlConnector = jiraConnection.NewHtmlConnector(config)

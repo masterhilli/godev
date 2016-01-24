@@ -11,7 +11,7 @@ type ReporterInterface interface {
 	ExportReport(pi TimeTrackingReport)
 }
 
-func GetReporter(separator rune, config Config) ReporterInterface {
+func GetReporter(separator rune, config *Config) ReporterInterface {
 	args := GetArguments()
 	if args.GetReporterId() == 0 {
 		return GetSimpleProjectReporter()
