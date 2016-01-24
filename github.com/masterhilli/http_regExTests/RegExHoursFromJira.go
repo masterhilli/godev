@@ -18,7 +18,7 @@ func ReturnTDClassMainValues(stringToParse string) []string {
 
 func returnValuesOfTag(stringToParse string, tag string, attributes string) []string {
 	indexArray := parseForTagStartEnd(stringToParse, tag, attributes)
-	return trimTagsFromArray(indexArray, stringToParse, len(tag+attributes))
+	return trimTagsFromArray(indexArray, stringToParse)
 }
 
 func parseForTagStartEnd(stringToParse string, tag string, attributes string) []IntPair {
@@ -54,7 +54,7 @@ func returnIndexPairs(stringToParse string, tag string, attributes string) []Int
 	return indexPairs
 }
 
-func trimTagsFromArray(indexArray []IntPair, stringToTrim string, tagNameLen int) []string {
+func trimTagsFromArray(indexArray []IntPair, stringToTrim string) []string {
 	parsedSubMatchedTexts := make([]string, len(indexArray))
 	for i := 0; i < len(indexArray); i++ {
 		if (indexArray[i].stop - indexArray[i].start) >= 0 {

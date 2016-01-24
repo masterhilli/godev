@@ -214,3 +214,8 @@ func (s *RegexpJiraTestEngine) TestJiraStreamShouldReturn2Index(c *C) {
 	index := returnIndexArray(s.jiraPageTestString, "<tr>")
 	c.Assert(len(index), Equals, 4)
 }
+
+func (s *RegexpJiraTestEngine) TestTrimTagsFromArrayWithStopPosBeforeStartPosReturnsEmptyStringOnPosition(c *C) {
+	parsedTexts := trimTagsFromArray([]IntPair{IntPair{start: 5, stop: 4}}, "tst")
+	c.Assert(parsedTexts[0], Equals, "")
+}
