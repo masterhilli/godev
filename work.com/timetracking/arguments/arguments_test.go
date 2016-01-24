@@ -39,11 +39,14 @@ func TestRegisterArgumentTestEngine(t *testing.T) {
 	TestingT(t)
 }
 
-// we ignore that one because depending on the IDE we use, the args are different
-/*func (ate *ArgumentTestEngine) IgnoreSettingArgumentsWithOnly1Argument(c *C) {
-	var ta TimeTrackingArgs = GetArguments()
-	c.Assert(ta.GetCountParsedArgs(), Equals, 1)
-}*/
+// we test if setting to Console Printer also works
+func (this *ArgumentTestEngine) TestSetConsolePrinterResultsInCallToConsolePrinter(c *C) {
+    console := new(Console)
+	this.ta.Initialize(false,console )
+    this.ta.parseAllArguments([]string{executableArg, argBRunning,argBAny})
+	c.Assert(this.ta.out.getValue(), Equals, argBAny)
+    this.ta.Initialize(false, uiMocker)
+}
 
 // test initialization of the object
 func (this *ArgumentTestEngine) TestInitialValueForStartDateResultsInZeroDate(c *C) {

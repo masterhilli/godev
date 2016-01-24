@@ -18,7 +18,7 @@ func TestHttpLibrary(t *testing.T) {
 	TestingT(t)
 }
 
-func (s *HttpTestEngine) TestHttpGetOnGoogleReturnsNoError(c *C) {
+func (s *HttpTestEngine) IgnoreTestHttpGetOnGoogleReturnsNoError(c *C) {
 	_, err := http.Get("http://www.google.com")
 	c.Assert(err, IsNil)
 }
@@ -28,7 +28,7 @@ func (s *HttpTestEngine) TestHttpGetOnExampleReturnsError(c *C) {
 	c.Assert(err, NotNil)
 }
 
-func (s *HttpTestEngine) TestHttpGetParseForBodyNoError(c *C) {
+func (s *HttpTestEngine) IgnoreTestHttpGetParseForBodyNoError(c *C) {
 	resp, err := http.Get("http://www.google.com/")
 	if err == nil {
 		_, errReader := ioutil.ReadAll(resp.Body)
@@ -39,7 +39,7 @@ func (s *HttpTestEngine) TestHttpGetParseForBodyNoError(c *C) {
 	}
 }
 
-func (s *HttpTestEngine) TestHttpsGetParseForBodyNoError(c *C) {
+func (s *HttpTestEngine) IgnoreTestHttpsGetParseForBodyNoError(c *C) {
 	resp, err := http.Get("https://www.google.com")
 	if err == nil {
 		_, errReader := ioutil.ReadAll(resp.Body)
@@ -50,7 +50,7 @@ func (s *HttpTestEngine) TestHttpsGetParseForBodyNoError(c *C) {
 	}
 }
 
-func (s *HttpTestEngine) TTestHttpsGetJiraUrl(c *C) {
+func (s *HttpTestEngine) IgnoreTestHttpsGetJiraUrl(c *C) {
 	var url string = "http://10.207.121.181/j/"
 	resp, err := http.Get(url)
 	if err == nil {
@@ -63,7 +63,7 @@ func (s *HttpTestEngine) TTestHttpsGetJiraUrl(c *C) {
 	}
 }
 
-func (s *HttpTestEngine) TTestJiraCreateRequestAndLogin(c *C) {
+func (s *HttpTestEngine) IgnoreTestJiraCreateRequestAndLogin(c *C) {
 	filename, _ := filepath.Abs("..\\jira.yaml")
 	yamlInformation, err := ioutil.ReadFile(filename)
 	if err != nil {

@@ -42,24 +42,17 @@ type ArgOut interface {
     getValue() string
 }
 
-
 // console output implementation
-
-
 type Console struct {
     value string
 }
 
 func (this *Console) Println(format string, argument string, args ...string) {
-    //arguments := []string(args)
     fmt.Printf(format + "\n", argument, args)
     this.value = argument
 }
 
-func (this *Console) getValue() string {
-    return this.value
-}
-
+func (this Console) getValue() string { return this.value}
 
 // The test mock up
 type TestMockUp struct {
