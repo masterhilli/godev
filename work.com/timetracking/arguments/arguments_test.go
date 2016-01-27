@@ -59,7 +59,11 @@ func (this *ArgumentTestEngine) TestInitialValueForStartDateResultsInZeroDate(c 
 func (this *ArgumentTestEngine) TestInitialEndDateResultsInZeroDate(c *C) {
     this.ta.Initialize(false, uiMocker)
     this.ta.parseAllArguments([]string{executableArg})
-    c.Assert(this.ta.GetEndDate(), Equals, time.Now())
+
+    c.Assert(this.ta.GetEndDate().Hour(), Equals, time.Now().Hour())
+    c.Assert(this.ta.GetEndDate().Day(), Equals, time.Now().Day())
+    c.Assert(this.ta.GetEndDate().Month(), Equals, time.Now().Month())
+    c.Assert(this.ta.GetEndDate().Year(), Equals, time.Now().Year())
 }
 
 
