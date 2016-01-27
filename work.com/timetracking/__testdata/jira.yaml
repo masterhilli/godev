@@ -1,0 +1,34 @@
+jiradata:
+    username: xyz
+    password: "abcdefgh"
+    url: "http://10.99.11.333/j/secure/"
+reportname: mykwlReport
+dates:
+    startdate: 01.01.2015
+    enddate: 22.12.2015
+projects:
+    ABCDE:
+        project: ABCDE
+        #this is a comment
+        productowner: OtherPO
+        excludeothers: true
+    GHJKLK:
+        project: GHJKLK
+        productowner: RealPO
+    ZUIOP:
+        project: ZUIOP
+        productowner: OtherPO
+    SUPER:
+        project: SUPER
+        productowner: RealPO
+teammembers: [
+    anton.OtherPO,
+    david.huggl,
+    leonardo.vastic,
+    marc.Soriano,
+    martin.RealPO,
+    richard.Friesenbichler,
+    serhat.Kalowski,
+    thomas.Eisenherz,
+    thomas.Fridolino
+]

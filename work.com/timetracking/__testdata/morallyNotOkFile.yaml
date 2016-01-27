@@ -1,0 +1,19 @@
+jiradata:
+    username: abc
+    password: xyz
+    url: www.google.at
+projects:
+    SOLUT:
+        project: SOLUT
+        platform: "TOOL SOLUT"
+        excludeothers: true
+        productowner: Hillbrand
+    RMA:
+        project: RMA
+        productowner: Schiller
+    RB:
+        platform: RasenBall
+        productowner: Kater
+teammembers: [
+    anton.Fressner
+]

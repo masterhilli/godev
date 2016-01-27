@@ -2,7 +2,6 @@
 
 
 # Folders
-__testdata
 __configFiles
 
 # Architecture specific extensions/prefixes
@@ -18,3 +17,5 @@ _cgo_export.*
 #test coverage files
 *.out
 *.html
+*.xls
+*.txt
